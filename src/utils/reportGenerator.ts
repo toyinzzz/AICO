@@ -1,0 +1,452 @@
+import jsPDF from 'jspdf';
+
+interface CompetitorData {
+  id: string;
+  url: string;
+  name: string;
+  isYourSite?: boolean;
+  metrics: {
+    seoScore: number;
+    pageSpeed: number;
+    mobileScore: number;
+    uxScore: number;
+    contentScore: number;
+    ctaCount: number;
+    loadTime: number;
+    conversionRate: number;
+    trustSignals: number;
+  };
+  strengths: string[];
+  weaknesses: string[];
+  recommendations: string[];
+}
+
+interface AnalysisData {
+  name: string;
+  url: string;
+  score: number;
+  metrics: {
+    conversionRate: number;
+    bounceRate: number;
+    avgSessionDuration: string;
+    pageViews: number;
+  };
+  recommendations: Array<{
+    title: string;
+    description: string;
+    impact: string;
+    expectedUplift: string;
+    difficulty: string;
+    estimatedTime: string;
+    category: string;
+    implemented: boolean;
+  }>;
+}
+
+export const generateReport = (analysisData: CompetitorData[]): string => {
+  const currentDate = new Date().toLocaleDateString();
+  const yourSite = analysisData.find(d => d.isYourSite);
+  const competitors = analysisData.filter(d => !d.isYourSite);
+
+  let report = `COMPETITOR ANALYSIS REPORT
+Generated on: ${currentDate}
+
+EXECUTIVE SUMMARY
+=================
+This report analyzes ${analysisData.length} websites, including your site and ${competitors.length} competitor(s).
+
+YOUR WEBSITE OVERVIEW
+====================
+Website: ${yourSite?.name || 'Your Website'}
+URL: ${yourSite?.url || 'N/A'}
+
+Performance Metrics:
+- SEO Score: ${yourSite?.metrics.seoScore || 0}/100
+- Page Speed: ${yourSite?.metrics.pageSpeed || 0}/100
+- Mobile Score: ${yourSite?.metrics.mobileScore || 0}/100
+- UX Score: ${yourSite?.metrics.uxScore || 0}/100
+- Content Score: ${yourSite?.metrics.contentScore || 0}/100
+- Load Time: ${yourSite?.metrics.loadTime || 0}s
+- Conversion Rate: ${yourSite?.metrics.conversionRate || 0}%
+- CTA Count: ${yourSite?.metrics.ctaCount || 0}
+- Trust Signals: ${yourSite?.metrics.trustSignals || 0}
+
+Strengths:
+${yourSite?.strengths.map(s => `• ${s}`).join('\n') || '• No strengths identified'}
+
+Areas for Improvement:
+${yourSite?.weaknesses.map(w => `• ${w}`).join('\n') || '• No weaknesses identified'}
+
+COMPETITOR ANALYSIS
+==================
+`;
+
+  competitors.forEach((competitor, index) => {
+    report += `
+${index + 1}. ${competitor.name}
+${'='.repeat(competitor.name.length + 3)}
+URL: ${competitor.url}
+
+Performance Metrics:
+- SEO Score: ${competitor.metrics.seoScore}/100
+- Page Speed: ${competitor.metrics.pageSpeed}/100
+- Mobile Score: ${competitor.metrics.mobileScore}/100
+- UX Score: ${competitor.metrics.uxScore}/100
+- Content Score: ${competitor.metrics.contentScore}/100
+- Load Time: ${competitor.metrics.loadTime}s
+- Conversion Rate: ${competitor.metrics.conversionRate}%
+- CTA Count: ${competitor.metrics.ctaCount}
+- Trust Signals: ${competitor.metrics.trustSignals}
+
+Strengths:
+${competitor.strengths.map(s => `• ${s}`).join('\n')}
+
+Weaknesses:
+${competitor.weaknesses.map(w => `• ${w}`).join('\n')}
+
+Key Learnings:
+${competitor.recommendations.map(r => `• ${r}`).join('\n')}
+`;
+  });
+
+  // Gap Analysis
+  if (yourSite) {
+    report += `
+
+GAP ANALYSIS
+============
+Areas where competitors outperform your website:
+
+`;
+
+    const gaps = [];
+    competitors.forEach(competitor => {
+      Object.entries(competitor.metrics).forEach(([metric, value]) => {
+        const yourValue = yourSite.metrics[metric as keyof typeof yourSite.metrics];
+        if (typeof value === 'number' && typeof yourValue === 'number' && value > yourValue) {
+          const gap = value - yourValue;
+          gaps.push({
+            metric: metric.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()),
+            competitor: competitor.name,
+            gap: gap,
+            yourValue,
+            theirValue: value
+          });
+        }
+      });
+    });
+
+    const sortedGaps = gaps.sort((a, b) => b.gap - a.gap).slice(0, 10);
+    
+    if (sortedGaps.length > 0) {
+      sortedGaps.forEach(gap => {
+        report += `• ${gap.metric}: You (${gap.yourValue}) vs ${gap.competitor} (${gap.theirValue}) - Gap: ${gap.gap.toFixed(1)} points
+`;
+      });
+    } else {
+      report += `• No significant gaps identified - your website performs competitively across all metrics!
+`;
+    }
+  }
+
+  report += `
+
+RECOMMENDATIONS
+===============
+Based on this analysis, here are the top recommendations:
+
+`;
+
+  if (yourSite) {
+    yourSite.recommendations.forEach((rec, index) => {
+      report += `${index + 1}. ${rec}
+`;
+    });
+  }
+
+  report += `
+
+METHODOLOGY
+===========
+This analysis was conducted using automated web auditing tools that evaluate:
+- SEO optimization and meta tag quality
+- Page loading speed and performance metrics
+- Mobile responsiveness and user experience
+- Content quality and engagement factors
+- Call-to-action effectiveness
+- Trust signal presence and authority markers
+
+For questions about this report, please contact your web development team.
+
+---
+Report generated by Competitor Analysis Tool
+${currentDate}
+`;
+
+  return report;
+};
+
+export const generateAnalysisReport = (analysisData: AnalysisData): string => {
+  const currentDate = new Date().toLocaleDateString();
+
+  let report = `WEBSITE ANALYSIS REPORT
+Generated on: ${currentDate}
+
+EXECUTIVE SUMMARY
+=================
+This comprehensive analysis evaluates your website's conversion optimization potential and provides actionable recommendations for improvement.
+
+WEBSITE OVERVIEW
+================
+Website: ${analysisData.name}
+URL: ${analysisData.url}
+Overall CRO Score: ${analysisData.score}/100
+
+PERFORMANCE METRICS
+==================
+- Conversion Rate: ${analysisData.metrics.conversionRate}%
+- Bounce Rate: ${analysisData.metrics.bounceRate}%
+- Average Session Duration: ${analysisData.metrics.avgSessionDuration}
+- Monthly Page Views: ${analysisData.metrics.pageViews.toLocaleString()}
+
+RECOMMENDATIONS SUMMARY
+=======================
+Total Recommendations: ${analysisData.recommendations.length}
+Implemented: ${analysisData.recommendations.filter(r => r.implemented).length}
+Pending: ${analysisData.recommendations.filter(r => !r.implemented).length}
+High Impact Opportunities: ${analysisData.recommendations.filter(r => r.impact === 'High').length}
+
+DETAILED RECOMMENDATIONS
+========================
+`;
+
+  analysisData.recommendations.forEach((rec, index) => {
+    const status = rec.implemented ? 'COMPLETED' : 'PENDING';
+    report += `
+${index + 1}. ${rec.title} [${status}]
+${'='.repeat(rec.title.length + 15)}
+Impact Level: ${rec.impact}
+Expected Conversion Uplift: ${rec.expectedUplift}
+Implementation Difficulty: ${rec.difficulty}
+Estimated Time Required: ${rec.estimatedTime}
+Category: ${rec.category}
+
+Description:
+${rec.description}
+
+`;
+  });
+
+  report += `
+IMPLEMENTATION ROADMAP
+=====================
+Based on impact and effort, we recommend implementing changes in this order:
+
+High Impact, Easy Implementation:
+`;
+
+  const highEasy = analysisData.recommendations.filter(r => r.impact === 'High' && r.difficulty === 'Easy' && !r.implemented);
+  highEasy.forEach((rec, index) => {
+    report += `${index + 1}. ${rec.title} (${rec.estimatedTime})
+`;
+  });
+
+  report += `
+High Impact, Medium Implementation:
+`;
+
+  const highMedium = analysisData.recommendations.filter(r => r.impact === 'High' && r.difficulty === 'Medium' && !r.implemented);
+  highMedium.forEach((rec, index) => {
+    report += `${index + 1}. ${rec.title} (${rec.estimatedTime})
+`;
+  });
+
+  report += `
+Medium Impact, Easy Implementation:
+`;
+
+  const mediumEasy = analysisData.recommendations.filter(r => r.impact === 'Medium' && r.difficulty === 'Easy' && !r.implemented);
+  mediumEasy.forEach((rec, index) => {
+    report += `${index + 1}. ${rec.title} (${rec.estimatedTime})
+`;
+  });
+
+  report += `
+
+METHODOLOGY
+===========
+This analysis was conducted using advanced AI-powered conversion rate optimization tools that evaluate:
+- User experience and interface design
+- Conversion funnel optimization
+- Mobile responsiveness and performance
+- Trust signals and social proof
+- Call-to-action effectiveness
+- Form optimization opportunities
+- Page loading speed and technical performance
+
+NEXT STEPS
+==========
+1. Review and prioritize recommendations based on your business goals
+2. Implement high-impact, low-effort changes first
+3. Set up A/B testing for major changes
+4. Monitor conversion metrics after each implementation
+5. Schedule follow-up analysis in 3 months
+
+For technical implementation support or questions about this report, please contact your development team.
+
+---
+Report generated by AI-Powered CRO Analysis Tool
+${currentDate}
+`;
+
+  return report;
+};
+
+export const generatePdfReport = (analysisData: CompetitorData[] | AnalysisData, reportType: 'competitor' | 'analysis' = 'competitor'): void => {
+  const doc = new jsPDF();
+  const currentDate = new Date().toLocaleDateString();
+  
+  // Set up document properties
+  doc.setProperties({
+    title: reportType === 'competitor' ? 'Competitor Analysis Report' : 'Website Analysis Report',
+    subject: 'CRO Analysis Report',
+    author: 'AI-Powered Analysis Tool',
+    creator: 'CRO Analysis Platform'
+  });
+
+  let yPosition = 20;
+  const pageHeight = doc.internal.pageSize.height;
+  const marginBottom = 20;
+
+  const addText = (text: string, fontSize: number = 12, isBold: boolean = false) => {
+    if (yPosition > pageHeight - marginBottom) {
+      doc.addPage();
+      yPosition = 20;
+    }
+    
+    doc.setFontSize(fontSize);
+    if (isBold) {
+      doc.setFont(undefined, 'bold');
+    } else {
+      doc.setFont(undefined, 'normal');
+    }
+    
+    const lines = doc.splitTextToSize(text, 170);
+    lines.forEach((line: string) => {
+      if (yPosition > pageHeight - marginBottom) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      doc.text(line, 20, yPosition);
+      yPosition += fontSize * 0.5;
+    });
+    yPosition += 5;
+  };
+
+  const addSection = (title: string, content: string) => {
+    addText(title, 16, true);
+    yPosition += 5;
+    addText(content, 12, false);
+    yPosition += 10;
+  };
+
+  if (reportType === 'competitor' && Array.isArray(analysisData)) {
+    // Competitor analysis report
+    addText('COMPETITOR ANALYSIS REPORT', 20, true);
+    addText(`Generated on: ${currentDate}`, 10);
+    yPosition += 10;
+
+    const yourSite = analysisData.find(d => d.isYourSite);
+    const competitors = analysisData.filter(d => !d.isYourSite);
+
+    addSection('EXECUTIVE SUMMARY', 
+      `This report analyzes ${analysisData.length} websites, including your site and ${competitors.length} competitor(s).`);
+
+    if (yourSite) {
+      addSection('YOUR WEBSITE OVERVIEW', 
+        `Website: ${yourSite.name}
+URL: ${yourSite.url}
+
+Performance Metrics:
+• SEO Score: ${yourSite.metrics.seoScore}/100
+• Page Speed: ${yourSite.metrics.pageSpeed}/100
+• Mobile Score: ${yourSite.metrics.mobileScore}/100
+• UX Score: ${yourSite.metrics.uxScore}/100
+• Content Score: ${yourSite.metrics.contentScore}/100`);
+    }
+
+    competitors.forEach((competitor, index) => {
+      addSection(`COMPETITOR ${index + 1}: ${competitor.name}`, 
+        `URL: ${competitor.url}
+
+Performance Metrics:
+• SEO Score: ${competitor.metrics.seoScore}/100
+• Page Speed: ${competitor.metrics.pageSpeed}/100
+• Mobile Score: ${competitor.metrics.mobileScore}/100
+• UX Score: ${competitor.metrics.uxScore}/100
+• Content Score: ${competitor.metrics.contentScore}/100
+
+Key Strengths:
+${competitor.strengths.map(s => `• ${s}`).join('\n')}
+
+Areas for Improvement:
+${competitor.weaknesses.map(w => `• ${w}`).join('\n')}`);
+    });
+  } else if (reportType === 'analysis' && !Array.isArray(analysisData)) {
+    // Single website analysis report
+    addText('WEBSITE ANALYSIS REPORT', 20, true);
+    addText(`Generated on: ${currentDate}`, 10);
+    yPosition += 10;
+
+    addSection('EXECUTIVE SUMMARY', 
+      'This comprehensive analysis evaluates your website\'s conversion optimization potential and provides actionable recommendations for improvement.');
+
+    addSection('WEBSITE OVERVIEW', 
+      `Website: ${analysisData.name}
+URL: ${analysisData.url}
+Overall CRO Score: ${analysisData.score}/100
+
+Performance Metrics:
+• Conversion Rate: ${analysisData.metrics.conversionRate}%
+• Bounce Rate: ${analysisData.metrics.bounceRate}%
+• Average Session Duration: ${analysisData.metrics.avgSessionDuration}
+• Monthly Page Views: ${analysisData.metrics.pageViews.toLocaleString()}`);
+
+    addSection('RECOMMENDATIONS SUMMARY', 
+      `Total Recommendations: ${analysisData.recommendations.length}
+Implemented: ${analysisData.recommendations.filter(r => r.implemented).length}
+Pending: ${analysisData.recommendations.filter(r => !r.implemented).length}
+High Impact Opportunities: ${analysisData.recommendations.filter(r => r.impact === 'High').length}`);
+
+    analysisData.recommendations.slice(0, 5).forEach((rec, index) => {
+      const status = rec.implemented ? 'COMPLETED' : 'PENDING';
+      addSection(`RECOMMENDATION ${index + 1}: ${rec.title} [${status}]`, 
+        `Impact Level: ${rec.impact}
+Expected Conversion Uplift: ${rec.expectedUplift}
+Implementation Difficulty: ${rec.difficulty}
+Estimated Time Required: ${rec.estimatedTime}
+Category: ${rec.category}
+
+Description: ${rec.description}`);
+    });
+  }
+
+  // Save the PDF
+  const filename = reportType === 'competitor' 
+    ? `competitor-analysis-report-${currentDate.replace(/\//g, '-')}.pdf`
+    : `website-analysis-report-${currentDate.replace(/\//g, '-')}.pdf`;
+  
+  doc.save(filename);
+};
+
+export const downloadReport = (reportContent: string, filename: string = 'competitor-analysis-report.txt') => {
+  const blob = new Blob([reportContent], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+};

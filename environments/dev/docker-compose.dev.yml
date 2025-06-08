@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  aico-frontend-dev:
+    build:
+      context: ../../
+      dockerfile: ./environments/dev/Dockerfile.dev
+    ports:
+      - "8080:8080"
+    volumes:
+      - ../../:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - VITE_API_BASE_URL=http://localhost:5000/api
+      - VITE_AI_SERVICE_URL=http://localhost:8000
+      - VITE_ENVIRONMENT=development
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+    networks:
+      - aico-dev-network
+
+  # Future: Add backend service here
+  # aico-api:
+  #   build:
+  #     context: ./backend
+  #   ports:
+  #     - "5000:5000"
+  #   environment:
+  #     - NODE_ENV=development
+  #   networks:
+  #     - aico-dev-network
+
+
+  # Future: Add database service here
+  # aico-db:
+  #   image: postgres:15
+  #   ports:
+  #     - "5432:5432"
+  #   environment:
+  #     - POSTGRES_USER=aico
+  #   networks:
+  #     - aico-dev-network  
+  #   volumes:
+  #     - ./data:/var/lib/postgresql/data
+  #   restart: unless-stopped 
+  #   stdin_open: true
+  #   tty: true
+  
+
+networks:
+  aico-dev-network:
+    driver: bridge

@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  aico-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    networks:
+      - aico-network
+
+  # Future: Add production services
+  # aico-api:
+  #   build:
+  #     context: ./backend
+  #   ports:
+  #     - "3001:3001"
+  #   environment:
+  #     - NODE_ENV=production
+  #   restart: unless-stopped
+  #   networks:
+  #     - aico-network
+
+  # Future: Add database service here
+  # aico-db:
+  #   image: postgres:15
+  #   ports:
+  #     - "5432:5432"
+  #   environment:
+  #     - POSTGRES_USER=aico  
+  #   networks:
+  #     - aico-network
+  #   volumes:
+  #     - ./data:/var/lib/postgresql/data
+  #   restart: unless-stopped 
+  #   stdin_open: true
+  #   tty: true 
+  
+
+networks:
+  aico-network:
+    driver: bridge
