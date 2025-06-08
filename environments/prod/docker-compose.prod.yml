@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  aico-frontend:
+    build:
+      context: ../../
+      dockerfile: ./environments/prod/Dockerfile.prod
+    ports:
+      - "80:80"
+    restart: always
+    networks:
+      - aico-prod-network
+
+  # Uncomment when backend is ready
+  # aico-api:
+  #   build:
+  #     context: ../../backend
+  #     dockerfile: ./Dockerfile.prod
+  #   ports:
+  #     - "5000:5000"
+  #   restart: always
+  #   environment:
+  #     - NODE_ENV=production
+  #     - DATABASE_URL=postgresql://user:password@aico-db:5432/aico
+  #   depends_on:
+  #     - aico-db
+  #   networks:
+  #     - aico-prod-network
+
+  # aico-db:
+  #   image: postgres:15-alpine
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   environment:
+  #     - POSTGRES_USER=user
+  #     - POSTGRES_PASSWORD=password
+  #     - POSTGRES_DB=aico
+  #   restart: always
+  #   networks:
+  #     - aico-prod-network
+
+networks:
+  aico-prod-network:
+    driver: bridge
+
+# volumes:
+#   postgres_data: 
