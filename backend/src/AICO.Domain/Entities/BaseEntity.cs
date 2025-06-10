@@ -1,68 +1,80 @@
-// BaseEntity.cs
-
 using System;
-using AICO.Domain.Interfaces;
+using System.Collections.Generic;
+using AICO.Domain.Events;
 
 namespace AICO.Domain.Entities
 {
     /// <summary>
-    /// Base class for all domain entities with common properties
+    /// Base class for all entities
     /// </summary>
-    public abstract class BaseEntity : IAuditableEntity
+    public abstract class BaseEntity
     {
-        /// <summary>
-        /// Unique identifier for the entity
-        /// </summary>
-        public Guid Id { get; protected set; }
-
-        /// <summary>
-        /// Date and time when the entity was created
-        /// </summary>
-        public DateTime CreatedAt { get; private set; }
-
-        /// <summary>
-        /// Date and time when the entity was last modified
-        /// </summary>
-        public DateTime? ModifiedAt { get; private set; }
+        private readonly List<DomainEvent> _domainEvents = new();
         
         /// <summary>
-        /// User ID who created the entity
+        /// Entity identifier
         /// </summary>
-        public string CreatedBy { get; private set; }
+        public Guid Id { get; protected set; } = Guid.NewGuid();
         
         /// <summary>
-        /// User ID who last modified the entity
+        /// When the entity was created
         /// </summary>
-        public string ModifiedBy { get; private set; }
-
-        protected BaseEntity()
+        public DateTime CreatedAt { get; protected set; } = DateTime.UtcNow;
+        
+        /// <summary>
+        /// When the entity was last updated
+        /// </summary>
+        public DateTime? UpdatedAt { get; protected set; }
+        
+        /// <summary>
+        /// Row version for optimistic concurrency
+        /// </summary>
+        public byte[] RowVersion { get; protected set; }
+        
+        /// <summary>
+        /// Whether the entity is deleted (soft delete)
+        /// </summary>
+        public bool IsDeleted { get; protected set; }
+        
+        /// <summary>
+        /// Domain events raised by this entity
+        /// </summary>
+        public IReadOnlyCollection<DomainEvent> DomainEvents => _domainEvents.AsReadOnly();
+        
+        /// <summary>
+        /// Adds a domain event
+        /// </summary>
+        protected void AddDomainEvent(DomainEvent domainEvent)
         {
-            Id = Guid.NewGuid();
-            CreatedAt = DateTime.UtcNow;
+            _domainEvents.Add(domainEvent);
         }
-
-        protected BaseEntity(Guid id)
+        
+        /// <summary>
+        /// Clears all domain events
+        /// </summary>
+        public void ClearDomainEvents()
         {
-            Id = id;
-            CreatedAt = DateTime.UtcNow;
+            _domainEvents.Clear();
         }
-
-        // Internal methods for audit service
-        internal void SetAuditInfo(string createdBy, string modifiedBy = null)
+        
+        /// <summary>
+        /// Marks the entity as updated
+        /// </summary>
+        protected void MarkAsUpdated()
         {
-            CreatedBy = createdBy;
-            if (modifiedBy != null)
+            UpdatedAt = DateTime.UtcNow;
+        }
+        
+        /// <summary>
+        /// Marks the entity as deleted (soft delete)
+        /// </summary>
+        public virtual void Delete()
+        {
+            if (!IsDeleted)
             {
-                ModifiedBy = modifiedBy;
-                ModifiedAt = DateTime.UtcNow;
+                IsDeleted = true;
+                MarkAsUpdated();
             }
-        }
-
-        // Internal method to update the modification date
-        internal void UpdateModificationDate()
-        {
-            ModifiedAt = DateTime.UtcNow;
         }
     }
 }
- 
