@@ -3,12 +3,12 @@ version: '3.8'
 services:
   aico-frontend-dev:
     build:
-      context: ../../
-      dockerfile: ./environments/dev/Dockerfile.dev
+      context: ../../frontend
+      dockerfile: ../environments/dev/Dockerfile.dev
     ports:
       - "8080:8080"
     volumes:
-      - ../../:/app
+      - ../../frontend:/app
       - /app/node_modules
     environment:
       - NODE_ENV=development

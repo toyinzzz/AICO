@@ -3,8 +3,8 @@ version: '3.8'
 services:
   aico-frontend:
     build:
-      context: ../../
-      dockerfile: ./environments/prod/Dockerfile.prod
+      context: ../../frontend
+      dockerfile: ../environments/prod/Dockerfile.prod
     ports:
       - "80:80"
     restart: always

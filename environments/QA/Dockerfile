@@ -29,8 +29,8 @@ WORKDIR /app
 # Copy built application
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Copy nginx configuration
-COPY nginx.conf /etc/nginx/nginx.conf
+# Copy nginx configuration if it exists
+# COPY ../environments/QA/nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 80
 

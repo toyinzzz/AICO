@@ -1,0 +1,12 @@
+version: '3.8' 
+ 
+services: 
+  ai-service: 
+    build: . 
+    ports: 
+      - "8000:8000" 
+    volumes: 
+      - ./:/app 
+    environment: 
+      - OPENAI_API_KEY=your_openai_api_key 
+    restart: unless-stopped 
