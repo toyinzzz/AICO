@@ -7,13 +7,13 @@ using AICO.Domain.Entities;
 namespace AICO.Domain.Interfaces.Repositories
 {
     /// <summary>
-    /// Generic repository interface for CRUD operations
+    /// Generic repository interface
     /// </summary>
-    /// <typeparam name="T">Entity type</typeparam>
+    /// <typeparam name="T">Entity type that derives from BaseEntity</typeparam>
     public interface IRepository<T> where T : BaseEntity
     {
         /// <summary>
-        /// Gets an entity by its ID
+        /// Gets entity by id
         /// </summary>
         Task<T> GetByIdAsync(Guid id);
         
@@ -23,7 +23,7 @@ namespace AICO.Domain.Interfaces.Repositories
         Task<IEnumerable<T>> GetAllAsync();
         
         /// <summary>
-        /// Finds entities based on a predicate
+        /// Finds entities based on predicate
         /// </summary>
         Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);
         
@@ -43,13 +43,13 @@ namespace AICO.Domain.Interfaces.Repositories
         Task DeleteAsync(T entity);
         
         /// <summary>
-        /// Removes an entity by its ID
+        /// Removes an entity by id
         /// </summary>
-        Task DeleteAsync(Guid id);
+        Task DeleteByIdAsync(Guid id);
         
         /// <summary>
-        /// Checks if any entity satisfies the given predicate
+        /// Checks if any entity satisfies the predicate
         /// </summary>
         Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate);
     }
-} 
+}

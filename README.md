@@ -1,71 +1,238 @@
 # AICO - AI Conversion Optimizer
 
-AICO is a comprehensive website optimization platform that analyzes websites and provides AI-driven recommendations to optimize performance, increase conversions, and enhance user experience.
+<div align="center">
+  <img src="frontend/public/placeholder.svg" alt="AICO Logo" width="200"/>
+  <p><strong>Enterprise-grade platform for optimizing website conversions with AI-powered insights</strong></p>
+  
+  <p>
+    <a href="https://reactjs.org/"><img src="https://img.shields.io/badge/React-18-blue.svg" alt="React 18"></a>
+    <a href="https://dotnet.microsoft.com/"><img src="https://img.shields.io/badge/.NET-8.0-512BD4.svg" alt=".NET 8"></a>
+    <a href="https://fastapi.tiangolo.com/"><img src="https://img.shields.io/badge/FastAPI-0.103.1-009688.svg" alt="FastAPI"></a>
+    <a href="https://www.postgresql.org/"><img src="https://img.shields.io/badge/PostgreSQL-15-336791.svg" alt="PostgreSQL 15"></a>
+    <a href="https://www.docker.com/"><img src="https://img.shields.io/badge/Docker-Enabled-2496ED.svg" alt="Docker Enabled"></a>
+  </p>
+</div>
+
+## Overview
+
+AICO (AI Conversion Optimizer) is an enterprise-grade platform that leverages artificial intelligence to analyze websites and provide data-driven recommendations for optimizing conversion rates, enhancing user experience, and improving overall performance. 
+
+Built with a modern microservices architecture, AICO follows Domain-Driven Design principles and Clean Architecture patterns to ensure scalability, maintainability, and extensibility. The platform integrates advanced analytics with machine learning algorithms to deliver actionable insights that measurably improve website conversion metrics.
+
+AICO is designed for marketing teams, e-commerce businesses, and digital agencies seeking to maximize their online conversion rates through AI-powered optimization strategies.
+
+### Key Features
+
+- **Real-time Analytics**: Track user behavior, sessions, and conversion events
+- **AI-Powered Insights**: Generate intelligent recommendations for conversion optimization
+- **A/B Testing**: Manage and analyze conversion experiments
+- **Competitor Analysis**: Monitor and compare against competitor performance
+- **Multi-channel Integration**: Support for various website platforms and tools
+
+## Architecture
+
+AICO is built as a cloud-native microservices application with the following components:
+
+- **Frontend Service**: React 18 + TypeScript + Vite
+- **Backend API Service**: C# + .NET 8 + ASP.NET Core
+- **AI Analysis Service**: Python + FastAPI
+- **Database**: PostgreSQL for persistent data storage
+- **Cache**: Redis for high-performance caching
+
+For detailed architecture information, see our [Architecture Documentation](./docs/ARCHITECTURE.md).
 
 ## Project Structure
 
-The project follows a microservices architecture with the following components:
-
 ```
 AICO/
-├── frontend/             # React + TypeScript frontend application
-│   ├── src/              # Frontend source code
-│   ├── public/           # Static assets
-│   └── environments/     # Environment-specific configurations
-│       ├── dev/          # Development environment
-│       ├── prod/         # Production environment
-│       └── QA/           # Quality Assurance environment
+├── frontend/                         # React + TypeScript frontend application
+│   ├── src/                          # Frontend source code
+│   │   ├── components/               # Reusable UI components
+│   │   │   ├── Analysis/             # Website analysis components
+│   │   │   ├── CROExpertChat/        # AI chat interface components
+│   │   │   ├── Dashboard/            # Dashboard widgets and charts
+│   │   │   ├── Landing/              # Landing page sections
+│   │   │   ├── Layout/               # Layout components
+│   │   │   ├── Pricing/              # Pricing page components
+│   │   │   └── ui/                   # shadcn/ui base components
+│   │   ├── hooks/                    # Custom React hooks
+│   │   ├── lib/                      # Utility libraries
+│   │   ├── pages/                    # Page components
+│   │   ├── providers/                # Context providers
+│   │   └── utils/                    # Utility functions
+│   ├── public/                       # Static assets
+│   ├── environments/                 # Environment-specific configurations
+│   └── [config files]                # Configuration files (vite, tailwind, etc.)
 │
-├── backend/              # C# + .NET 8 backend API service
-│   ├── src/              # Backend source code
-│   │   ├── AICO.API/     # API layer with controllers
-│   │   ├── AICO.Application/  # Application layer with services
-│   │   ├── AICO.Domain/  # Domain layer with entities
-│   │   ├── AICO.Infrastructure/  # Infrastructure layer
-│   │   └── AICO.Shared/  # Shared utilities
-│   └── tests/            # Backend tests
-│       ├── AICO.UnitTests/
-│       ├── AICO.IntegrationTests/
-│       └── AICO.ApiTests/
+├── backend/                          # C# + .NET 8 backend API service
+│   ├── src/                          # Backend source code
+│   │   ├── AICO.API/                 # API layer with controllers
+│   │   │   ├── Controllers/          # API controllers
+│   │   │   ├── Middleware/           # Custom middleware
+│   │   │   └── Filters/              # Action filters
+│   │   ├── AICO.Application/         # Application layer with services
+│   │   │   ├── Services/             # Application services
+│   │   │   ├── DTOs/                 # Data transfer objects
+│   │   │   ├── Interfaces/           # Service interfaces
+│   │   │   └── Validators/           # FluentValidation validators
+│   │   ├── AICO.Domain/              # Domain layer with entities
+│   │   │   ├── Entities/             # Domain entities
+│   │   │   ├── ValueObjects/         # Value objects
+│   │   │   ├── Events/               # Domain events
+│   │   │   └── Interfaces/           # Domain interfaces
+│   │   ├── AICO.Infrastructure/      # Infrastructure layer
+│   │   │   ├── Data/                 # EF Core context
+│   │   │   ├── Repositories/         # Repository implementations
+│   │   │   └── Configurations/       # EF configurations
+│   │   └── AICO.Shared/              # Shared utilities
+│   └── tests/                        # Backend tests
+│       ├── AICO.UnitTests/           # Unit tests
+│       ├── AICO.IntegrationTests/    # Integration tests
+│       └── AICO.ApiTests/            # API tests
 │
-└── docs/                 # Project documentation
-    ├── ARCHITECTURE.md   # Architecture documentation
-    ├── PLAN.md           # Development plan
-    ├── SENIOR_DEV_INSTRUCTION.md  # Developer instructions
-    └── CHANGE_LOG.md     # Change log
+├── ai-service/                       # Python + FastAPI AI analysis service
+│   ├── app/                          # Service source code
+│   │   ├── api/                      # FastAPI routes
+│   │   ├── core/                     # Core configuration
+│   │   ├── models/                   # Pydantic models
+│   │   ├── services/                 # Business logic
+│   │   │   ├── analysis/             # Website analysis
+│   │   │   ├── scraping/             # Web scraping
+│   │   │   └── ai/                   # AI/ML processing
+│   │   └── utils/                    # Utility functions
+│   ├── tests/                        # AI service tests
+│   └── requirements.txt              # Python dependencies
+│
+├── docs/                             # Project documentation
+│   ├── ARCHITECTURE.md               # Architecture documentation
+│   ├── PLAN.md                       # Development plan
+│   ├── ENTITY_DESIGN.md              # Domain model and entity relationships
+│   ├── IMPLEMENTATION_NOTES.md       # Technical implementation details
+│   └── CHANGE_LOG.md                 # Version history and changes
+│
+├── environments/                     # Environment configurations
+│   ├── dev/                          # Development environment
+│   ├── prod/                         # Production environment
+│   └── QA/                           # Quality Assurance environment
+│
+└── scripts/                          # Utility scripts for development and deployment
 ```
+
+Each component has its own detailed README with specific information about its structure, dependencies, and development guidelines.
 
 ## Getting Started
 
-### Frontend Development
+### Prerequisites
 
-   ```bash
+- Docker and Docker Compose
+- .NET 8 SDK
+- Node.js 18+ and npm/bun
+- Python 3.11+
+
+### Development Setup
+
+#### Frontend Development
+
+```bash
+# Install dependencies
 cd frontend
 npm install
+
+# Start development server
 npm run dev
+
+# Or using Docker
+./run-dev.bat  # Windows
+./run-dev.sh   # Linux/macOS
 ```
 
-Or using Docker:
+For detailed frontend documentation, see the [Frontend README](./frontend/README.md).
+
+#### Backend Development
 
 ```bash
-cd frontend
-.\run-dev.bat
-```
-
-### Backend Development
-
-```bash
+# Build and run the backend service
 cd backend
-# Instructions to be added as backend is implemented
+dotnet restore
+dotnet build
+dotnet run --project src/AICO.API
+
+# Or using Docker
+docker-compose -f environments/dev/docker-compose.dev.yml up backend
+```
+
+For detailed backend documentation, see the [Backend README](./backend/README.md).
+
+#### AI Service Development
+
+```bash
+# Set up Python environment
+cd ai-service
+python -m venv venv
+source venv/bin/activate  # Linux/macOS
+venv\Scripts\activate     # Windows
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the service
+uvicorn app.main:app --reload
 ```
 
 ## Documentation
 
-- [Architecture Documentation](docs/ARCHITECTURE.md)
-- [Development Plan](docs/PLAN.md)
-- [Developer Instructions](docs/SENIOR_DEV_INSTRUCTION.md)
-- [Change Log](docs/CHANGE_LOG.md)
+- [Architecture Documentation](./docs/ARCHITECTURE.md) - Detailed system architecture
+- [Development Plan](./docs/PLAN.md) - Project roadmap and implementation plan
+- [Developer Instructions](./docs/SENIOR_DEV_INSTRUCTION.md) - Guidelines for developers
+- [Entity Design](./docs/ENTITY_DESIGN.md) - Domain model and entity relationships
+- [Implementation Notes](./docs/IMPLEMENTATION_NOTES.md) - Technical implementation details
+- [Change Log](./docs/CHANGE_LOG.md) - Version history and changes
+
+## Development Workflow
+
+### Branching Strategy
+
+- `main` - Production-ready code
+- `develop` - Integration branch for feature development
+- `feature/*` - Feature branches for active development
+- `release/*` - Release preparation branches
+- `hotfix/*` - Emergency fixes for production issues
+
+### Continuous Integration
+
+The project uses GitHub Actions for continuous integration, running:
+- Automated builds
+- Unit and integration tests
+- Code quality checks
+- Security scanning
+
+### Code Quality Standards
+
+- Comprehensive test coverage (minimum 80%)
+- Static code analysis
+- Code style enforcement
+- Documentation requirements
+
+## Contributing
+
+Please follow our development guidelines outlined in the [Developer Instructions](./docs/SENIOR_DEV_INSTRUCTION.md) when contributing to this project. All contributions must adhere to our coding standards and pass all automated checks before being considered for merge.
+
+## Security
+
+Security vulnerabilities should be reported directly to the security team at security@example.com rather than through public issues. For more information, see our [Security Policy](./SECURITY.md).
 
 ## License
 
-This project is proprietary and confidential.
+This project is proprietary and confidential. All rights reserved.
+
+© 2023-2024 AICO Technologies
+
+---
+
+<div align="center">
+  <p>
+    <a href="https://github.com/toyinzzz/AICO/issues"><img src="https://img.shields.io/github/issues/toyinzzz/AICO.svg" alt="GitHub Issues"></a>
+    <a href="https://github.com/toyinzzz/AICO/pulls"><img src="https://img.shields.io/github/issues-pr/toyinzzz/AICO.svg" alt="GitHub Pull Requests"></a>
+    <a href="./LICENSE"><img src="https://img.shields.io/badge/License-Proprietary-red.svg" alt="License"></a>
+  </p>
+</div>
