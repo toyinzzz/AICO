@@ -1,4 +1,3 @@
-using System;
 using AICO.Domain.Entities;
 using Xunit;
 
@@ -40,7 +39,7 @@ namespace AICO.Domain.Tests.Entities
             var variantId = Guid.NewGuid();
 
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => 
+            Assert.Throws<ArgumentException>(() =>
                 Revenue.Create(sessionId, variantId, invalidAmount, "USD", "txn_123", DateTime.UtcNow));
         }
 
@@ -55,7 +54,7 @@ namespace AICO.Domain.Tests.Entities
             var variantId = Guid.NewGuid();
 
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => 
+            Assert.Throws<ArgumentException>(() =>
                 Revenue.Create(sessionId, variantId, 99.99m, invalidCurrency, "txn_123", DateTime.UtcNow));
         }
 
@@ -68,7 +67,7 @@ namespace AICO.Domain.Tests.Entities
             var futureTimestamp = DateTime.UtcNow.AddDays(1);
 
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => 
+            Assert.Throws<ArgumentException>(() =>
                 Revenue.Create(sessionId, variantId, 99.99m, "USD", "txn_123", futureTimestamp));
         }
     }

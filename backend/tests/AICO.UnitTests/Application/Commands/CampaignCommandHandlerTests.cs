@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using AICO.Application.Interfaces.Commands;
 using AICO.Domain.Entities;
 using AICO.Domain.Interfaces.Repositories;

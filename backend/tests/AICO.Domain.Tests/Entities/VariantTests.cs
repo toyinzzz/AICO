@@ -1,6 +1,4 @@
-using System;
 using AICO.Domain.Entities;
-using AICO.Domain.ValueObjects;
 using Xunit;
 
 namespace AICO.Domain.Tests.Entities
@@ -42,7 +40,7 @@ namespace AICO.Domain.Tests.Entities
             var abTestId = Guid.NewGuid();
 
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => 
+            Assert.Throws<ArgumentException>(() =>
                 Variant.Create(abTestId, invalidName, "Description", 50, ".button {}", false));
         }
 
@@ -56,7 +54,7 @@ namespace AICO.Domain.Tests.Entities
             var abTestId = Guid.NewGuid();
 
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => 
+            Assert.Throws<ArgumentException>(() =>
                 Variant.Create(abTestId, "Test Variant", "Description", invalidPercentage, ".button {}", false));
         }
 

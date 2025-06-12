@@ -1,6 +1,4 @@
-using System;
 using AICO.Domain.Entities;
-using AICO.Domain.ValueObjects;
 using Xunit;
 
 namespace AICO.Domain.Tests.Entities
@@ -46,7 +44,7 @@ namespace AICO.Domain.Tests.Entities
             var endDate = DateTime.UtcNow.AddDays(30);
 
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => 
+            Assert.Throws<ArgumentException>(() =>
                 Campaign.Create(websiteId, invalidName, "Description", startDate, endDate, 1000m, "https://example.com"));
         }
 
@@ -59,7 +57,7 @@ namespace AICO.Domain.Tests.Entities
             var endDate = DateTime.UtcNow.AddDays(30);
 
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => 
+            Assert.Throws<ArgumentException>(() =>
                 Campaign.Create(websiteId, "Test", "Description", startDate, endDate, -100m, "https://example.com"));
         }
 
@@ -72,7 +70,7 @@ namespace AICO.Domain.Tests.Entities
             var endDate = DateTime.UtcNow.AddDays(1);
 
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => 
+            Assert.Throws<ArgumentException>(() =>
                 Campaign.Create(websiteId, "Test", "Description", startDate, endDate, 1000m, "https://example.com"));
         }
 
@@ -104,7 +102,7 @@ namespace AICO.Domain.Tests.Entities
                         .Throws(new InvalidOperationException("Invalid transition"));
 
             // Act & Assert
-            Assert.Throws<InvalidOperationException>(() => 
+            Assert.Throws<InvalidOperationException>(() =>
                 campaign.UpdateStatus(CampaignStatus.Completed, mockValidator.Object));
         }
 

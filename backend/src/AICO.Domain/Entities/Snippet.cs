@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace AICO.Domain.Entities
@@ -70,7 +69,7 @@ namespace AICO.Domain.Entities
         /// <summary>
         /// Creates a new snippet
         /// </summary>
-        public Snippet(Guid websiteId, string name, string code, string type, 
+        public Snippet(Guid websiteId, string name, string code, string type,
                       string version = "1.0.0", string configuration = null)
         {
             WebsiteId = websiteId;

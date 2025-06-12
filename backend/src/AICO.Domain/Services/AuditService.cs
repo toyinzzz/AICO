@@ -1,4 +1,3 @@
-using System;
 using AICO.Domain.Entities;
 using AICO.Domain.Interfaces;
 
@@ -21,14 +20,7 @@ namespace AICO.Domain.Services
 
             if (entity is BaseEntity baseEntity)
             {
-                if (!string.IsNullOrWhiteSpace(userId))
-                {
-                    baseEntity.SetAuditInfo(baseEntity.CreatedBy, userId);
-                }
-                else
-                {
-                    baseEntity.UpdateModificationDate();
-                }
+                baseEntity.UpdateModificationDate(userId);
             }
             else
             {
@@ -55,5 +47,18 @@ namespace AICO.Domain.Services
                 throw new InvalidOperationException($"Entity of type {entity.GetType().Name} is not a BaseEntity and cannot be updated.");
             }
         }
+
+        /// <summary>
+        /// Sets the creation audit information for an AnalysisResult entity
+        /// </summary>
+        /// <param name="analysis">The AnalysisResult entity to update</param>
+        public void SetCreationAudit(AnalysisResult analysis)
+        {
+            if (analysis == null)
+                throw new ArgumentNullException(nameof(analysis));
+
+            // AnalysisResult inherits from BaseEntity, so we can set audit info
+            SetCreationAudit((IAuditableEntity)analysis, "System");
+        }
     }
-} 
+}

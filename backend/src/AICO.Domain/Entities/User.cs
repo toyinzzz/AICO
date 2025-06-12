@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace AICO.Domain.Entities
@@ -88,13 +86,13 @@ namespace AICO.Domain.Entities
         {
             if (string.IsNullOrWhiteSpace(email))
                 throw new ArgumentException("Email is required", nameof(email));
-            
+
             if (string.IsNullOrWhiteSpace(username))
                 throw new ArgumentException("Username is required", nameof(username));
-            
+
             if (string.IsNullOrWhiteSpace(passwordHash))
                 throw new ArgumentException("Password hash is required", nameof(passwordHash));
-            
+
             if (string.IsNullOrWhiteSpace(passwordSalt))
                 throw new ArgumentException("Password salt is required", nameof(passwordSalt));
 
@@ -127,7 +125,7 @@ namespace AICO.Domain.Entities
         {
             if (string.IsNullOrWhiteSpace(passwordHash))
                 throw new ArgumentException("Password hash is required", nameof(passwordHash));
-            
+
             if (string.IsNullOrWhiteSpace(passwordSalt))
                 throw new ArgumentException("Password salt is required", nameof(passwordSalt));
 
@@ -156,4 +154,4 @@ namespace AICO.Domain.Entities
             Role = role;
         }
     }
-} 
+}

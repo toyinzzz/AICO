@@ -1,4 +1,3 @@
-using System;
 using AICO.Domain.ValueObjects;
 using Xunit;
 

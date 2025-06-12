@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using AICO.Domain.Entities;
 using AICO.Domain.Interfaces;
 
@@ -31,7 +29,7 @@ namespace AICO.Domain.Services
         public async Task<Recommendation> CreateRecommendationAsync(Guid analysisResultId, string title, string description, int priority, string category)
         {
             // Validation is done in the entity factory method
-            
+
             // Create the recommendation using the factory method
             var recommendation = Recommendation.Create(analysisResultId, title, description, priority, category);
 
@@ -49,30 +47,23 @@ namespace AICO.Domain.Services
             if (recommendation == null)
                 throw new ArgumentNullException(nameof(recommendation));
 
-            // Create a new recommendation with updated values
-            var updatedRecommendation = Recommendation.Create(
-                recommendation.AnalysisResultId,
-                title,
-                description,
-                priority,
-                category
-            );
-
-            // Copy the ID from the original recommendation
-            typeof(BaseEntity).GetProperty("Id").SetValue(updatedRecommendation, recommendation.Id);
+            // Validate inputs
+            if (string.IsNullOrWhiteSpace(title))
+                throw new ArgumentException("Title is required", nameof(title));
             
-            // Copy the implementation status from the original recommendation
-            typeof(Recommendation).GetProperty("IsImplemented").SetValue(updatedRecommendation, recommendation.IsImplemented);
-            typeof(Recommendation).GetProperty("ImplementedAt").SetValue(updatedRecommendation, recommendation.ImplementedAt);
+            if (string.IsNullOrWhiteSpace(description))
+                throw new ArgumentException("Description is required", nameof(description));
+            
+            if (priority < 1 || priority > 5)
+                throw new ArgumentException("Priority must be between 1 and 5", nameof(priority));
 
-            // Copy the updated values back to the original recommendation
-            typeof(Recommendation).GetProperty("Title").SetValue(recommendation, title);
-            typeof(Recommendation).GetProperty("Description").SetValue(recommendation, description);
-            typeof(Recommendation).GetProperty("Priority").SetValue(recommendation, priority);
-            typeof(Recommendation).GetProperty("Category").SetValue(recommendation, category);
-
+            // Update the recommendation using safe internal methods (no reflection needed)
+            recommendation.UpdateDetails(title, description, priority, category);
+            
             // Update audit information
             _auditService.UpdateModificationDate(recommendation);
+            
+            // Note: Persistence should be handled by the calling application service
         }
 
         /// <summary>
@@ -89,7 +80,7 @@ namespace AICO.Domain.Services
                 recommendation.Title,
                 recommendation.Description,
                 recommendation.Priority,
-                recommendation.Category,
+                recommendation.RecommendationType,
                 DateTime.UtcNow
             );
 
@@ -120,7 +111,7 @@ namespace AICO.Domain.Services
                 recommendation.Title,
                 recommendation.Description,
                 recommendation.Priority,
-                recommendation.Category
+                recommendation.RecommendationType
             );
 
             // Copy the ID from the original recommendation
@@ -153,4 +144,4 @@ namespace AICO.Domain.Services
             }
         }
     }
-} 
+}

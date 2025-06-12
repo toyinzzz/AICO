@@ -1,4 +1,3 @@
-using System;
 using AICO.Domain.Entities;
 using AICO.Domain.ValueObjects;
 using Moq;
@@ -50,7 +49,7 @@ namespace AICO.Domain.Tests.Entities
             var endDate = DateTime.UtcNow.AddDays(30);
 
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => 
+            Assert.Throws<ArgumentException>(() =>
                 AbTest.Create(campaignId, "Test", "Description", testType, invalidTrafficSplit, "conversion_rate", startDate, endDate));
         }
 
@@ -80,7 +79,7 @@ namespace AICO.Domain.Tests.Entities
             var mockValidator = new Mock<IAbTestStateValidationService>();
             mockValidator.Setup(x => x.CanTransitionTo(AbTestStatus.Running, AbTestStatus.Completed))
                         .Returns(true);
-            
+
             // Start the test first
             abTest.GetType().GetProperty("Status")?.SetValue(abTest, AbTestStatus.Running);
 

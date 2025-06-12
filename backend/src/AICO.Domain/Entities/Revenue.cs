@@ -1,5 +1,5 @@
-using System;
 using System.ComponentModel.DataAnnotations;
+using AICO.Domain.Entities;
 
 namespace AICO.Domain.Entities
 {
@@ -73,6 +73,16 @@ namespace AICO.Domain.Entities
         public DateTime RevenueDate { get; private set; }
 
         /// <summary>
+        /// Session ID for tracking
+        /// </summary>
+        public Guid? SessionId { get; private set; }
+
+        /// <summary>
+        /// Variant ID for A/B testing
+        /// </summary>
+        public Guid? VariantId { get; private set; }
+
+        /// <summary>
         /// Private constructor for EF Core
         /// </summary>
         private Revenue() { }
@@ -80,10 +90,11 @@ namespace AICO.Domain.Entities
         /// <summary>
         /// Creates a new revenue record
         /// </summary>
-        public Revenue(Guid websiteId, Guid userId, decimal amount, string source, 
-                      DateTime? revenueDate = null, string currency = "USD", 
-                      Guid? conversionId = null, Guid? campaignId = null, 
-                      string transactionId = null, string metadata = null)
+        public Revenue(Guid websiteId, Guid userId, decimal amount, string source,
+                      DateTime? revenueDate = null, string currency = "USD",
+                      Guid? conversionId = null, Guid? campaignId = null,
+                      string transactionId = null, string metadata = null,
+                      Guid? sessionId = null, Guid? variantId = null)
         {
             WebsiteId = websiteId;
             UserId = userId;
@@ -95,6 +106,8 @@ namespace AICO.Domain.Entities
             TransactionId = transactionId;
             Metadata = metadata;
             RevenueDate = revenueDate ?? DateTime.UtcNow;
+            SessionId = sessionId;
+            VariantId = variantId;
         }
 
         /// <summary>
@@ -109,4 +122,17 @@ namespace AICO.Domain.Entities
             UpdatedAt = DateTime.UtcNow;
         }
     }
+}
+
+public class Revenue : BaseEntity
+{
+    public Guid SessionId { get; set; }
+    public Guid VariantId { get; set; }
+    public decimal Amount { get; set; }
+    public string Currency { get; set; }
+    public DateTime RecordedAt { get; set; }
+    
+    // Navigation properties
+    public Session Session { get; set; }
+    public Variant Variant { get; set; }
 }

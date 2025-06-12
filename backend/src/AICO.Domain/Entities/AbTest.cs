@@ -1,7 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using AICO.Domain.ValueObjects;
+using System.ComponentModel.DataAnnotations;
+using AICO.Domain.Validators;
 
 namespace AICO.Domain.Entities
 {
@@ -73,7 +72,7 @@ namespace AICO.Domain.Entities
         /// <summary>
         /// Creates a new A/B test
         /// </summary>
-        public AbTest(string name, string description, Guid campaignId, TestType testType, 
+        public AbTest(string name, string description, Guid campaignId, TestType testType,
                      string targetSelector, string originalContent)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
@@ -100,7 +99,7 @@ namespace AICO.Domain.Entities
         {
             AbTestStateValidator.ValidateTransition(Status, AbTestStatus.Running);
             Status = AbTestStatus.Running;
-            // Removed DateTime.UtcNow - will be handled by service layer
+            
         }
 
         /// <summary>

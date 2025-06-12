@@ -1,6 +1,4 @@
 using AICO.Domain.Entities;
-using System;
-using System.Threading.Tasks;
 
 namespace AICO.Application.Interfaces.Commands
 {

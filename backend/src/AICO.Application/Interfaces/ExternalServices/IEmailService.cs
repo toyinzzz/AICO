@@ -1,5 +1,3 @@
-using System.Threading.Tasks;
-
 namespace AICO.Application.Interfaces.ExternalServices
 {
     public interface IEmailService

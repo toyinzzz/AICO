@@ -1,4 +1,3 @@
-using System;
 using System.Net.Mail;
 
 namespace AICO.Domain.ValueObjects
@@ -12,12 +11,12 @@ namespace AICO.Domain.ValueObjects
         /// The email address value
         /// </summary>
         public string Value { get; }
-        
+
         private Email(string value)
         {
             Value = value;
         }
-        
+
         /// <summary>
         /// Creates a new Email value object
         /// </summary>
@@ -28,7 +27,7 @@ namespace AICO.Domain.ValueObjects
         {
             if (string.IsNullOrWhiteSpace(value))
                 throw new ArgumentException("Email cannot be empty", nameof(value));
-                
+
             try
             {
                 var mailAddress = new MailAddress(value);
@@ -39,7 +38,7 @@ namespace AICO.Domain.ValueObjects
                 throw new ArgumentException("Invalid email format", nameof(value));
             }
         }
-        
+
         public override string ToString() => Value;
     }
 }

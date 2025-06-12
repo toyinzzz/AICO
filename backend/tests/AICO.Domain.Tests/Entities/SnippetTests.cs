@@ -1,4 +1,3 @@
-using System;
 using AICO.Domain.Entities;
 using Xunit;
 
@@ -40,7 +39,7 @@ namespace AICO.Domain.Tests.Entities
             var websiteId = Guid.NewGuid();
 
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => 
+            Assert.Throws<ArgumentException>(() =>
                 Snippet.Create(websiteId, invalidName, "Description", "<script></script>", "head", true));
         }
 
@@ -53,7 +52,7 @@ namespace AICO.Domain.Tests.Entities
             var websiteId = Guid.NewGuid();
 
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => 
+            Assert.Throws<ArgumentException>(() =>
                 Snippet.Create(websiteId, "Test", "Description", invalidContent, "head", true));
         }
 

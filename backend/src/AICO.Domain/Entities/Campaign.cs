@@ -1,7 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using AICO.Domain.Services;
+using AICO.Domain.Validators;
 
 namespace AICO.Domain.Entities
 {

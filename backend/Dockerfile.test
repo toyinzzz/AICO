@@ -1,0 +1,33 @@
+# Use the official .NET SDK image for building and testing
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+
+WORKDIR /app
+
+# Copy solution file (if exists) and project files
+COPY *.sln ./
+COPY src/ ./src/
+COPY tests/ ./tests/
+
+# Restore dependencies
+RUN dotnet restore
+
+# Build the solution
+RUN dotnet build --configuration Release --no-restore
+
+# Run tests
+FROM build AS test
+WORKDIR /app
+
+# Install test reporting tools
+RUN dotnet tool install --global dotnet-reportgenerator-globaltool
+ENV PATH="$PATH:/root/.dotnet/tools"
+
+# Set environment variables for testing
+ENV ASPNETCORE_ENVIRONMENT=Testing
+ENV ConnectionStrings__DefaultConnection="Server=localhost;Database=AICO_Test;Trusted_Connection=true;TrustServerCertificate=true;"
+
+# Create test results directory
+RUN mkdir -p /app/TestResults
+
+# Default command to run all tests with coverage
+CMD ["dotnet", "test", "--configuration", "Release", "--logger", "trx", "--results-directory", "/app/TestResults", "--collect", "XPlat Code Coverage", "--verbosity", "normal"]

@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace AICO.Domain.ValueObjects
 {
     /// <summary>
@@ -38,9 +34,9 @@ namespace AICO.Domain.ValueObjects
                 throw new ArgumentException("Test type value cannot be null or empty", nameof(value));
 
             // Check if it's a predefined type first
-            var predefined = _predefinedTypes.FirstOrDefault(t => 
+            var predefined = _predefinedTypes.FirstOrDefault(t =>
                 string.Equals(t.Value, value, StringComparison.OrdinalIgnoreCase));
-            
+
             return predefined ?? new TestType(value);
         }
 
@@ -49,12 +45,12 @@ namespace AICO.Domain.ValueObjects
         /// </summary>
         public static IReadOnlyList<TestType> GetPredefinedTypes() => _predefinedTypes.AsReadOnly();
 
-        public bool Equals(TestType other) => 
+        public bool Equals(TestType other) =>
             other != null && string.Equals(Value, other.Value, StringComparison.OrdinalIgnoreCase);
 
         public override bool Equals(object obj) => Equals(obj as TestType);
 
-        public override int GetHashCode() => 
+        public override int GetHashCode() =>
             Value?.ToLowerInvariant().GetHashCode() ?? 0;
 
         public override string ToString() => Value;

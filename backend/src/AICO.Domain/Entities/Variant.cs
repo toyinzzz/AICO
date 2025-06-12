@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace AICO.Domain.Entities
@@ -69,7 +68,7 @@ namespace AICO.Domain.Entities
         /// <summary>
         /// Creates a new variant
         /// </summary>
-        public Variant(string name, Guid abTestId, string content, int trafficAllocation, 
+        public Variant(string name, Guid abTestId, string content, int trafficAllocation,
                       bool isControl = false, string aiPrompt = null, int? aiConfidenceScore = null)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));

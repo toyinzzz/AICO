@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "dgSpecHash": "HJ1HU686FUE=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.Domain\\AICO.Domain.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\toyin\\.nuget\\packages\\fluentvalidation\\11.8.1\\fluentvalidation.11.8.1.nupkg.sha512",
+    "C:\\Users\\toyin\\.nuget\\packages\\mediatr\\12.2.0\\mediatr.12.2.0.nupkg.sha512",
+    "C:\\Users\\toyin\\.nuget\\packages\\mediatr.contracts\\2.0.1\\mediatr.contracts.2.0.1.nupkg.sha512",
+    "C:\\Users\\toyin\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\8.0.0\\microsoft.extensions.dependencyinjection.abstractions.8.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}

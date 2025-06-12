@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace AICO.Domain.Entities
@@ -100,6 +99,74 @@ namespace AICO.Domain.Entities
         {
         }
 
+        // Overloaded static factory method for creating a recommendation with fewer parameters
+        public static Recommendation Create(
+            Guid analysisResultId,
+            string title,
+            string description,
+            int priority,
+            string category)
+        {
+            if (analysisResultId == Guid.Empty)
+                throw new ArgumentException("Analysis Result ID is required", nameof(analysisResultId));
+
+            if (string.IsNullOrWhiteSpace(title))
+                throw new ArgumentException("Title is required", nameof(title));
+
+            if (string.IsNullOrWhiteSpace(description))
+                throw new ArgumentException("Description is required", nameof(description));
+
+            if (priority < 1 || priority > 5)
+                throw new ArgumentException("Priority must be between 1 and 5", nameof(priority));
+
+            return new Recommendation
+            {
+                AnalysisResultId = analysisResultId,
+                RecommendationType = category ?? "General",
+                Title = title.Trim(),
+                Description = description.Trim(),
+                Priority = priority,
+                ExpectedImpact = "Medium",
+                ImplementationEffort = "Medium",
+                Status = "Pending",
+                GeneratedAt = DateTime.UtcNow
+            };
+        }
+
+        // Static factory method for creating an implemented recommendation
+        public static Recommendation CreateImplemented(
+            Guid analysisResultId,
+            string title,
+            string description,
+            int priority,
+            string category,
+            DateTime implementedAt)
+        {
+            if (analysisResultId == Guid.Empty)
+                throw new ArgumentException("Analysis Result ID is required", nameof(analysisResultId));
+
+            if (string.IsNullOrWhiteSpace(title))
+                throw new ArgumentException("Title is required", nameof(title));
+
+            if (string.IsNullOrWhiteSpace(description))
+                throw new ArgumentException("Description is required", nameof(description));
+
+            if (priority < 1 || priority > 5)
+                throw new ArgumentException("Priority must be between 1 and 5", nameof(priority));
+
+            return new Recommendation
+            {
+                AnalysisResultId = analysisResultId,
+                RecommendationType = category ?? "General",
+                Title = title.Trim(),
+                Description = description.Trim(),
+                Priority = priority,
+                Status = "Implemented",
+                GeneratedAt = DateTime.UtcNow,
+                ImplementedAt = implementedAt
+            };
+        }
+
         // Static factory method for creating a new recommendation
         public static Recommendation Create(
             Guid websiteId,
@@ -114,22 +181,22 @@ namespace AICO.Domain.Entities
         {
             if (websiteId == Guid.Empty)
                 throw new ArgumentException("Website ID is required", nameof(websiteId));
-            
+
             if (analysisResultId == Guid.Empty)
                 throw new ArgumentException("Analysis Result ID is required", nameof(analysisResultId));
-            
+
             if (string.IsNullOrWhiteSpace(recommendationType))
                 throw new ArgumentException("Recommendation type is required", nameof(recommendationType));
-            
+
             if (string.IsNullOrWhiteSpace(title))
                 throw new ArgumentException("Title is required", nameof(title));
-            
+
             if (string.IsNullOrWhiteSpace(description))
                 throw new ArgumentException("Description is required", nameof(description));
-            
+
             if (priority < 1 || priority > 5)
                 throw new ArgumentException("Priority must be between 1 and 5", nameof(priority));
-            
+
             if (string.IsNullOrWhiteSpace(implementationEffort))
                 throw new ArgumentException("Implementation effort is required", nameof(implementationEffort));
 
@@ -174,7 +241,7 @@ namespace AICO.Domain.Entities
                 throw new ArgumentException("Invalid status value", nameof(newStatus));
 
             Status = newStatus;
-            
+
             if (newStatus == "Implemented" && !ImplementedAt.HasValue)
             {
                 ImplementedAt = DateTime.UtcNow;
@@ -188,6 +255,24 @@ namespace AICO.Domain.Entities
                 throw new ArgumentException("Priority must be between 1 and 5", nameof(newPriority));
 
             Priority = newPriority;
+        }
+
+        // Method to update recommendation details
+        internal void UpdateDetails(string title, string description, int priority, string category)
+        {
+            if (string.IsNullOrWhiteSpace(title))
+                throw new ArgumentException("Title is required", nameof(title));
+            
+            if (string.IsNullOrWhiteSpace(description))
+                throw new ArgumentException("Description is required", nameof(description));
+            
+            if (priority < 1 || priority > 5)
+                throw new ArgumentException("Priority must be between 1 and 5", nameof(priority));
+
+            Title = title.Trim();
+            Description = description.Trim();
+            Priority = priority;
+            RecommendationType = category?.Trim() ?? RecommendationType;
         }
     }
 }

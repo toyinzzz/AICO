@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using AICO.Domain.Entities;
 using AICO.Domain.Interfaces;
 using AICO.Domain.Services;
@@ -80,7 +78,7 @@ namespace AICO.Domain.Tests.Services
                 3,
                 "Initial category"
             );
-            
+
             var newTitle = "Updated title";
             var newDescription = "Updated description";
             var newPriority = 2;
@@ -188,4 +186,4 @@ namespace AICO.Domain.Tests.Services
             Assert.True(result);
         }
     }
-} 
+}

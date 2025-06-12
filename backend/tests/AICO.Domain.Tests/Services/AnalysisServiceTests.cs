@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AICO.Domain.Entities;
 using AICO.Domain.Interfaces;
 using AICO.Domain.Services;
@@ -82,7 +78,7 @@ namespace AICO.Domain.Tests.Services
                 "{\"issues\":\"minor\"}",
                 "Initial summary"
             );
-            
+
             var newScore = 80;
             var newResultData = "{\"issues\":\"none\"}";
             var newSummary = "Updated summary";
@@ -109,10 +105,10 @@ namespace AICO.Domain.Tests.Services
                 "{\"data\":\"test\"}",
                 "Test analysis"
             );
-            
+
             // Set ID for the analysis
             typeof(BaseEntity).GetProperty("Id").SetValue(analysis, Guid.NewGuid());
-            
+
             var title = "Improve meta tags";
             var description = "Add better meta descriptions";
             var priority = 2;
@@ -158,7 +154,7 @@ namespace AICO.Domain.Tests.Services
             var summary = "Test summary";
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(() => 
+            await Assert.ThrowsAsync<ArgumentException>(() =>
                 _analysisService.CreateAnalysisAsync(websiteId, invalidAnalysisType, score, resultData, summary));
         }
 
@@ -174,7 +170,7 @@ namespace AICO.Domain.Tests.Services
             var summary = "Test summary";
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => 
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
                 _analysisService.CreateAnalysisAsync(websiteId, analysisType, invalidScore, resultData, summary));
         }
 
@@ -204,4 +200,4 @@ namespace AICO.Domain.Tests.Services
             Assert.False(result);
         }
     }
-} 
+}

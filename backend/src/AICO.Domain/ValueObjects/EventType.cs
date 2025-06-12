@@ -1,5 +1,3 @@
-using System;
-
 namespace AICO.Domain.ValueObjects
 {
     /// <summary>
@@ -20,17 +18,17 @@ namespace AICO.Domain.ValueObjects
             public static readonly EventType Error = new("error");
             public static readonly EventType Custom = new("custom");
         }
-        
+
         /// <summary>
         /// The event type value
         /// </summary>
         public string Value { get; }
-        
+
         private EventType(string value)
         {
             Value = value;
         }
-        
+
         /// <summary>
         /// Creates a new EventType value object
         /// </summary>
@@ -41,10 +39,10 @@ namespace AICO.Domain.ValueObjects
         {
             if (string.IsNullOrWhiteSpace(value))
                 throw new ArgumentException("Event type cannot be empty", nameof(value));
-                
+
             return new EventType(value.Trim().ToLowerInvariant());
         }
-        
+
         public override string ToString() => Value;
     }
 }

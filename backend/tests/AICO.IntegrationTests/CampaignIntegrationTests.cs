@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using AICO.Application.Interfaces.Commands;
 using AICO.Application.Interfaces.Queries;
 using AICO.Domain.Entities;
@@ -40,7 +38,7 @@ namespace AICO.IntegrationTests
 
             // Act - Create
             var createdCampaign = await _commandHandler.CreateCampaignAsync(createCommand);
-            
+
             // Act - Retrieve
             var retrievedCampaign = await _queryHandler.GetCampaignByIdAsync(createdCampaign.Id);
 
