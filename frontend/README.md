@@ -95,9 +95,24 @@ npm install
 npm run dev
 ```
 
+This will start the Vite development server, typically accessible at `http://localhost:8080/`.
+
 ### Docker Development
 
+The `run-dev.bat` script is intended to simplify starting the frontend service using Docker Compose.
+
 ```bash
+# Navigate to the frontend directory
+cd AICO/frontend
+
+# Run the development script
+./run-dev.bat 
+```
+
+**Notes on Docker Development:**
+- The `run-dev.bat` script initially had an incorrect path to the `docker-compose.dev.yml` file. This has been corrected in the script.
+- During initial setup, the `docker-compose up --build` command (executed by the script) was observed to hang indefinitely at the "load build context" step for the `aico-frontend-dev` service.
+- Due to this, the current recommended approach for frontend development is the local setup described above (`npm install` followed by `npm run dev`). Further investigation is needed to resolve the Docker build issue if containerized development for the frontend is preferred.bash
 # Run in Docker development container
 .\run-dev.bat
 ```
@@ -170,4 +185,4 @@ npm run build
 
 ## Integration with Backend
 
-The frontend communicates with the C# backend API through RESTful endpoints. See the backend README for more information on API endpoints and integration. 
+The frontend communicates with the C# backend API through RESTful endpoints. See the backend README for more information on API endpoints and integration.
