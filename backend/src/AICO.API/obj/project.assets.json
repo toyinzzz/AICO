@@ -5561,11 +5561,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "c:\\Users\\toyin\\AICO\\backend\\src\\AICO.API\\AICO.API.csproj",
+      "projectUniqueName": "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.API\\AICO.API.csproj",
       "projectName": "AICO.API",
-      "projectPath": "c:\\Users\\toyin\\AICO\\backend\\src\\AICO.API\\AICO.API.csproj",
+      "projectPath": "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.API\\AICO.API.csproj",
       "packagesPath": "C:\\Users\\toyin\\.nuget\\packages\\",
-      "outputPath": "c:\\Users\\toyin\\AICO\\backend\\src\\AICO.API\\obj\\",
+      "outputPath": "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.API\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -5586,14 +5586,14 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "c:\\Users\\toyin\\AICO\\backend\\src\\AICO.Application\\AICO.Application.csproj": {
-              "projectPath": "c:\\Users\\toyin\\AICO\\backend\\src\\AICO.Application\\AICO.Application.csproj"
+            "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.Application\\AICO.Application.csproj": {
+              "projectPath": "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.Application\\AICO.Application.csproj"
             },
-            "c:\\Users\\toyin\\AICO\\backend\\src\\AICO.Infrastructure\\AICO.Infrastructure.csproj": {
-              "projectPath": "c:\\Users\\toyin\\AICO\\backend\\src\\AICO.Infrastructure\\AICO.Infrastructure.csproj"
+            "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.Infrastructure\\AICO.Infrastructure.csproj": {
+              "projectPath": "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.Infrastructure\\AICO.Infrastructure.csproj"
             },
-            "c:\\Users\\toyin\\AICO\\backend\\src\\AICO.Shared\\AICO.Shared.csproj": {
-              "projectPath": "c:\\Users\\toyin\\AICO\\backend\\src\\AICO.Shared\\AICO.Shared.csproj"
+            "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.Shared\\AICO.Shared.csproj": {
+              "projectPath": "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.Shared\\AICO.Shared.csproj"
             }
           }
         }

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "+OulR8856As=",
+  "dgSpecHash": "GMI3bcjlwE8=",
   "success": true,
-  "projectFilePath": "c:\\Users\\toyin\\AICO\\backend\\src\\AICO.API\\AICO.API.csproj",
+  "projectFilePath": "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.API\\AICO.API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\toyin\\.nuget\\packages\\automapper\\12.0.1\\automapper.12.0.1.nupkg.sha512",
     "C:\\Users\\toyin\\.nuget\\packages\\azure.ai.openai\\2.1.0\\azure.ai.openai.2.1.0.nupkg.sha512",

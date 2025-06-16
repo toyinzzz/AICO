@@ -5952,11 +5952,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "c:\\Users\\toyin\\AICO\\backend\\tests\\AICO.Domain.Tests\\AICO.Domain.Tests.csproj",
+      "projectUniqueName": "C:\\Users\\toyin\\AICO\\backend\\tests\\AICO.Domain.Tests\\AICO.Domain.Tests.csproj",
       "projectName": "AICO.Domain.Tests",
-      "projectPath": "c:\\Users\\toyin\\AICO\\backend\\tests\\AICO.Domain.Tests\\AICO.Domain.Tests.csproj",
+      "projectPath": "C:\\Users\\toyin\\AICO\\backend\\tests\\AICO.Domain.Tests\\AICO.Domain.Tests.csproj",
       "packagesPath": "C:\\Users\\toyin\\.nuget\\packages\\",
-      "outputPath": "c:\\Users\\toyin\\AICO\\backend\\tests\\AICO.Domain.Tests\\obj\\",
+      "outputPath": "C:\\Users\\toyin\\AICO\\backend\\tests\\AICO.Domain.Tests\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -5977,8 +5977,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "c:\\Users\\toyin\\AICO\\backend\\src\\AICO.Domain\\AICO.Domain.csproj": {
-              "projectPath": "c:\\Users\\toyin\\AICO\\backend\\src\\AICO.Domain\\AICO.Domain.csproj"
+            "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.Domain\\AICO.Domain.csproj": {
+              "projectPath": "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.Domain\\AICO.Domain.csproj"
             }
           }
         }
