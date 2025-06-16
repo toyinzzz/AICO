@@ -1,7 +1,5 @@
 // AnalysisResult.cs
 
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace AICO.Domain.Entities
@@ -66,10 +64,10 @@ namespace AICO.Domain.Entities
         {
             if (string.IsNullOrWhiteSpace(analysisType))
                 throw new ArgumentException("Analysis type cannot be null or empty", nameof(analysisType));
-            
+
             if (string.IsNullOrWhiteSpace(resultData))
                 throw new ArgumentException("Result data cannot be null or empty", nameof(resultData));
-            
+
             if (score < 0 || score > 100)
                 throw new ArgumentOutOfRangeException(nameof(score), "Score must be between 0 and 100");
 

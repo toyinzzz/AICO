@@ -1,5 +1,3 @@
-using System;
-
 namespace AICO.Domain.Events
 {
     /// <summary>
@@ -11,12 +9,12 @@ namespace AICO.Domain.Events
         /// Unique identifier for the event
         /// </summary>
         public Guid Id { get; }
-        
+
         /// <summary>
         /// When the event occurred
         /// </summary>
         public DateTime OccurredOn { get; }
-        
+
         protected DomainEvent()
         {
             Id = Guid.NewGuid();

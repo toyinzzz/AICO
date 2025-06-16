@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AICO.Domain.Entities;
 using AICO.Domain.Interfaces;
+using AICO.Domain.Interfaces.Services;
 using AICO.Domain.Services;
 using Moq;
 using Xunit;
@@ -67,7 +64,7 @@ namespace AICO.Domain.Tests.Services
             Assert.Equal(score, result.Score);
             Assert.Equal(resultData, result.ResultData);
             Assert.Equal(summary, result.Summary);
-            _mockAuditService.Verify(s => s.SetCreationAudit(It.IsAny<IAuditableEntity>()), Times.Once);
+            _mockAuditService.Verify(s => s.SetCreationAudit(It.IsAny<AnalysisResult>()), Times.Once);
         }
 
         [Fact]
@@ -82,7 +79,7 @@ namespace AICO.Domain.Tests.Services
                 "{\"issues\":\"minor\"}",
                 "Initial summary"
             );
-            
+
             var newScore = 80;
             var newResultData = "{\"issues\":\"none\"}";
             var newSummary = "Updated summary";
@@ -109,10 +106,10 @@ namespace AICO.Domain.Tests.Services
                 "{\"data\":\"test\"}",
                 "Test analysis"
             );
-            
+
             // Set ID for the analysis
             typeof(BaseEntity).GetProperty("Id").SetValue(analysis, Guid.NewGuid());
-            
+
             var title = "Improve meta tags";
             var description = "Add better meta descriptions";
             var priority = 2;
@@ -137,7 +134,7 @@ namespace AICO.Domain.Tests.Services
                 .ReturnsAsync(recommendation);
 
             // Act
-            await _analysisService.AddRecommendationAsync(analysis, title, description, priority, category);
+            await _analysisService.AddRecommendationAsync(analysis.Id, title, description, priority, category);
 
             // Assert
             Assert.Contains(recommendation, analysis.Recommendations);
@@ -158,7 +155,7 @@ namespace AICO.Domain.Tests.Services
             var summary = "Test summary";
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(() => 
+            await Assert.ThrowsAsync<ArgumentException>(() =>
                 _analysisService.CreateAnalysisAsync(websiteId, invalidAnalysisType, score, resultData, summary));
         }
 
@@ -174,7 +171,7 @@ namespace AICO.Domain.Tests.Services
             var summary = "Test summary";
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => 
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
                 _analysisService.CreateAnalysisAsync(websiteId, analysisType, invalidScore, resultData, summary));
         }
 
@@ -186,7 +183,7 @@ namespace AICO.Domain.Tests.Services
 
             // Act
             var result = await _analysisService.ValidateAnalysisDataAsync(validJson);
-
+  
             // Assert
             Assert.True(result);
         }
@@ -204,4 +201,4 @@ namespace AICO.Domain.Tests.Services
             Assert.False(result);
         }
     }
-} 
+}

@@ -1,11 +1,9 @@
 // AnalysisService.cs
 
-using System;
-using System.Text.Json;
-using System.Threading.Tasks;
 using AICO.Domain.Entities;
 using AICO.Domain.Interfaces;
-using System.Collections.Generic;
+using AICO.Domain.Interfaces.Services;
+using System.Text.Json;
 
 namespace AICO.Domain.Services
 {
@@ -37,7 +35,7 @@ namespace AICO.Domain.Services
         public async Task<AnalysisResult> CreateAnalysisAsync(Guid websiteId, string analysisType, int score, string resultData, string summary)
         {
             // Validate input is done in the entity factory method
-            
+
             // Create the analysis result using the factory method
             var analysis = AnalysisResult.Create(websiteId, analysisType, score, resultData, summary);
 
@@ -158,5 +156,45 @@ namespace AICO.Domain.Services
 
             return Task.CompletedTask;
         }
+
+        public Task<AnalysisResult> AnalyzeWebsiteAsync(Guid websiteId, string analysisType)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<AnalysisResult> GetAnalysisResultByIdAsync(Guid id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<AnalysisResult>> GetAnalysisResultsByWebsiteIdAsync(Guid websiteId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<AnalysisResult> GetLatestAnalysisResultAsync(Guid websiteId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Recommendation> AddRecommendationAsync(Guid analysisResultId, string title, string description, int priority, string category)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<Recommendation>> GetRecommendationsByAnalysisResultIdAsync(Guid analysisResultId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task MarkRecommendationAsImplementedAsync(Guid recommendationId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task MarkRecommendationAsNotImplementedAsync(Guid recommendationId)
+        {
+            throw new NotImplementedException();
+        }
     }
-} 
+}

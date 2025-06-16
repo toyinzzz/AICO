@@ -1,3 +1,285 @@
+1. AICO.Domain
+Prüfpunkte:
+•	Entities, ValueObjects, Interfaces, Domain-Services
+•	Kapselung, Validierung, Factory-Pattern
+•	Keine Business-Logik in Entities, sondern in Services
+Typische Hinweise:
+•	Properties sollten möglichst private set oder init haben.
+•	Factory-Methoden für Entity-Erstellung nutzen.
+•	Validierung in Factory/Service, nicht im Controller.
+•	Keine Magic Strings/Numbers.
+•	Interfaces sollten Nullability korrekt abbilden (Task<T?> für GetByIdAsync).
+---
+2. AICO.Application
+Prüfpunkte:
+•	Command/Query-Handler, DTOs, Application-Services
+•	Trennung von Logik und Datenzugriff
+•	Nutzung von MediatR, AutoMapper, FluentValidation
+Typische Hinweise:
+•	Handler sollten nur orchestrieren, keine Business-Logik enthalten.
+•	DTOs und Entities klar trennen.
+•	Validierung mit FluentValidation.
+•	Keine direkten Datenbankzugriffe im Application-Layer.
+---
+3. AICO.Infrastructure
+Prüfpunkte:
+•	Repositories, Datenbankzugriff, externe Services, DI
+•	Nutzung von EF Core, saubere Repository-Pattern-Implementierung
+•	Keine Business-Logik in Repositories
+Typische Hinweise:
+•	Alle Services/Repos im DI-Container registrieren.
+•	Asynchrone Methoden für alle Datenbankzugriffe.
+•	Keine Reflection für Property-Setzung (besser: interne/protected Setter).
+•	NotImplementedException nur für nicht-MVP-relevante Methoden.
+---
+4. AICO.API
+Prüfpunkte:
+•	Controller, Routing, Swagger, Auth
+•	REST-Konformität, Fehlerbehandlung, Statuscodes
+Typische Hinweise:
+•	Controller sollten nur orchestrieren, keine Logik enthalten.
+•	Fehler sauber behandeln (z.B. mit ProblemDetails).
+•	Swagger/OpenAPI aktiviert.
+•	Authentifizierung und Autorisierung korrekt konfiguriert.
+---
+5. AICO.Shared
+Prüfpunkte:
+•	Geteilte Typen, Hilfsklassen, ggf. Extensions
+Typische Hinweise:
+•	Keine Business-Logik, nur Hilfsfunktionen/Typen.
+•	Saubere Trennung von Shared-Code und Domain/Application.
+---
+6. AICO.IntegrationTests
+Prüfpunkte:
+•	Testabdeckung für alle MVP-Workflows
+•	Arrange/Act/Assert-Struktur, Nutzung von Test-Fixtures
+•	Tests für Erfolgs- und Fehlerfälle
+Typische Hinweise:
+•	Tests sollten unabhängig und wiederholbar sein.
+•	Testdaten gezielt wählen, nicht nur zufällige GUIDs.
+•	Negativtests ergänzen.
+
+## Code Review Report: for Entities, AbTest Entity as example
+
+**Developer:** [AgentA]  
+**Reviewer:** [AgentB]  
+**Date:** June 11, 2025  
+**File:** `AICO.Domain.Entities/AbTest.cs`
+
+## Executive Summary
+
+Your AbTest entity demonstrates a solid understanding of domain-driven design principles and entity encapsulation. The code follows many best practices including proper encapsulation, constructor validation, and domain logic placement. However, there are several improvements needed to fully align with SOLID principles and IoC patterns.
+
+**Overall Grade:** B+ (Good work with room for specific improvements)
+
+## What You Did Well ✅
+
+### Strong Domain Modeling
+- Excellent use of private setters to protect entity state
+- Proper constructor validation with null checks
+- Clear separation between public constructor and EF Core private constructor
+- Good documentation with XML comments
+
+### Business Logic Encapsulation
+- State transition logic (`Start()`, `Stop()`) is correctly placed in the entity
+- Validation rules prevent invalid state changes
+- Enum usage for status provides type safety
+
+### Entity Relationships
+- Proper navigation properties for Campaign, Variants, and Conversions
+- Correct use of foreign keys and collection initialization
+
+## Issues to Address 🔧
+
+### Priority 1: High Impact Issues
+
+#### 1. Hidden DateTime Dependency (Violates IoC)
+**Problem:** Direct use of `DateTime.UtcNow` creates untestable code
+```csharp
+// Current problematic code
+UpdatedAt = DateTime.UtcNow;
+```
+
+**Solution:** Remove direct DateTime dependency from the entity
+```csharp
+// Updated Start method - remove DateTime.UtcNow
+public void Start()
+{
+    if (Status != AbTestStatus.Draft)
+        throw new InvalidOperationException("Only draft tests can be started");
+    Status = AbTestStatus.Running;
+    // Remove this line: UpdatedAt = DateTime.UtcNow;
+}
+
+// Handle timestamp updates in your service layer instead
+public class AbTestService
+{
+    private readonly IDateTimeProvider _dateTimeProvider;
+    
+    public void StartTest(AbTest test)
+    {
+        test.Start();
+        test.UpdateTimestamp(_dateTimeProvider.UtcNow);
+    }
+}
+```
+
+**Why:** This makes the entity testable and removes hidden dependencies.
+
+#### 2. Add Missing UpdateTimestamp Method
+**Action Required:** Add this method to your AbTest entity
+```csharp
+/// <summary>
+/// Updates the timestamp (should only be called by domain services)
+/// </summary>
+internal void UpdateTimestamp(DateTime timestamp)
+{
+    UpdatedAt = timestamp;
+}
+```
+
+### Priority 2: Medium Impact Improvements
+
+#### 3. String-Based TestType Lacks Type Safety
+**Problem:** Using strings for test types reduces compile-time safety
+```csharp
+// Current approach allows any string
+public string TestType { get; private set; }
+```
+
+**Solution:** Create a TestType value object
+```csharp
+// Create new file: TestType.cs
+public class TestType : IEquatable<TestType>
+{
+    public static readonly TestType Headline = new("Headline");
+    public static readonly TestType CallToAction = new("CTA");
+    public static readonly TestType Layout = new("Layout");
+    public static readonly TestType Image = new("Image");
+    
+    public string Value { get; }
+    
+    private TestType(string value)
+    {
+        Value = value ?? throw new ArgumentNullException(nameof(value));
+    }
+    
+    public static TestType Create(string value)
+    {
+        return new TestType(value);
+    }
+    
+    // Implement IEquatable<TestType> and override Equals/GetHashCode
+    public bool Equals(TestType other) => other != null && Value == other.Value;
+    public override bool Equals(object obj) => Equals(obj as TestType);
+    public override int GetHashCode() => Value.GetHashCode();
+    public override string ToString() => Value;
+}
+```
+
+**Update AbTest entity:**
+```csharp
+// Change from string to TestType
+public TestType TestType { get; private set; }
+
+// Update constructor
+public AbTest(string name, string description, Guid campaignId, TestType testType, 
+             string targetSelector, string originalContent)
+{
+    // ... other assignments
+    TestType = testType ?? throw new ArgumentNullException(nameof(testType));
+}
+```
+
+#### 4. Hardcoded State Transitions (Violates OCP)
+**Current Limitation:** Adding new statuses or transition rules requires modifying the entity
+
+**Solution:** Create a state transition validator
+```csharp
+// Create new file: AbTestStateValidator.cs
+public static class AbTestStateValidator
+{
+    private static readonly Dictionary<AbTestStatus, List<AbTestStatus>> ValidTransitions = new()
+    {
+        { AbTestStatus.Draft, new List<AbTestStatus> { AbTestStatus.Running } },
+        { AbTestStatus.Running, new List<AbTestStatus> { AbTestStatus.Stopped, AbTestStatus.Completed } },
+        { AbTestStatus.Stopped, new List<AbTestStatus> { AbTestStatus.Running } },
+        { AbTestStatus.Completed, new List<AbTestStatus>() } // No transitions from completed
+    };
+    
+    public static bool CanTransitionTo(AbTestStatus from, AbTestStatus to)
+    {
+        return ValidTransitions.ContainsKey(from) && ValidTransitions[from].Contains(to);
+    }
+    
+    public static void ValidateTransition(AbTestStatus from, AbTestStatus to)
+    {
+        if (!CanTransitionTo(from, to))
+            throw new InvalidOperationException($"Cannot transition from {from} to {to}");
+    }
+}
+```
+
+**Update your methods:**
+```csharp
+public void Start()
+{
+    AbTestStateValidator.ValidateTransition(Status, AbTestStatus.Running);
+    Status = AbTestStatus.Running;
+}
+
+public void Stop()
+{
+    AbTestStateValidator.ValidateTransition(Status, AbTestStatus.Stopped);
+    Status = AbTestStatus.Stopped;
+}
+```
+
+### Priority 3: Future Enhancements
+
+#### 5. Consider Domain Events
+For future scalability, consider adding domain events when state changes occur:
+```csharp
+// This is for future implementation - not required now
+public void Start()
+{
+    AbTestStateValidator.ValidateTransition(Status, AbTestStatus.Running);
+    Status = AbTestStatus.Running;
+    
+    // Future: AddDomainEvent(new AbTestStartedEvent(Id, CampaignId));
+}
+```
+
+## Action Items Summary
+
+### Must Do (Before Code Review Approval)
+1. ✅ Remove `DateTime.UtcNow` from Start() and Stop() methods
+2. ✅ Add `UpdateTimestamp(DateTime timestamp)` method
+3. ✅ Create IDateTimeProvider interface and update service layer
+
+### Should Do (Next Sprint)
+1. ✅ Implement TestType value object
+2. ✅ Create AbTestStateValidator class
+3. ✅ Update constructor to use TestType instead of string
+
+### Nice to Have (Future Backlog)
+1. ✅ Research domain events pattern
+2. ✅ Consider adding validation for TargetSelector CSS syntax
+
+## Testing Recommendations
+
+After implementing these changes, ensure you have unit tests covering:
+- State transitions with mocked time provider
+- Constructor validation
+- Invalid state transition scenarios
+- TestType equality and creation
+
+## Questions?
+
+If you have questions about any of these recommendations or need help implementing them, please schedule a pairing session. The Priority 1 items should be addressed before this code goes to production.
+
+Good work overall - you're showing strong progress in understanding domain modeling!
+
 ## Revised MVP Development Plan
 ### Phase 1: Backend Core (Weeks 1-4) Week 1: Authentication & User Management
 ```

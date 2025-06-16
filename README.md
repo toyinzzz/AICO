@@ -41,6 +41,29 @@ AICO is built as a cloud-native microservices application with the following com
 
 For detailed architecture information, see our [Architecture Documentation](./docs/ARCHITECTURE.md).
 
+## Development Setup & Status
+
+This section outlines the current development setup progress and status for each service.
+
+### Frontend Service (React + Vite)
+
+- **Local Development:** The frontend can be run locally.
+  - Navigate to the `frontend` directory.
+  - Run `npm install` to install dependencies.
+  - Run `npm run dev` to start the development server (typically on `http://localhost:8080/`).
+- **Initial Setup Notes:**
+  - The `frontend/run-dev.bat` script for Docker-based development was initially pointing to an incorrect path for `docker-compose.dev.yml`. This has been corrected.
+  - During initial attempts, the Docker build process for the frontend (`docker-compose up --build`) was getting stuck at the "load build context" stage. As a workaround, local development via `npm run dev` was pursued and is functional.
+  - Data display in the frontend is a mix: many components use mocked data, while an `mcpService.ts` exists for potential backend integration (currently configured with `mockData: true` in some usages).
+
+### Backend API Service (.NET)
+
+- Setup and testing are pending.
+
+### AI Analysis Service (Python + FastAPI)
+
+- Setup and testing are pending.
+
 ## Project Structure
 
 ```

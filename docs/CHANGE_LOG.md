@@ -1,5 +1,50 @@
 # AICO Project Change Log
 
+## Version 0.3.0 (Strategic Pivot to ProfitLift MVP)
+
+### Strategic Changes
+- **Business Plan Restructure**: Replaced broad AICO business plan with focused ProfitLift strategy
+- **MVP Definition**: Established ProfitLift as the core MVP for market entry
+- **Market Positioning**: Pivoted from general AI optimization to profit-focused CRO tool
+- **Target Audience**: Narrowed focus to indie SaaS founders, DTC eCommerce operators, and freelance CRO marketers
+
+### Added
+- **COMPREHENSIVE_BUSINESS_PLAN.md**: Updated comprehensive business strategy merging AICO's technical architecture with ProfitLift's market approach
+- **PROFITLIFT_MVP.md**: Detailed 6-month MVP implementation plan with specific milestones and deliverables
+- **Strategic Focus**: Clear prioritization of MVP features over infrastructure complexity
+
+### Business Model Updates
+- **Revenue Model**: Tiered SaaS pricing ($49-$499/month) with high ARPU potential
+- **Financial Projections**: 12-month forecast showing breakeven at month 8 with $15K MRR
+- **Go-to-Market Strategy**: Three-phase approach (Indie Founder Podcasts → Partner/Affiliate → Self-Serve)
+- **Competitive Advantage**: AI-driven profit optimization vs traditional A/B testing tools
+
+### Development Priorities
+- **Infrastructure Deferral**: Postponed CI/CD complexity until active user base established
+- **MVP Core Features**: Prioritized variant generation, page injection, profit tracking, and UX
+- **Market Validation**: Emphasis on building, sharing, feedback, and iteration cycle
+
+### MCP Implementation
+- **Core Calculation Logic**: Implemented MCP calculation in ProfitTrackingService with methods for basic calculation, currency conversion, multiple variants, and statistical significance
+- **Data Structures**: Created supporting DTOs and entities (MCPResult, RevenueReport, Revenue)
+- **Edge Case Handling**: Implemented handling for division by zero, extreme values, overflow exceptions, and input validation
+- **Statistical Significance**: Added basic implementation with minimum sample size requirements
+- **Stripe Integration**: Implemented partial integration with ProcessStripeWebhookAsync method
+- **Identified Gaps**: Documented critical gaps including currency conversion, advanced statistical analysis, frontend visualization, time-based analysis, segmentation, and automated decision making
+
+### Documentation
+- Update old `BUSINESS_PLAN.md` to avoid confusion
+- Established clear separation between comprehensive strategy and MVP execution
+- Aligned all planning documents with ProfitLift brand and market positioning
+
+### Strategic Rationale
+- **Market Timing**: Leveraging AI advancement wave for CRO applications
+- **Resource Optimization**: Solo founder approach with focused scope
+- **Revenue Potential**: Higher value problem tied directly to customer revenue
+- **Defensibility**: Specialized niche with sticky, results-driven product
+
+---
+
 ## Version 0.2.0 (Comprehensive Architecture Documentation)
 
 ### Added

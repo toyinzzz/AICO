@@ -1,5 +1,3 @@
-using System;
-
 namespace AICO.Domain.ValueObjects
 {
     /// <summary>
@@ -11,12 +9,12 @@ namespace AICO.Domain.ValueObjects
         /// The URL value
         /// </summary>
         public string Value { get; }
-        
+
         private Url(string value)
         {
             Value = value;
         }
-        
+
         /// <summary>
         /// Creates a new URL value object
         /// </summary>
@@ -27,14 +25,14 @@ namespace AICO.Domain.ValueObjects
         {
             if (string.IsNullOrWhiteSpace(value))
                 throw new ArgumentException("URL cannot be empty", nameof(value));
-                
-            if (!Uri.TryCreate(value, UriKind.Absolute, out var uri) || 
+
+            if (!Uri.TryCreate(value, UriKind.Absolute, out var uri) ||
                 (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
                 throw new ArgumentException("Invalid URL format. Must be a valid HTTP or HTTPS URL.", nameof(value));
-                
+
             return new Url(value.Trim());
         }
-        
+
         public override string ToString() => Value;
     }
 }

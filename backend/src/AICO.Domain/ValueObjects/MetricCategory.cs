@@ -1,5 +1,3 @@
-using System;
-
 namespace AICO.Domain.ValueObjects
 {
     /// <summary>
@@ -19,17 +17,17 @@ namespace AICO.Domain.ValueObjects
             public static readonly MetricCategory UX = new("ux");
             public static readonly MetricCategory Custom = new("custom");
         }
-        
+
         /// <summary>
         /// The metric category value
         /// </summary>
         public string Value { get; }
-        
+
         private MetricCategory(string value)
         {
             Value = value;
         }
-        
+
         /// <summary>
         /// Creates a new MetricCategory value object
         /// </summary>
@@ -40,10 +38,10 @@ namespace AICO.Domain.ValueObjects
         {
             if (string.IsNullOrWhiteSpace(value))
                 throw new ArgumentException("Metric category cannot be empty", nameof(value));
-                
+
             return new MetricCategory(value.Trim().ToLowerInvariant());
         }
-        
+
         public override string ToString() => Value;
     }
 }

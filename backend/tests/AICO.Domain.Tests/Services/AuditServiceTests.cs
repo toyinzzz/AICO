@@ -1,4 +1,3 @@
-using System;
 using AICO.Domain.Entities;
 using AICO.Domain.Interfaces;
 using AICO.Domain.Services;
@@ -62,9 +61,9 @@ namespace AICO.Domain.Tests.Services
         public void UpdateModificationDate_WithNullEntity_ThrowsArgumentNullException()
         {
             // Act & Assert
-            var exception = Assert.Throws<ArgumentNullException>(() => 
+            var exception = Assert.Throws<ArgumentNullException>(() =>
                 _auditService.UpdateModificationDate(null));
-            
+
             Assert.Equal("entity", exception.ParamName);
         }
 
@@ -116,10 +115,10 @@ namespace AICO.Domain.Tests.Services
         public void SetCreationAudit_WithNullEntity_ThrowsArgumentNullException()
         {
             // Act & Assert
-            var exception = Assert.Throws<ArgumentNullException>(() => 
+            var exception = Assert.Throws<ArgumentNullException>(() =>
                 _auditService.SetCreationAudit(null));
-            
+
             Assert.Equal("entity", exception.ParamName);
         }
     }
-} 
+}

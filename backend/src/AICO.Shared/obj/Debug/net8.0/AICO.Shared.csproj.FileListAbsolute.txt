@@ -1,0 +1,13 @@
+C:\Users\toyin\AICO\backend\src\AICO.Shared\bin\Debug\net8.0\AICO.Shared.deps.json
+C:\Users\toyin\AICO\backend\src\AICO.Shared\bin\Debug\net8.0\AICO.Shared.dll
+C:\Users\toyin\AICO\backend\src\AICO.Shared\bin\Debug\net8.0\AICO.Shared.pdb
+C:\Users\toyin\AICO\backend\src\AICO.Shared\obj\Debug\net8.0\AICO.Shared.csproj.AssemblyReference.cache
+C:\Users\toyin\AICO\backend\src\AICO.Shared\obj\Debug\net8.0\AICO.Shared.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\toyin\AICO\backend\src\AICO.Shared\obj\Debug\net8.0\AICO.Shared.AssemblyInfoInputs.cache
+C:\Users\toyin\AICO\backend\src\AICO.Shared\obj\Debug\net8.0\AICO.Shared.AssemblyInfo.cs
+C:\Users\toyin\AICO\backend\src\AICO.Shared\obj\Debug\net8.0\AICO.Shared.csproj.CoreCompileInputs.cache
+C:\Users\toyin\AICO\backend\src\AICO.Shared\obj\Debug\net8.0\AICO.Shared.sourcelink.json
+C:\Users\toyin\AICO\backend\src\AICO.Shared\obj\Debug\net8.0\AICO.Shared.dll
+C:\Users\toyin\AICO\backend\src\AICO.Shared\obj\Debug\net8.0\refint\AICO.Shared.dll
+C:\Users\toyin\AICO\backend\src\AICO.Shared\obj\Debug\net8.0\AICO.Shared.pdb
+C:\Users\toyin\AICO\backend\src\AICO.Shared\obj\Debug\net8.0\ref\AICO.Shared.dll
