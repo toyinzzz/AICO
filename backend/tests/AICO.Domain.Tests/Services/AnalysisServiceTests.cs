@@ -1,5 +1,6 @@
 using AICO.Domain.Entities;
 using AICO.Domain.Interfaces;
+using AICO.Domain.Interfaces.Services;
 using AICO.Domain.Services;
 using Moq;
 using Xunit;
@@ -63,7 +64,7 @@ namespace AICO.Domain.Tests.Services
             Assert.Equal(score, result.Score);
             Assert.Equal(resultData, result.ResultData);
             Assert.Equal(summary, result.Summary);
-            _mockAuditService.Verify(s => s.SetCreationAudit(It.IsAny<IAuditableEntity>()), Times.Once);
+            _mockAuditService.Verify(s => s.SetCreationAudit(It.IsAny<AnalysisResult>()), Times.Once);
         }
 
         [Fact]
@@ -133,7 +134,7 @@ namespace AICO.Domain.Tests.Services
                 .ReturnsAsync(recommendation);
 
             // Act
-            await _analysisService.AddRecommendationAsync(analysis, title, description, priority, category);
+            await _analysisService.AddRecommendationAsync(analysis.Id, title, description, priority, category);
 
             // Assert
             Assert.Contains(recommendation, analysis.Recommendations);
@@ -182,7 +183,7 @@ namespace AICO.Domain.Tests.Services
 
             // Act
             var result = await _analysisService.ValidateAnalysisDataAsync(validJson);
-
+  
             // Assert
             Assert.True(result);
         }

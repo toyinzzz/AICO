@@ -66,7 +66,7 @@ namespace AICO.Domain.Tests.Services
             _mockAuditService.Verify(s => s.SetCreationAudit(It.IsAny<IAuditableEntity>()), Times.Once);
         }
 
-        [Fact]
+         [Fact]
         public async Task UpdateRecommendationAsync_ShouldUpdateAndAuditEntity()
         {
             // Arrange

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AICO.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+062478489126c758c2e7c81b92ffcf4bb2d7df98")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e7b90d5612ae574fd68c1f1f3193ebc41df23e12")]
 [assembly: System.Reflection.AssemblyProductAttribute("AICO.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AICO.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

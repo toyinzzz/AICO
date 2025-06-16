@@ -56,6 +56,21 @@ namespace AICO.Domain.DTOs
         public Dictionary<Guid, decimal> ConversionRateByVariant { get; set; } = new();
 
         /// <summary>
+        /// MCP (Marginal Contribution to Profit) by variant
+        /// </summary>
+        public Dictionary<Guid, decimal> MCPByVariant { get; set; } = new();
+
+        /// <summary>
+        /// Statistical significance of MCP values by variant
+        /// </summary>
+        public Dictionary<Guid, bool> MCPStatisticalSignificance { get; set; } = new();
+
+        /// <summary>
+        /// Overall MCP for the winning variant
+        /// </summary>
+        public decimal OverallMCP { get; set; }
+
+        /// <summary>
         /// Revenue growth compared to control
         /// </summary>
         public decimal RevenueGrowth { get; set; }

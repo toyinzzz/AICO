@@ -1,7 +1,6 @@
 using AICO.Domain.DTOs;
 using AICO.Domain.Interfaces.Services;
 using AICO.Domain.Interfaces.Repositories;
-using AICO.Domain.Entities;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 
@@ -29,14 +28,46 @@ namespace AICO.Application.Services
             ValidateInputs(controlRevenue, controlConversions, variantRevenue, variantConversions);
             var controlRPC = controlConversions == 0 ? 0 : controlRevenue / controlConversions;
             var variantRPC = variantConversions == 0 ? 0 : variantRevenue / variantConversions;
-            if (controlRPC == 0) return variantRPC == 0 ? 0 : decimal.MaxValue;
-            var mcp = ((variantRPC - controlRPC) / controlRPC) * 100;
-            return Math.Round(mcp, 4);
+            
+            // Handle zero control RPC case properly
+            if (controlRPC == 0)
+            {
+                // If both are zero, there's no lift
+                if (variantRPC == 0) return 0;
+                
+                // If control is zero but variant has value, it's a significant improvement
+                // but we cap it to avoid overflow
+                return 1000; // Cap at 1000% improvement instead of MaxValue
+            }
+            
+            // Protect against potential overflow
+            try
+            {
+                var mcp = ((variantRPC - controlRPC) / controlRPC) * 100;
+                
+                // Cap extreme values to reasonable limits
+                if (mcp > 1000) return 1000;
+                if (mcp < -1000) return -1000;
+                
+                return Math.Round(mcp, 4);
+            }
+            catch (OverflowException)
+            {
+                // If calculation causes overflow, determine if it's positive or negative
+                return variantRPC > controlRPC ? 1000 : -1000;
+            }
         }
 
         public decimal CalculateMCPWithCurrency(decimal controlRevenue, int controlConversions, decimal variantRevenue, int variantConversions, string currency)
         {
-            // Currency normalization should be handled upstream or injected as a service if needed
+            // TODO: For MVP, we assume all values are already normalized to the same currency
+            // In a future implementation, this method should:
+            // 1. Use a currency conversion service to normalize all values to a base currency
+            // 2. Apply appropriate exchange rates based on the transaction dates
+            // 3. Handle currency fluctuations over time
+            // 4. Consider implementing ICurrencyConversionService for proper dependency injection
+            //
+            // For now, we pass through to the standard MCP calculation
             return CalculateMCP(controlRevenue, controlConversions, variantRevenue, variantConversions);
         }
 
@@ -134,8 +165,64 @@ namespace AICO.Application.Services
 
             // FIXED: Proper handling of nullable Guid in GroupBy
             var revenueByVariant = filteredRevenues
-                .GroupBy(r => r.VariantId ?? Guid.Empty)
+                .GroupBy(r => r.VariantId.HasValue ? r.VariantId.Value : Guid.Empty)
                 .ToDictionary(g => g.Key, g => g.Sum(r => r.Amount));
+
+            // Calculate conversions by variant
+            var conversionsByVariant = filteredRevenues
+                .GroupBy(r => r.VariantId.HasValue ? r.VariantId.Value : Guid.Empty)
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            // Calculate MCP for each variant
+            var mcpByVariant = new Dictionary<Guid, decimal>();
+            var mcpSignificanceByVariant = new Dictionary<Guid, bool>();
+            decimal? overallMCP = null;
+            decimal highestMCP = decimal.MinValue;
+            Guid? winningVariantId = null;
+
+            // Find control variant (assuming it's the one with Guid.Empty or a specific flag in your data model)
+            var controlVariantId = Guid.Empty; // Adjust this based on your actual control variant identification logic
+            
+            if (revenueByVariant.ContainsKey(controlVariantId) && conversionsByVariant.ContainsKey(controlVariantId))
+            {
+                var controlRevenue = revenueByVariant[controlVariantId];
+                var controlConversions = conversionsByVariant[controlVariantId];
+
+                // Calculate MCP for each non-control variant
+                foreach (var variantId in revenueByVariant.Keys.Where(id => id != controlVariantId))
+                {
+                    if (conversionsByVariant.ContainsKey(variantId))
+                    {
+                        var variantRevenue = revenueByVariant[variantId];
+                        var variantConversions = conversionsByVariant[variantId];
+
+                        try
+                        {
+                            // Calculate MCP
+                            var mcp = CalculateMCP(controlRevenue, controlConversions, variantRevenue, variantConversions);
+                            mcpByVariant[variantId] = mcp;
+
+                            // Check statistical significance
+                            var isSignificant = variantConversions >= MinimumSampleSize && controlConversions >= MinimumSampleSize;
+                            mcpSignificanceByVariant[variantId] = isSignificant;
+
+                            // Track highest MCP for significant variants
+                            if (isSignificant && mcp > highestMCP)
+                            {
+                                highestMCP = mcp;
+                                winningVariantId = variantId;
+                                overallMCP = mcp;
+                            }
+                        }
+                        catch (ArgumentException)
+                        {
+                            // Skip variants with invalid inputs
+                            mcpByVariant[variantId] = 0;
+                            mcpSignificanceByVariant[variantId] = false;
+                        }
+                    }
+                }
+            }
 
             return new RevenueReport
             {
@@ -145,7 +232,11 @@ namespace AICO.Application.Services
                 TotalRevenue = totalRevenue,
                 TotalConversions = totalConversions,
                 AverageOrderValue = averageOrderValue,
-                RevenueByVariant = revenueByVariant
+                RevenueByVariant = revenueByVariant,
+                MCPByVariant = mcpByVariant,
+                MCPStatisticalSignificance = mcpSignificanceByVariant,
+                OverallMCP = overallMCP ?? 0,
+                WinningVariantId = winningVariantId
             };
         }
 

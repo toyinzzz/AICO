@@ -1,18 +1,36 @@
 using AICO.Application.Interfaces.ExternalServices;
+using AICO.Application.Interfaces.Services;
+using AICO.Application.Services;
+using AICO.Domain.DTOs;
+using AICO.Domain.Entities;
+using AICO.Domain.Interfaces.Repositories;
+using AICO.Domain.Interfaces.Services;
+using Microsoft.AspNetCore.Http;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace AICO.UnitTests.Services
 {
     public class ProfitTrackingTests
     {
-        private readonly Mock<IPaymentService> _mockPaymentService;
-        private readonly ProfitTrackingService _profitTrackingService;
+        private readonly Mock<IRevenueRepository> _mockRevenueRepository;
+        private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor;
+        private readonly Mock<IWebsiteService> _mockWebsiteService;
+        private readonly IProfitTrackingService _profitTrackingService;
 
         public ProfitTrackingTests()
         {
-            _mockPaymentService = new Mock<IPaymentService>();
-            _profitTrackingService = new ProfitTrackingService(_mockPaymentService.Object);
+            _mockRevenueRepository = new Mock<IRevenueRepository>();
+            _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
+            _mockWebsiteService = new Mock<IWebsiteService>();
+            
+            _profitTrackingService = new ProfitTrackingService(
+                _mockRevenueRepository.Object,
+                _mockHttpContextAccessor.Object,
+                _mockWebsiteService.Object);
         }
 
         [Fact]
@@ -21,20 +39,37 @@ namespace AICO.UnitTests.Services
             // Arrange
             var sessionId = Guid.NewGuid();
             var variantId = Guid.NewGuid();
+            var websiteId = Guid.NewGuid();
+            var userId = Guid.NewGuid();
             var stripeEvent = new StripeWebhookEvent
             {
                 Type = "payment_intent.succeeded",
                 Data = new StripePaymentData
                 {
+                    Id = "pi_123456789",
                     Amount = 9999, // $99.99 in cents
                     Currency = "usd",
                     Metadata = new Dictionary<string, string>
                     {
                         ["session_id"] = sessionId.ToString(),
-                        ["variant_id"] = variantId.ToString()
+                        ["variant_id"] = variantId.ToString(),
+                        ["website_id"] = websiteId.ToString(),
+                        ["user_id"] = userId.ToString()
                     }
                 }
             };
+
+            // Set up mock for website service to validate ownership
+            _mockWebsiteService
+                .Setup(s => s.ValidateOwnershipAsync(websiteId, userId))
+                .ReturnsAsync(true);
+
+            // Set up mock for repository to capture the added revenue
+            Revenue capturedRevenue = null;
+            _mockRevenueRepository
+                .Setup(r => r.AddAsync(It.IsAny<Revenue>()))
+                .Callback<Revenue>(r => capturedRevenue = r)
+                .Returns(Task.CompletedTask);
 
             // Act
             var revenue = await _profitTrackingService.ProcessStripeWebhookAsync(stripeEvent);
@@ -45,6 +80,15 @@ namespace AICO.UnitTests.Services
             Assert.Equal(variantId, revenue.VariantId);
             Assert.Equal(99.99m, revenue.Amount);
             Assert.Equal("USD", revenue.Currency);
+            Assert.Equal(websiteId, revenue.WebsiteId);
+            Assert.Equal(userId, revenue.UserId);
+            Assert.Equal("pi_123456789", revenue.TransactionId);
+            
+            // Verify repository was called with the correct revenue object
+            _mockRevenueRepository.Verify(r => r.AddAsync(It.IsAny<Revenue>()), Times.Once);
+            
+            // Verify website service was called to validate ownership
+            _mockWebsiteService.Verify(s => s.ValidateOwnershipAsync(websiteId, userId), Times.Once);
         }
 
         [Fact]
@@ -259,6 +303,64 @@ namespace AICO.UnitTests.Services
             // Test precision with very small differences
             var result = _profitTrackingService.CalculateMCP(1000.0000m, 100, 1000.0001m, 100);
             Assert.True(Math.Abs(result - 0.0001m) < 0.00001m);
+        }
+        
+        [Fact]
+        public void CalculateMCP_WithZeroControlRPC_ShouldReturnCappedValue()
+        {
+            // Arrange: Control has zero RPC (revenue per conversion)
+            decimal controlRevenue = 0;
+            int controlConversions = 100;
+            decimal variantRevenue = 1000;
+            int variantConversions = 100;
+            
+            // Act
+            var result = _profitTrackingService.CalculateMCP(controlRevenue, controlConversions, variantRevenue, variantConversions);
+            
+            // Assert: Should return capped value (1000%) instead of MaxValue
+            Assert.Equal(1000m, result);
+        }
+        
+        [Fact]
+        public void CalculateMCP_WithBothZeroRPC_ShouldReturnZero()
+        {
+            // Arrange: Both control and variant have zero RPC
+            decimal controlRevenue = 0;
+            int controlConversions = 100;
+            decimal variantRevenue = 0;
+            int variantConversions = 100;
+            
+            // Act
+            var result = _profitTrackingService.CalculateMCP(controlRevenue, controlConversions, variantRevenue, variantConversions);
+            
+            // Assert: Should return 0 when both have zero RPC
+            Assert.Equal(0m, result);
+        }
+        
+        [Fact]
+        public void CalculateMCP_WithExtremeValues_ShouldCapResults()
+        {
+            // Arrange: Extreme improvement (would normally cause very large value)
+            decimal controlRevenue = 0.0001m;
+            int controlConversions = 100;
+            decimal variantRevenue = 10000m;
+            int variantConversions = 100;
+            
+            // Act
+            var result = _profitTrackingService.CalculateMCP(controlRevenue, controlConversions, variantRevenue, variantConversions);
+            
+            // Assert: Should cap at 1000%
+            Assert.Equal(1000m, result);
+            
+            // Arrange: Extreme decline (would normally cause very negative value)
+            controlRevenue = 10000m;
+            variantRevenue = 0.0001m;
+            
+            // Act
+            result = _profitTrackingService.CalculateMCP(controlRevenue, controlConversions, variantRevenue, variantConversions);
+            
+            // Assert: Should cap at -1000%
+            Assert.Equal(-1000m, result);
         }
     }
 }

@@ -1,0 +1,6 @@
+c:\Users\toyin\AICO\backend\src\AICO.Application\obj\Debug\net8.0\AICO.Application.csproj.AssemblyReference.cache
+c:\Users\toyin\AICO\backend\src\AICO.Application\obj\Debug\net8.0\AICO.Application.GeneratedMSBuildEditorConfig.editorconfig
+c:\Users\toyin\AICO\backend\src\AICO.Application\obj\Debug\net8.0\AICO.Application.AssemblyInfoInputs.cache
+c:\Users\toyin\AICO\backend\src\AICO.Application\obj\Debug\net8.0\AICO.Application.AssemblyInfo.cs
+c:\Users\toyin\AICO\backend\src\AICO.Application\obj\Debug\net8.0\AICO.Application.csproj.CoreCompileInputs.cache
+c:\Users\toyin\AICO\backend\src\AICO.Application\obj\Debug\net8.0\AICO.Application.sourcelink.json

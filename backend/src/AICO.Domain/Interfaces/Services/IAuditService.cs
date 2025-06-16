@@ -14,14 +14,15 @@ namespace AICO.Domain.Interfaces
         /// </summary>
         /// <param name="entity">The entity to update</param>
         /// <param name="userId">Optional user ID who performed the modification</param>
-        void UpdateModificationDate(IAuditableEntity entity, string userId = null);
+        void UpdateModificationDate(IAuditableEntity entity, string userId );
 
         /// <summary>
         /// Sets the creation audit information for an entity
         /// </summary>
         /// <param name="entity">The entity to update</param>
         /// <param name="userId">Optional user ID who created the entity</param>
-        void SetCreationAudit(IAuditableEntity entity, string userId = null);
+        void SetCreationAudit(IAuditableEntity entity, string userId );
         void SetCreationAudit(AnalysisResult analysis);
+        void UpdateModificationDate(IAuditableEntity auditableEntity);
     }
 }

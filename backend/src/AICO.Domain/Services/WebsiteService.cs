@@ -71,6 +71,6 @@ public class WebsiteService : IWebsiteService
     public async Task<bool> ValidateWebsiteOwnershipAsync(Guid websiteId, Guid userId)
     {
         var website = await _websiteRepository.GetByIdAsync(websiteId);
-        return website != null && website.OwnerId == userId;
+        return website != null && website.UserId == userId;
     }
 }

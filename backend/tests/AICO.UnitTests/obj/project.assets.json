@@ -9965,11 +9965,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\toyin\\AICO\\backend\\tests\\AICO.UnitTests\\AICO.UnitTests.csproj",
+      "projectUniqueName": "c:\\Users\\toyin\\AICO\\backend\\tests\\AICO.UnitTests\\AICO.UnitTests.csproj",
       "projectName": "AICO.UnitTests",
-      "projectPath": "C:\\Users\\toyin\\AICO\\backend\\tests\\AICO.UnitTests\\AICO.UnitTests.csproj",
+      "projectPath": "c:\\Users\\toyin\\AICO\\backend\\tests\\AICO.UnitTests\\AICO.UnitTests.csproj",
       "packagesPath": "C:\\Users\\toyin\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\toyin\\AICO\\backend\\tests\\AICO.UnitTests\\obj\\",
+      "outputPath": "c:\\Users\\toyin\\AICO\\backend\\tests\\AICO.UnitTests\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -9990,11 +9990,11 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.Application\\AICO.Application.csproj": {
-              "projectPath": "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.Application\\AICO.Application.csproj"
+            "c:\\Users\\toyin\\AICO\\backend\\src\\AICO.Application\\AICO.Application.csproj": {
+              "projectPath": "c:\\Users\\toyin\\AICO\\backend\\src\\AICO.Application\\AICO.Application.csproj"
             },
-            "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.Infrastructure\\AICO.Infrastructure.csproj": {
-              "projectPath": "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.Infrastructure\\AICO.Infrastructure.csproj"
+            "c:\\Users\\toyin\\AICO\\backend\\src\\AICO.Infrastructure\\AICO.Infrastructure.csproj": {
+              "projectPath": "c:\\Users\\toyin\\AICO\\backend\\src\\AICO.Infrastructure\\AICO.Infrastructure.csproj"
             }
           }
         }

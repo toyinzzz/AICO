@@ -1,4 +1,7 @@
-namespace AICO.Application.Interfaces.Services
+using System;
+using System.Threading.Tasks;
+
+namespace AICO.Domain.Interfaces.Services
 {
     public interface IPaymentService
     {

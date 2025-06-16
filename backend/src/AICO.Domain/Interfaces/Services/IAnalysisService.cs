@@ -48,5 +48,9 @@ namespace AICO.Domain.Interfaces.Services
         /// Marks a recommendation as not implemented
         /// </summary>
         Task MarkRecommendationAsNotImplementedAsync(Guid recommendationId);
+        Task <AnalysisResult> CreateAnalysisEntity(Guid websiteId, string analysisType, int score, string resultData, string summary);
+        Task<AnalysisResult> CreateAnalysisAsync(Guid websiteId, string analysisType, int score, string resultData, string summary);
+        Task UpdateAnalysisAsync(AnalysisResult analysis, int newScore, string newResultData, string newSummary);
+        Task<bool> ValidateAnalysisDataAsync(string validJson);
     }
 }

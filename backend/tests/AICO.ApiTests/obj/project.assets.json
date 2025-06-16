@@ -11757,11 +11757,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\toyin\\AICO\\backend\\tests\\AICO.ApiTests\\AICO.ApiTests.csproj",
+      "projectUniqueName": "c:\\Users\\toyin\\AICO\\backend\\tests\\AICO.ApiTests\\AICO.ApiTests.csproj",
       "projectName": "AICO.ApiTests",
-      "projectPath": "C:\\Users\\toyin\\AICO\\backend\\tests\\AICO.ApiTests\\AICO.ApiTests.csproj",
+      "projectPath": "c:\\Users\\toyin\\AICO\\backend\\tests\\AICO.ApiTests\\AICO.ApiTests.csproj",
       "packagesPath": "C:\\Users\\toyin\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\toyin\\AICO\\backend\\tests\\AICO.ApiTests\\obj\\",
+      "outputPath": "c:\\Users\\toyin\\AICO\\backend\\tests\\AICO.ApiTests\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -11782,8 +11782,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.API\\AICO.API.csproj": {
-              "projectPath": "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.API\\AICO.API.csproj"
+            "c:\\Users\\toyin\\AICO\\backend\\src\\AICO.API\\AICO.API.csproj": {
+              "projectPath": "c:\\Users\\toyin\\AICO\\backend\\src\\AICO.API\\AICO.API.csproj"
             }
           }
         }

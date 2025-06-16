@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "FQ7Q/NuqbBw=",
+  "dgSpecHash": "NZwThX/IBNM=",
   "success": true,
-  "projectFilePath": "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.Shared\\AICO.Shared.csproj",
+  "projectFilePath": "c:\\Users\\toyin\\AICO\\backend\\src\\AICO.Shared\\AICO.Shared.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\toyin\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\8.0.0\\microsoft.extensions.dependencyinjection.abstractions.8.0.0.nupkg.sha512",
     "C:\\Users\\toyin\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\8.0.0\\microsoft.extensions.logging.abstractions.8.0.0.nupkg.sha512",
@@ -14,9 +14,9 @@
       "code": "NU1903",
       "level": "Warning",
       "message": "Das Paket \"System.Text.Json\" 8.0.0 weist eine bekannte Hoch Schweregrad-Sicherheitsanfälligkeit auf, https://github.com/advisories/GHSA-8g4q-xg66-9fp4.",
-      "projectPath": "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.Shared\\AICO.Shared.csproj",
+      "projectPath": "c:\\Users\\toyin\\AICO\\backend\\src\\AICO.Shared\\AICO.Shared.csproj",
       "warningLevel": 1,
-      "filePath": "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.Shared\\AICO.Shared.csproj",
+      "filePath": "c:\\Users\\toyin\\AICO\\backend\\src\\AICO.Shared\\AICO.Shared.csproj",
       "libraryId": "System.Text.Json",
       "targetGraphs": [
         "net8.0"
@@ -26,9 +26,9 @@
       "code": "NU1903",
       "level": "Warning",
       "message": "Das Paket \"System.Text.Json\" 8.0.0 weist eine bekannte Hoch Schweregrad-Sicherheitsanfälligkeit auf, https://github.com/advisories/GHSA-hh2w-p6rv-4g7w.",
-      "projectPath": "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.Shared\\AICO.Shared.csproj",
+      "projectPath": "c:\\Users\\toyin\\AICO\\backend\\src\\AICO.Shared\\AICO.Shared.csproj",
       "warningLevel": 1,
-      "filePath": "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.Shared\\AICO.Shared.csproj",
+      "filePath": "c:\\Users\\toyin\\AICO\\backend\\src\\AICO.Shared\\AICO.Shared.csproj",
       "libraryId": "System.Text.Json",
       "targetGraphs": [
         "net8.0"

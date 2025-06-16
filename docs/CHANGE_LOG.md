@@ -24,8 +24,16 @@
 - **MVP Core Features**: Prioritized variant generation, page injection, profit tracking, and UX
 - **Market Validation**: Emphasis on building, sharing, feedback, and iteration cycle
 
+### MCP Implementation
+- **Core Calculation Logic**: Implemented MCP calculation in ProfitTrackingService with methods for basic calculation, currency conversion, multiple variants, and statistical significance
+- **Data Structures**: Created supporting DTOs and entities (MCPResult, RevenueReport, Revenue)
+- **Edge Case Handling**: Implemented handling for division by zero, extreme values, overflow exceptions, and input validation
+- **Statistical Significance**: Added basic implementation with minimum sample size requirements
+- **Stripe Integration**: Implemented partial integration with ProcessStripeWebhookAsync method
+- **Identified Gaps**: Documented critical gaps including currency conversion, advanced statistical analysis, frontend visualization, time-based analysis, segmentation, and automated decision making
+
 ### Documentation
-- Removed old `BUSINESS_PLAN.md` to eliminate confusion
+- Update old `BUSINESS_PLAN.md` to avoid confusion
 - Established clear separation between comprehensive strategy and MVP execution
 - Aligned all planning documents with ProfitLift brand and market positioning
 

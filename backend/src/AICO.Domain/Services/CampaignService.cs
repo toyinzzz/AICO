@@ -1,4 +1,4 @@
-﻿namespace AICO.Infrastructure.DependencyInjection
+namespace AICO.Domain.Services
 {
     public class CampaignService
     {
