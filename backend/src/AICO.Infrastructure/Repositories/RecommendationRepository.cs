@@ -2,6 +2,7 @@ using AICO.Domain.Entities;
 using AICO.Domain.Interfaces.Repositories;
 using AICO.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using AICO.Domain.Entities; // Added for RecommendationStatus enum
 
 namespace AICO.Infrastructure.Repositories;
 
@@ -11,39 +12,101 @@ public class RecommendationRepository : BaseRepository<Recommendation>, IRecomme
     {
     }
 
+    public async Task<IEnumerable<Recommendation>> GetByStatusAsync(string status)
+    {
+        if (Enum.TryParse<RecommendationStatus>(status, true, out var statusEnum))
+        {
+            return await _context.Recommendations
+                .Where(r => r.Status == statusEnum)
+                .ToListAsync();
+        }
+        return new List<Recommendation>(); // Or throw an exception for invalid status
+    }
+
+    public async Task<IEnumerable<Recommendation>> GetByWebsiteIdAsync(Guid websiteId)
+    {
+        return await _context.Recommendations
+            .Where(r => r.WebsiteId == websiteId)
+            .ToListAsync();
+    }
+
     public async Task<IEnumerable<Recommendation>> GetByAnalysisResultIdAsync(Guid analysisResultId)
     {
         return await _context.Recommendations
             .Where(r => r.AnalysisResultId == analysisResultId)
-            .OrderByDescending(r => r.Priority)
-            .ThenByDescending(r => r.CreatedAt)
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<Recommendation>> GetByStatusAsync(RecommendationStatus status)
+    // Example of a more complex query method
+    public async Task<IEnumerable<Recommendation>> GetPrioritizedRecommendationsAsync(Guid websiteId, int minPriority)
     {
         return await _context.Recommendations
-            .Where(r => r.Status == status)
+            .Where(r => r.WebsiteId == websiteId && r.Priority >= minPriority)
             .OrderByDescending(r => r.Priority)
-            .ThenByDescending(r => r.CreatedAt)
+            .ThenByDescending(r => r.GeneratedAt)
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<Recommendation>> GetByPriorityAsync(int minPriority)
+    public async Task<int> CountPendingRecommendationsAsync(Guid websiteId)
     {
         return await _context.Recommendations
-            .Where(r => r.Priority >= minPriority)
-            .OrderByDescending(r => r.Priority)
-            .ThenByDescending(r => r.CreatedAt)
-            .ToListAsync();
+            .CountAsync(r => r.WebsiteId == websiteId && r.Status == RecommendationStatus.Pending);
     }
 
-    public async Task<IEnumerable<Recommendation>> GetImplementedRecommendationsAsync()
+    public async Task MarkAsImplementedAsync(Guid recommendationId)
     {
-        return await _context.Recommendations
-            .Where(r => r.Status == RecommendationStatus.Implemented)
-            .OrderByDescending(r => r.ImplementedAt)
-            .ToListAsync();
+        var recommendation = await _context.Recommendations.FindAsync(recommendationId);
+        if (recommendation != null)
+        {
+            recommendation.MarkAsImplemented();
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    public async Task ChangeStatusAsync(Guid recommendationId, string newStatus)
+    {
+        var recommendation = await _context.Recommendations.FindAsync(recommendationId);
+        if (recommendation != null && Enum.TryParse<RecommendationStatus>(newStatus, true, out var statusEnum))
+        {
+            recommendation.UpdateStatus(statusEnum);
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    public async Task<IEnumerable<Recommendation>> GetRecommendationsByCriteriaAsync(Guid websiteId, string status, int? priority, DateTime? startDate, DateTime? endDate)
+    {
+        var query = _context.Recommendations.Where(r => r.WebsiteId == websiteId);
+
+        if (!string.IsNullOrEmpty(status))
+        {
+            if (Enum.TryParse<RecommendationStatus>(status, true, out var statusEnum))
+            {
+                query = query.Where(r => r.Status == statusEnum);
+            }
+            else
+            {
+                // Handle invalid status string, perhaps log a warning or throw an exception
+                // For now, let's assume an invalid status string means no filtering by status
+                // Or, if strict, throw new ArgumentException($"Invalid recommendation status: {status}");
+            }
+        }
+
+        if (priority.HasValue)
+        {
+            query = query.Where(r => r.Priority == priority.Value);
+        }
+
+        if (startDate.HasValue)
+        {
+            query = query.Where(r => r.GeneratedAt >= startDate.Value);
+        }
+
+        if (endDate.HasValue)
+        {
+            query = query.Where(r => r.GeneratedAt <= endDate.Value);
+        }
+
+        return await query.OrderByDescending(r => r.GeneratedAt).ToListAsync();
     }
 
     public Task<IEnumerable<Recommendation>> GetByCategoryAndAnalysisResultIdAsync(string category, Guid analysisResultId)
@@ -52,16 +115,6 @@ public class RecommendationRepository : BaseRepository<Recommendation>, IRecomme
     }
 
     public Task<IEnumerable<Recommendation>> GetByImplementationStatusAndAnalysisResultIdAsync(bool isImplemented, Guid analysisResultId)
-    {
-        throw new NotImplementedException();
-    }
-
-    Task IRepository<Recommendation>.UpdateAsync(Recommendation entity)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task DeleteByIdAsync(Guid id)
     {
         throw new NotImplementedException();
     }

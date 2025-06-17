@@ -19,10 +19,10 @@ public class AnalysisResultRepository : BaseRepository<AnalysisResult>, IAnalysi
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<AnalysisResult>> GetByStatusAsync(string status)
+    public async Task<IEnumerable<AnalysisResult>> GetByStatusAsync(string analysisType)
     {
         return await _context.AnalysisResults
-            .Where(ar => ar.Status == status)
+            .Where(ar => ar.AnalysisType == analysisType)
             .OrderByDescending(ar => ar.CreatedAt)
             .ToListAsync();
     }
@@ -53,7 +53,7 @@ public class AnalysisResultRepository : BaseRepository<AnalysisResult>, IAnalysi
         throw new NotImplementedException();
     }
 
-    public Task DeleteByIdAsync(Guid id)
+    public new Task DeleteByIdAsync(Guid id)
     {
         throw new NotImplementedException();
     }

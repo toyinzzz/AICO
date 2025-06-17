@@ -28,29 +28,29 @@ namespace AICO.Infrastructure.Repositories
             return await _dbSet.AnyAsync(w => w.Domain == domain);
         }
 
-        public Task<Website> GetByUrlAsync(string url)
+        public async Task<Website?> GetByUrlAsync(string url)
         {
-            throw new NotImplementedException();
+            // Assuming URL might be stored in a specific field or related to the domain.
+            // For now, let's assume the domain is part of the URL or the URL is the domain.
+            // This might need a more sophisticated way to parse the domain from the URL.
+            return await _dbSet.FirstOrDefaultAsync(w => w.Domain == new Uri(url).Host || w.Domain == url);
         }
 
-        public Task<bool> IsUrlInUseAsync(string url)
+        public async Task<bool> IsUrlInUseAsync(string url)
         {
-            throw new NotImplementedException();
+            // Similar assumption as GetByUrlAsync
+            return await _dbSet.AnyAsync(w => w.Domain == new Uri(url).Host || w.Domain == url);
         }
 
-        public Task<IEnumerable<Website>> GetByIndustryAsync(string industry)
+        public async Task<IEnumerable<Website>> GetByIndustryAsync(string industry)
         {
-            throw new NotImplementedException();
+            // Assuming Website entity has an 'Industry' property
+            return await _dbSet.Where(w => w.Industry == industry).ToListAsync();
         }
 
         Task IRepository<Website>.UpdateAsync(Website entity)
         {
             return UpdateAsync(entity);
-        }
-
-        public Task DeleteByIdAsync(Guid id)
-        {
-            throw new NotImplementedException();
         }
     }
 }

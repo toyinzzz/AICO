@@ -20,43 +20,51 @@ public class MetricService : IMetricService
         throw new NotImplementedException("Metric calculation will be implemented in Phase 2");
     }
 
-    public Task<Metric> RecordMetricAsync(Guid websiteId, string name, string category, double value, string unit = null, string dimension = null, string dimensionValue = null)
+    public Task<Metric?> RecordMetricAsync(Guid websiteId, string name, string category, double value, string? unit = null, string? dimension = null, string? dimensionValue = null)
     {
-        throw new NotImplementedException();
+        // Basic placeholder: returns null. Actual implementation needed.
+        return Task.FromResult<Metric?>(null);
     }
 
-    public Task<Metric> UpdateMetricAsync(Guid metricId, double newValue)
+    public Task<Metric?> UpdateMetricAsync(Guid metricId, double newValue)
     {
-        throw new NotImplementedException();
+        // Basic placeholder: returns null. Actual implementation needed.
+        return Task.FromResult<Metric?>(null);
     }
 
-    public Task<IEnumerable<Metric>> GetMetricsByCategoryAsync(Guid websiteId, string category, DateTime? startDate = null, DateTime? endDate = null)
+    public Task<IEnumerable<Metric>?> GetMetricsByCategoryAsync(Guid websiteId, string category, DateTime? startDate = null, DateTime? endDate = null)
     {
-        throw new NotImplementedException();
+        // Basic placeholder: returns null. Actual implementation needed.
+        return Task.FromResult<IEnumerable<Metric>?>(null);
     }
 
-    public Task<IEnumerable<Metric>> GetMetricsByNameAsync(Guid websiteId, string name, DateTime? startDate = null, DateTime? endDate = null)
+    public Task<IEnumerable<Metric>?> GetMetricsByNameAsync(Guid websiteId, string name, DateTime? startDate = null, DateTime? endDate = null)
     {
-        throw new NotImplementedException();
+        // Basic placeholder: returns null. Actual implementation needed.
+        return Task.FromResult<IEnumerable<Metric>?>(null);
     }
 
-    public Task<IEnumerable<Metric>> GetMetricsByDimensionAsync(Guid websiteId, string dimension, string dimensionValue = null, DateTime? startDate = null, DateTime? endDate = null)
+    public Task<IEnumerable<Metric>?> GetMetricsByDimensionAsync(Guid websiteId, string dimension, string? dimensionValue = null, DateTime? startDate = null, DateTime? endDate = null)
     {
-        throw new NotImplementedException();
+        // Basic placeholder: returns null. Actual implementation needed.
+        return Task.FromResult<IEnumerable<Metric>?>(null);
     }
 
-    public Task<Metric> GetLatestMetricAsync(Guid websiteId, string name, string dimension = null, string dimensionValue = null)
+    public Task<Metric?> GetLatestMetricAsync(Guid websiteId, string name, string? dimension = null, string? dimensionValue = null)
     {
-        throw new NotImplementedException();
+        // Basic placeholder: returns null. Actual implementation needed.
+        return Task.FromResult<Metric?>(null);
     }
 
-    public Task<IEnumerable<(DateTime Date, double Value)>> GetMetricTrendAsync(Guid websiteId, string name, string timeframe, string dimension = null, string dimensionValue = null)
+    public Task<IEnumerable<(DateTime Date, double Value)>?> GetMetricTrendAsync(Guid websiteId, string name, string timeframe, string? dimension = null, string? dimensionValue = null)
     {
-        throw new NotImplementedException();
+        // Basic placeholder: returns null. Actual implementation needed.
+        return Task.FromResult<IEnumerable<(DateTime Date, double Value)>?>(null);
     }
 
-    public Task<IDictionary<string, double>> CalculateDashboardMetricsAsync(Guid websiteId, DateTime? startDate = null, DateTime? endDate = null)
+    public Task<IDictionary<string, double>?> CalculateDashboardMetricsAsync(Guid websiteId, DateTime? startDate = null, DateTime? endDate = null)
     {
-        throw new NotImplementedException();
+        // Basic placeholder: returns null. Actual implementation needed.
+        return Task.FromResult<IDictionary<string, double>?>(null);
     }
 }

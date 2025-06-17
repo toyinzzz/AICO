@@ -10,7 +10,7 @@ namespace AICO.Domain.Interfaces.Services
         /// <summary>
         /// Creates a new session or returns existing active session
         /// </summary>
-        Task<Session> GetOrCreateSessionAsync(Guid websiteId, string visitorId, string entryPage, string userAgent = null, string ipAddress = null, string referrer = null);
+        Task<Session> GetOrCreateSessionAsync(Guid websiteId, string visitorId, string entryPage, string? userAgent = null, string? ipAddress = null, string? referrer = null);
 
         /// <summary>
         /// Gets a session by ID

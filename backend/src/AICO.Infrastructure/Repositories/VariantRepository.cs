@@ -1,3 +1,5 @@
+using AICO.Domain.Entities;
+using AICO.Domain.Interfaces.Repositories;
 using AICO.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 

@@ -26,17 +26,17 @@ namespace AICO.Domain.Entities
         /// <summary>
         /// JSON data associated with the event
         /// </summary>
-        public string EventData { get; private set; }
+        public string? EventData { get; private set; }
 
         /// <summary>
         /// User agent string from the browser/client
         /// </summary>
-        public string UserAgent { get; private set; }
+        public string? UserAgent { get; private set; }
 
         /// <summary>
         /// IP address of the client
         /// </summary>
-        public string IpAddress { get; private set; }
+        public string? IpAddress { get; private set; }
 
         /// <summary>
         /// When the event occurred
@@ -46,12 +46,12 @@ namespace AICO.Domain.Entities
         /// <summary>
         /// Navigation property to the website
         /// </summary>
-        public virtual Website Website { get; private set; }
+        public virtual Website? Website { get; private set; }
 
         /// <summary>
         /// Navigation property to the session
         /// </summary>
-        public virtual Session Session { get; private set; }
+        public virtual Session? Session { get; private set; }
 
         // Private constructor for EF Core
         private Event() { }
@@ -62,16 +62,17 @@ namespace AICO.Domain.Entities
         public static Event Create(
             Guid websiteId,
             EventType eventType,
-            string eventData,
-            string userAgent = null,
-            string ipAddress = null,
+            string? eventData,
+            string? userAgent = null,
+            string? ipAddress = null,
             Guid? sessionId = null)
         {
             if (eventType == null)
                 throw new ArgumentNullException(nameof(eventType));
 
-            if (string.IsNullOrWhiteSpace(eventData))
-                throw new ArgumentException("Event data cannot be null or empty", nameof(eventData));
+            // Allow null or empty eventData if it's made nullable
+            // if (string.IsNullOrWhiteSpace(eventData))
+            //     throw new ArgumentException("Event data cannot be null or empty", nameof(eventData));
 
             var @event = new Event
             {
@@ -95,9 +96,9 @@ namespace AICO.Domain.Entities
         public static Event Create(
             Guid websiteId,
             string eventType,
-            string eventData,
-            string userAgent = null,
-            string ipAddress = null,
+            string? eventData,
+            string? userAgent = null,
+            string? ipAddress = null,
             Guid? sessionId = null)
         {
             return Create(

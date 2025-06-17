@@ -8,49 +8,43 @@ namespace AICO.Infrastructure.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<Conversion> builder)
         {
-            // Table configuration
-            builder.ToTable("Conversions");
-
-            // Primary key
             builder.HasKey(c => c.Id);
 
-            // Properties
             builder.Property(c => c.ConversionType)
                 .IsRequired()
-                .HasMaxLength(50);
+                .HasConversion<string>()
+                .HasMaxLength(50); // Max length for the string representation of the enum
 
             builder.Property(c => c.GoalName)
                 .IsRequired()
-                .HasMaxLength(100);
+                .HasMaxLength(255);
 
             builder.Property(c => c.Value)
-                .HasPrecision(18, 2);
+                .HasColumnType("decimal(18,2)"); // Precision and scale for monetary value
 
             builder.Property(c => c.Currency)
-                .HasMaxLength(3);
+                .HasMaxLength(3); // Standard currency code length (e.g., USD, EUR)
 
             builder.Property(c => c.ConversionData)
-                .HasColumnType("jsonb");
+                .HasColumnType("jsonb"); // Assuming PostgreSQL, adjust if different DB
 
-            builder.Property(c => c.ConvertedAt)
-                .IsRequired();
+            builder.Property(c => c.ConvertedAt).IsRequired();
 
             // Relationships
             builder.HasOne(c => c.Website)
-                .WithMany()
+                .WithMany() // Assuming Website doesn't have a direct collection of Conversions, or configured elsewhere
                 .HasForeignKey(c => c.WebsiteId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .IsRequired();
 
             builder.HasOne(c => c.Session)
-                .WithMany()
+                .WithMany(s => s.Conversions) // Assuming Session has a collection of Conversions
                 .HasForeignKey(c => c.SessionId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .IsRequired(false); // SessionId is nullable
 
-            // Indexes
-            builder.HasIndex(c => c.WebsiteId);
-            builder.HasIndex(c => c.SessionId);
-            builder.HasIndex(c => c.ConversionType);
-            builder.HasIndex(c => c.ConvertedAt);
+            // BaseEntity properties
+            builder.Property(c => c.CreatedAt).IsRequired();
+            builder.Property(c => c.ModifiedAt).IsRequired();
+            builder.Property(c => c.RowVersion).IsRowVersion();
         }
     }
 }

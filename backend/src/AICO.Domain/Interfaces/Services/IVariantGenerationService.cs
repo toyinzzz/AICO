@@ -16,7 +16,7 @@ namespace AICO.Domain.Interfaces.Services
         /// <summary>
         /// Creates a custom variant manually
         /// </summary>
-        Task<Variant> CreateCustomVariantAsync(Guid campaignId, string name, string htmlContent, string description = null);
+        Task<Variant> CreateCustomVariantAsync(Guid campaignId, string name, string htmlContent, string? description = null);
 
         /// <summary>
         /// Analyzes page content and structure

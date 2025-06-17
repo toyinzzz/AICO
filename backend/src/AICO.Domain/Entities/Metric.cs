@@ -31,7 +31,7 @@ namespace AICO.Domain.Entities
         /// <summary>
         /// The unit of measurement (e.g., seconds, percentage, count)
         /// </summary>
-        public string Unit { get; private set; }
+        public string? Unit { get; private set; }
 
         /// <summary>
         /// The date this metric was recorded
@@ -41,17 +41,17 @@ namespace AICO.Domain.Entities
         /// <summary>
         /// Optional dimension for the metric (e.g., device type, browser)
         /// </summary>
-        public string Dimension { get; private set; }
+        public string? Dimension { get; private set; }
 
         /// <summary>
         /// Optional dimension value
         /// </summary>
-        public string DimensionValue { get; private set; }
+        public string? DimensionValue { get; private set; }
 
         /// <summary>
         /// Navigation property to the website
         /// </summary>
-        public virtual Website Website { get; private set; }
+        public virtual Website? Website { get; private set; }
 
         // Private constructor for EF Core
         private Metric() { }
@@ -64,9 +64,9 @@ namespace AICO.Domain.Entities
             string name,
             MetricCategory category,
             double value,
-            string unit = null,
-            string dimension = null,
-            string dimensionValue = null)
+            string? unit = null,
+            string? dimension = null,
+            string? dimensionValue = null)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Metric name cannot be null or empty", nameof(name));
@@ -99,9 +99,9 @@ namespace AICO.Domain.Entities
             string name,
             string category,
             double value,
-            string unit = null,
-            string dimension = null,
-            string dimensionValue = null)
+            string? unit = null,
+            string? dimension = null,
+            string? dimensionValue = null)
         {
             return Create(
                 websiteId,

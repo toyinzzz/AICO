@@ -11,27 +11,27 @@ namespace AICO.Domain.Interfaces.Services
         /// <summary>
         /// Creates a new A/B test with variants
         /// </summary>
-        Task<AbTest> CreateTestAsync(Guid campaignId, List<Variant> variants, int trafficSplit = 50);
+        Task<AbTest?> CreateTestAsync(Guid campaignId, List<AbTestVariant> variants, int trafficSplit = 50);
 
         /// <summary>
         /// Gets the appropriate variant for a visitor
         /// </summary>
-        Task<Variant> GetVariantForVisitorAsync(Guid testId, string visitorId, string userAgent = null);
+        Task<AbTestVariant?> GetVariantForVisitorAsync(Guid testId, string visitorId, string? userAgent = null);
 
         /// <summary>
         /// Records a variant view/impression
         /// </summary>
-        Task RecordVariantViewAsync(Guid variantId, string visitorId, string sessionId = null);
+        Task RecordVariantViewAsync(Guid variantId, string visitorId, string? sessionId = null);
 
         /// <summary>
         /// Records a conversion for a variant
         /// </summary>
-        Task RecordVariantConversionAsync(Guid variantId, string visitorId, decimal? value = null, string conversionType = null);
+        Task RecordVariantConversionAsync(Guid variantId, string visitorId, decimal? value = null, string? conversionType = null);
 
         /// <summary>
         /// Gets comprehensive test results
         /// </summary>
-        Task<AbTestResults> GetTestResultsAsync(Guid testId);
+        Task<AbTestResults?> GetTestResultsAsync(Guid testId);
 
         /// <summary>
         /// Checks if test has statistical significance
@@ -46,12 +46,12 @@ namespace AICO.Domain.Interfaces.Services
         /// <summary>
         /// Declares a winning variant and stops the test
         /// </summary>
-        Task<Variant> DeclareWinnerAsync(Guid testId, Guid? winningVariantId = null);
+        Task<AbTestVariant?> DeclareWinnerAsync(Guid testId, Guid? winningVariantId = null);
 
         /// <summary>
         /// Gets test performance over time
         /// </summary>
-        Task<IEnumerable<TestPerformancePoint>> GetTestPerformanceHistoryAsync(Guid testId, DateTime? startDate = null, DateTime? endDate = null);
+        Task<IEnumerable<TestPerformancePoint>?> GetTestPerformanceHistoryAsync(Guid testId, DateTime? startDate = null, DateTime? endDate = null);
 
         /// <summary>
         /// Calculates required sample size for test

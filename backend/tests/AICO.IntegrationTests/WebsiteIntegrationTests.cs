@@ -1,6 +1,7 @@
 using AICO.Domain.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
+using AICO.Application.Interfaces.Services; // Added this line
 
 namespace AICO.IntegrationTests
 {

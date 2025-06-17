@@ -55,15 +55,17 @@ namespace AICO.Domain.Tests.Services
             var summary = "Performance test";
 
             // Act
-            var result = await _analysisService.CreateAnalysisAsync(websiteId, analysisType, score, resultData, summary);
+            // var analysisResultTask = _analysisService.CreateAnalysisAsync(websiteId, analysisType, score, resultData, summary);
+            // var analysisResult = await analysisResultTask;
+            var analysisResult = await _analysisService.CreateAnalysisAsync(websiteId, analysisType, score, resultData, summary);
 
             // Assert
-            Assert.NotNull(result);
-            Assert.Equal(websiteId, result.WebsiteId);
-            Assert.Equal(analysisType, result.AnalysisType);
-            Assert.Equal(score, result.Score);
-            Assert.Equal(resultData, result.ResultData);
-            Assert.Equal(summary, result.Summary);
+            Assert.NotNull(analysisResult);
+            Assert.Equal(websiteId, analysisResult.WebsiteId);
+            Assert.Equal(analysisType, analysisResult.AnalysisType);
+            Assert.Equal(score, analysisResult.Score);
+            Assert.Equal(resultData, analysisResult.ResultData);
+            Assert.Equal(summary, analysisResult.Summary);
             _mockAuditService.Verify(s => s.SetCreationAudit(It.IsAny<AnalysisResult>()), Times.Once);
         }
 

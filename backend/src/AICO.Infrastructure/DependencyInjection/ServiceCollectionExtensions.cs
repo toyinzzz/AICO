@@ -1,12 +1,15 @@
 using AICO.Application.Interfaces.Commands;
 using AICO.Application.Interfaces.ExternalServices;
 using AICO.Application.Interfaces.Queries;
+using AICO.Domain.Interfaces;
 using AICO.Domain.Interfaces.Repositories;
 using AICO.Domain.Interfaces.Services;
 using AICO.Domain.Services;
 using AICO.Infrastructure.Repositories;
 using Microsoft.Extensions.DependencyInjection;
-
+using AICO.Application.Commands; // Corrected this line
+using AICO.Application.Queries;
+using AICO.Infrastructure.ExternalServices; // Corrected this line
 
 
 namespace AICO.Infrastructure.DependencyInjection;
@@ -63,11 +66,13 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAbTestCommandHandler, AbTestCommandHandler>();
         services.AddScoped<ICampaignCommandHandler, CampaignCommandHandler>();
         services.AddScoped<IVariantCommandHandler, VariantCommandHandler>();
+        services.AddScoped<IConversionEventCommandHandler, ConversionEventCommandHandler>(); // Added this line
 
         // Query Handlers
         services.AddScoped<IAbTestQueryHandler, AbTestQueryHandler>();
         services.AddScoped<ICampaignQueryHandler, CampaignQueryHandler>();
         services.AddScoped<IVariantQueryHandler, VariantQueryHandler>();
+        services.AddScoped<IConversionEventQueryHandler, ConversionEventQueryHandler>(); // Added this line
 
         // Add to existing registrations
         services.AddScoped<IProfitTrackingService, ProfitTrackingService>();
@@ -77,7 +82,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddExternalServices(this IServiceCollection services)
     {
         services.AddScoped<IAIService, AIService>();
-        services.AddScoped<IPaymentService, StripePaymentService>();
+        services.AddScoped<Application.Interfaces.ExternalServices.IPaymentService, StripePaymentService>();
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IAnalyticsService, AnalyticsService>();
 

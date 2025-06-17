@@ -1,17 +1,10 @@
 using AICO.Domain.Entities;
+using System;
+using System.Threading.Tasks;
 
 namespace AICO.Application.Interfaces.Commands
 {
-    public interface IAbTestCommandHandler
-    {
-        Task<AbTest> CreateAbTestAsync(CreateAbTestCommand command);
-        Task<AbTest> UpdateAbTestAsync(UpdateAbTestCommand command);
-        Task DeleteAbTestAsync(Guid abTestId);
-        Task<AbTest> StartAbTestAsync(Guid abTestId);
-        Task<AbTest> StopAbTestAsync(Guid abTestId);
-        Task<AbTest> CompleteAbTestAsync(Guid abTestId);
-    }
-
+    // Command Records
     public record CreateAbTestCommand(
         Guid CampaignId,
         string Name,
@@ -21,7 +14,7 @@ namespace AICO.Application.Interfaces.Commands
         string SuccessMetric,
         DateTime StartDate,
         DateTime? EndDate
-    );
+    ) : ICommand<AbTest>;
 
     public record UpdateAbTestCommand(
         Guid Id,
@@ -32,5 +25,24 @@ namespace AICO.Application.Interfaces.Commands
         string SuccessMetric,
         DateTime StartDate,
         DateTime? EndDate
-    );
+    ) : ICommand<AbTest>;
+
+    public record DeleteAbTestCommand(Guid AbTestId) : ICommand;
+
+    public record StartAbTestCommand(Guid AbTestId) : ICommand<AbTest>;
+
+    public record StopAbTestCommand(Guid AbTestId) : ICommand<AbTest>;
+
+    public record CompleteAbTestCommand(Guid AbTestId) : ICommand<AbTest>;
+
+    // Command Handler Interface
+    public interface IAbTestCommandHandler :
+        ICommandHandler<CreateAbTestCommand, AbTest>,
+        ICommandHandler<UpdateAbTestCommand, AbTest>,
+        ICommandHandler<DeleteAbTestCommand>,
+        ICommandHandler<StartAbTestCommand, AbTest>,
+        ICommandHandler<StopAbTestCommand, AbTest>,
+        ICommandHandler<CompleteAbTestCommand, AbTest>
+    {
+    }
 }

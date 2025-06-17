@@ -1,5 +1,6 @@
 using AICO.Domain.Entities;
 using AICO.Domain.Interfaces.Repositories;
+using AICO.Domain.ValueObjects;
 using AICO.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -47,6 +48,26 @@ namespace AICO.Infrastructure.Repositories
                 .Include(e => e.Session)
                 .OrderByDescending(e => e.CreatedAt)
                 .ToListAsync();
+        }
+
+        public Task<IEnumerable<Event>> GetByWebsiteIdAsync(Guid websiteId, DateTime? startDate = null, DateTime? endDate = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<Event>> GetByTypeAsync(Guid websiteId, string eventType)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task BulkInsertAsync(IEnumerable<Event> events)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> GetCountByTypeAsync(Guid websiteId, string eventType, DateTime? startDate = null, DateTime? endDate = null)
+        {
+            throw new NotImplementedException();
         }
     }
 }

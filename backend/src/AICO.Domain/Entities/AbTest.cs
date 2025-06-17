@@ -1,6 +1,7 @@
 using AICO.Domain.ValueObjects;
 using System.ComponentModel.DataAnnotations;
 using AICO.Domain.Validators;
+using AICO.Domain.Entities; // Added for AbTestVariant
 
 namespace AICO.Domain.Entities
 {
@@ -14,107 +15,93 @@ namespace AICO.Domain.Entities
         /// <summary>
         /// Test name
         /// </summary>
-        [Required]
-        [MaxLength(200)]
         public string Name { get; private set; }
 
         /// <summary>
         /// Test description
         /// </summary>
-        [MaxLength(1000)]
-        public string Description { get; private set; }
+        public string? Description { get; private set; }
 
         /// <summary>
         /// Test hypothesis - what we expect to happen
         /// </summary>
-        [MaxLength(500)]
-        public string Hypothesis { get; private set; }
+        public string? Hypothesis { get; private set; }
 
         /// <summary>
         /// Expected outcome description
         /// </summary>
-        [MaxLength(500)]
-        public string ExpectedOutcome { get; private set; }
+        public string? ExpectedOutcome { get; private set; }
 
         /// <summary>
         /// Campaign this test belongs to
         /// </summary>
-        [Required]
         public Guid CampaignId { get; private set; }
         public Campaign Campaign { get; private set; }
 
         /// <summary>
         /// Test status
         /// </summary>
-        [Required]
         public AbTestStatus Status { get; private set; }
 
         /// <summary>
         /// Test type (using value object for type safety)
         /// </summary>
-        [Required]
         public TestType TestType { get; private set; }
+
+        /// <summary>
+        /// Website this test belongs to
+        /// </summary>
+        public Guid WebsiteId { get; private set; }
+        public Website Website { get; private set; }
 
         /// <summary>
         /// Target element selector (CSS selector)
         /// </summary>
-        [Required]
-        [MaxLength(500)]
         public string TargetSelector { get; private set; }
 
         /// <summary>
         /// Original content (control)
         /// </summary>
-        [Required]
         public string OriginalContent { get; private set; }
 
         /// <summary>
         /// Primary metric being measured (e.g., "conversion_rate", "click_through_rate")
         /// </summary>
-        [Required]
-        [MaxLength(100)]
         public string PrimaryMetric { get; private set; }
 
         /// <summary>
         /// Percentage of traffic to include in test (0-100)
         /// </summary>
-        [Range(0.01, 100)]
         public decimal TrafficPercentage { get; private set; }
 
         /// <summary>
         /// Minimum sample size required for statistical significance
         /// </summary>
-        [Range(1, int.MaxValue)]
         public int MinimumSampleSize { get; private set; }
 
         /// <summary>
         /// Statistical significance level (e.g., 0.05 for 95% confidence)
         /// </summary>
-        [Range(0.01, 0.1)]
         public decimal SignificanceLevel { get; private set; }
 
         /// <summary>
         /// Statistical power (e.g., 0.8 for 80% power)
         /// </summary>
-        [Range(0.7, 0.95)]
         public decimal StatisticalPower { get; private set; }
 
         /// <summary>
         /// Baseline conversion rate (if known)
         /// </summary>
-        [Range(0, 1)]
         public decimal? BaselineConversionRate { get; private set; }
 
         /// <summary>
         /// Expected lift/improvement (as decimal, e.g., 0.1 for 10% improvement)
         /// </summary>
-        [Range(0, 10)]
         public decimal? ExpectedLift { get; private set; }
 
         /// <summary>
         /// Minimum duration in days
         /// </summary>
-        [Range(1, 365)]
         public int MinimumDurationDays { get; private set; }
 
         /// <summary>
@@ -140,8 +127,7 @@ namespace AICO.Domain.Entities
         /// <summary>
         /// Audience filter criteria (JSON or specific format)
         /// </summary>
-        [MaxLength(1000)]
-        public string AudienceFilter { get; private set; }
+        public string? AudienceFilter { get; private set; }
 
         /// <summary>
         /// Whether this test affects all users or a specific segment
@@ -156,13 +142,12 @@ namespace AICO.Domain.Entities
         /// <summary>
         /// Priority for handling overlapping tests
         /// </summary>
-        [Range(1, 10)]
         public int Priority { get; private set; }
 
         /// <summary>
         /// Test variants
         /// </summary>
-        public ICollection<Variant> Variants { get; private set; } = new List<Variant>();
+        public ICollection<AbTestVariant> Variants { get; private set; } = new List<AbTestVariant>();
 
         /// <summary>
         /// Conversions tracked for this test
@@ -181,7 +166,7 @@ namespace AICO.Domain.Entities
         /// <summary>
         /// Creates a new A/B test with essential parameters
         /// </summary>
-        public AbTest(string name, string description, Guid campaignId, TestType testType,
+        public AbTest(string name, string? description, Guid campaignId, TestType testType,
                      string targetSelector, string originalContent, string primaryMetric)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
@@ -207,11 +192,11 @@ namespace AICO.Domain.Entities
         /// <summary>
         /// Creates a new A/B test with full configuration
         /// </summary>
-        public AbTest(string name, string description, string hypothesis, string expectedOutcome,
+        public AbTest(string name, string? description, string? hypothesis, string? expectedOutcome,
                      Guid campaignId, TestType testType, string targetSelector, string originalContent,
                      string primaryMetric, decimal trafficPercentage, int minimumSampleSize,
                      decimal significanceLevel, decimal statisticalPower, int minimumDurationDays,
-                     DateTime? plannedEndDate = null, string audienceFilter = null,
+                     DateTime? plannedEndDate = null, string? audienceFilter = null,
                      bool isGlobalTest = true, int priority = 5)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
@@ -276,7 +261,7 @@ namespace AICO.Domain.Entities
         /// <summary>
         /// Adds a variant to the test
         /// </summary>
-        public void AddVariant(Variant variant)
+        public void AddVariant(AbTestVariant variant)
         {
             if (Status != AbTestStatus.Draft)
                 throw new InvalidOperationException("Cannot modify variants after test starts");
@@ -293,7 +278,7 @@ namespace AICO.Domain.Entities
         /// <summary>
         /// Removes a variant from the test
         /// </summary>
-        public void RemoveVariant(Variant variant)
+        public void RemoveVariant(AbTestVariant variant)
         {
             if (Status != AbTestStatus.Draft)
                 throw new InvalidOperationException("Cannot modify variants after test starts");
@@ -422,7 +407,7 @@ namespace AICO.Domain.Entities
         /// </summary>
         public bool HasMinimumSampleSize()
         {
-            var totalSamples = Variants.Sum(v => v.Impressions) + GetControlImpressions();
+            var totalSamples = Variants.Sum(v => v.Views) + GetControlImpressions(); // Changed v.Impressions to v.Views
             return totalSamples >= MinimumSampleSize;
         }
 
@@ -439,7 +424,7 @@ namespace AICO.Domain.Entities
         /// <summary>
         /// Gets the winning variant (if test is completed and has statistical significance)
         /// </summary>
-        public Variant GetWinningVariant()
+        public AbTestVariant? GetWinningVariant()
         {
             if (Status != AbTestStatus.Completed)
                 throw new InvalidOperationException("Test must be completed to determine winner");
@@ -448,7 +433,7 @@ namespace AICO.Domain.Entities
             // For now, return the variant with the highest conversion rate
             return Variants
                 .Where(v => v.Conversions > 0)
-                .OrderByDescending(v => v.ConversionRate)
+                .OrderByDescending(v => v.GetConversionRate()) // Changed v.ConversionRate to v.GetConversionRate()
                 .FirstOrDefault();
         }
 

@@ -3,6 +3,7 @@ using AICO.Domain.Interfaces.Services;
 using AICO.Domain.Interfaces.Repositories;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
+using AICO.Domain.Entities;
 
 namespace AICO.Application.Services
 {
@@ -99,7 +100,7 @@ namespace AICO.Application.Services
             return CalculateMCP(controlRevenue, controlConversions, variantRevenue, variantConversions);
         }
 
-        public async Task<Revenue> ProcessStripeWebhookAsync(StripeWebhookEvent stripeEvent)
+        public async Task<AICO.Domain.Entities.Revenue> ProcessStripeWebhookAsync(StripeWebhookEvent stripeEvent)
         {
             var sessionId = stripeEvent.Data.Metadata?.GetValueOrDefault("session_id");
             var variantId = stripeEvent.Data.Metadata?.GetValueOrDefault("variant_id");
@@ -139,8 +140,6 @@ namespace AICO.Application.Services
             }
 
             var revenue = new Revenue(
-                abTestId: Guid.Empty,
-                websiteId: websiteId,
                 websiteId: websiteId,
                 userId: userId,
                 amount: amount / 100m,

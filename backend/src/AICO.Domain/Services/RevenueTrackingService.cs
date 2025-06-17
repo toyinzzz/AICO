@@ -21,7 +21,7 @@ public class RevenueTrackingService : IRevenueTrackingService
         throw new NotImplementedException("ROI calculation will be implemented in Phase 2");
     }
 
-    public Task RecordRevenueEventAsync(Guid campaignId, Guid variantId, decimal amount, string currency, string transactionId = null)
+    public Task RecordRevenueEventAsync(Guid campaignId, Guid variantId, decimal amount, string currency, string? transactionId = null)
     {
         throw new NotImplementedException();
     }

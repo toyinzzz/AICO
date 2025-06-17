@@ -308,11 +308,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.Shared\\AICO.Shared.csproj",
+      "projectUniqueName": "c:\\Users\\toyin\\AICO\\backend\\src\\AICO.Shared\\AICO.Shared.csproj",
       "projectName": "AICO.Shared",
-      "projectPath": "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.Shared\\AICO.Shared.csproj",
+      "projectPath": "c:\\Users\\toyin\\AICO\\backend\\src\\AICO.Shared\\AICO.Shared.csproj",
       "packagesPath": "C:\\Users\\toyin\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.Shared\\obj\\",
+      "outputPath": "c:\\Users\\toyin\\AICO\\backend\\src\\AICO.Shared\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

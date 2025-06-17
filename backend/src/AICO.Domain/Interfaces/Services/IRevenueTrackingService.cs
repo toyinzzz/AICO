@@ -11,7 +11,7 @@ namespace AICO.Domain.Interfaces.Services
         /// <summary>
         /// Records a revenue event for a specific variant
         /// </summary>
-        Task RecordRevenueEventAsync(Guid campaignId, Guid variantId, decimal amount, string currency, string transactionId = null);
+        Task RecordRevenueEventAsync(Guid campaignId, Guid variantId, decimal amount, string currency, string? transactionId = null);
 
         /// <summary>
         /// Calculates profit lift for a campaign

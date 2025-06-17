@@ -86,7 +86,7 @@ namespace AICO.Domain.Entities
         /// </summary>
         /// <param name="createdBy">User who created the entity</param>
         /// <param name="modifiedBy">User who modified the entity</param>
-        public void SetAuditInfo(string createdBy, string modifiedBy = null)
+        public void SetAuditInfo(string createdBy, string? modifiedBy = null)
         {
             if (!string.IsNullOrWhiteSpace(createdBy))
             {
@@ -98,13 +98,18 @@ namespace AICO.Domain.Entities
                 ModifiedBy = modifiedBy;
                 MarkAsUpdated();
             }
+            // Ensure ModifiedBy is not null if it wasn't set and CreatedBy was
+            else if (!string.IsNullOrWhiteSpace(createdBy) && string.IsNullOrEmpty(ModifiedBy))
+            {
+                ModifiedBy = string.Empty; // Or some other default non-null value if appropriate
+            }
         }
 
         /// <summary>
         /// Updates the modification date and user
         /// </summary>
         /// <param name="modifiedBy">User who modified the entity</param>
-        public void UpdateModificationDate(string modifiedBy = null)
+        public void UpdateModificationDate(string? modifiedBy = null)
         {
             ModifiedBy = modifiedBy ?? "System";
             MarkAsUpdated();

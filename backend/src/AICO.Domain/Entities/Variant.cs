@@ -19,7 +19,7 @@ namespace AICO.Domain.Entities
         /// </summary>
         [Required]
         public Guid AbTestId { get; private set; }
-        public AbTest AbTest { get; private set; }
+        public AbTest? AbTest { get; private set; }
 
         /// <summary>
         /// Variant content (HTML/text)
@@ -48,7 +48,7 @@ namespace AICO.Domain.Entities
         /// AI generation prompt used
         /// </summary>
         [MaxLength(2000)]
-        public string AiPrompt { get; private set; }
+        public string? AiPrompt { get; private set; }
 
         /// <summary>
         /// Number of views for this variant
@@ -69,7 +69,7 @@ namespace AICO.Domain.Entities
         /// Creates a new variant
         /// </summary>
         public Variant(string name, Guid abTestId, string content, int trafficAllocation,
-                      bool isControl = false, string aiPrompt = null, int? aiConfidenceScore = null)
+                      bool isControl = false, string? aiPrompt = null, int? aiConfidenceScore = null)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
             AbTestId = abTestId;

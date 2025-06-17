@@ -64,7 +64,7 @@ public class RevenueRepository : BaseRepository<Revenue>, IRevenueRepository
         throw new NotImplementedException();
     }
 
-    public Task DeleteByIdAsync(Guid id)
+    public new Task DeleteByIdAsync(Guid id)
     {
         throw new NotImplementedException();
     }

@@ -47,6 +47,16 @@ namespace AICO.Domain.Entities
         public string PasswordSalt { get; private set; }
 
         /// <summary>
+        /// Foreign key for the Website this user is primarily associated with (optional)
+        /// </summary>
+        public Guid? WebsiteId { get; private set; }
+
+        /// <summary>
+        /// Navigation property for the Website
+        /// </summary>
+        public Website? Website { get; private set; }
+
+        /// <summary>
         /// User's role (e.g., Admin, User)
         /// </summary>
         [Required]

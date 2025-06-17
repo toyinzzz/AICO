@@ -30,74 +30,47 @@ namespace AICO.Domain.Services
         }
 
         /// <summary>
-        /// Creates a new analysis result
+        /// Creates a new analysis result, performing asynchronous operations if necessary.
         /// </summary>
         public async Task<AnalysisResult> CreateAnalysisAsync(Guid websiteId, string analysisType, int score, string resultData, string summary)
         {
-            // Validate input is done in the entity factory method
-
-            // Create the analysis result using the factory method
+            ValidateAnalysisInput(analysisType, score, resultData); // Keep this validation for now
             var analysis = AnalysisResult.Create(websiteId, analysisType, score, resultData, summary);
-
-            // Set audit information
-            _auditService.SetCreationAudit(analysis);
-
-            return analysis;
+            _auditService.SetCreationAudit(analysis); // Assuming this can be called in an async context
+            return await Task.FromResult(analysis); // Correctly return a Task<AnalysisResult>
         }
 
         /// <summary>
-        /// Updates an existing analysis result
+        /// Updates an existing analysis result, performing asynchronous operations if necessary.
         /// </summary>
         public async Task UpdateAnalysisAsync(AnalysisResult analysis, int newScore, string newResultData, string newSummary)
         {
-            if (analysis == null)
-                throw new ArgumentNullException(nameof(analysis));
+            if (analysis == null) throw new ArgumentNullException(nameof(analysis));
+            if (newScore < 0 || newScore > 100) throw new ArgumentOutOfRangeException(nameof(newScore), "Score must be between 0 and 100");
+            if (!await ValidateAnalysisDataAsync(newResultData)) throw new ArgumentException("Invalid JSON data", nameof(newResultData));
 
-            // Validate input
-            if (newScore < 0 || newScore > 100)
-                throw new ArgumentException("Score must be between 0 and 100", nameof(newScore));
-
-            await ValidateAnalysisDataAsync(newResultData);
-
-            // Create a new analysis result with updated values
-            var updatedAnalysis = AnalysisResult.Create(
-                analysis.WebsiteId,
-                analysis.AnalysisType,
-                newScore,
-                newResultData,
-                newSummary
-            );
-
-            // Copy the ID and recommendations from the original analysis
-            typeof(BaseEntity).GetProperty("Id").SetValue(updatedAnalysis, analysis.Id);
-            typeof(AnalysisResult).GetProperty("Recommendations").SetValue(updatedAnalysis, analysis.Recommendations);
-
-            // Copy the updated values back to the original analysis
-            typeof(AnalysisResult).GetProperty("Score").SetValue(analysis, newScore);
-            typeof(AnalysisResult).GetProperty("ResultData").SetValue(analysis, newResultData);
-            typeof(AnalysisResult).GetProperty("Summary").SetValue(analysis, newSummary);
-
-            // Update audit information
-            _auditService.UpdateModificationDate(analysis);
+            analysis.Score = newScore;
+            analysis.ResultData = newResultData;
+            analysis.Summary = newSummary;
+            _auditService.UpdateModificationDate(analysis); // Assuming this can be called in an async context
+            // No explicit return needed for Task method if all paths are async or complete
         }
 
         /// <summary>
-        /// Validates analysis data
+        /// Validates analysis data asynchronously.
         /// </summary>
         public async Task<bool> ValidateAnalysisDataAsync(string resultData)
         {
             if (string.IsNullOrWhiteSpace(resultData))
-                return true;
-
+                return await Task.FromResult(true);
             try
             {
-                // Try to parse the JSON data to validate it
                 JsonDocument.Parse(resultData);
-                return true;
+                return await Task.FromResult(true);
             }
             catch (JsonException)
             {
-                return false;
+                return await Task.FromResult(false);
             }
         }
 
@@ -118,11 +91,12 @@ namespace AICO.Domain.Services
                 category
             );
 
-            // Create a new collection with the added recommendation
-            var updatedRecommendations = new List<Recommendation>(analysis.Recommendations) { recommendation };
+            // Ensure Recommendations collection is initialized
+            var recommendations = analysis.Recommendations as ICollection<Recommendation> ?? new List<Recommendation>();
+            recommendations.Add(recommendation);
 
-            // Update the recommendations collection using reflection
-            typeof(AnalysisResult).GetProperty("Recommendations").SetValue(analysis, updatedRecommendations);
+            // Update the recommendations collection using reflection (consider a public setter or method on AnalysisResult)
+            typeof(AnalysisResult).GetProperty("Recommendations").SetValue(analysis, recommendations);
 
             // Update audit information for the analysis
             _auditService.UpdateModificationDate(analysis);
@@ -131,30 +105,28 @@ namespace AICO.Domain.Services
         /// <summary>
         /// Validates analysis input
         /// </summary>
-        private async Task ValidateAnalysisInputAsync(string analysisType, int score, string resultData)
+        private void ValidateAnalysisInput(string analysisType, int score, string resultData) // Made synchronous
         {
             if (string.IsNullOrWhiteSpace(analysisType))
                 throw new ArgumentException("Analysis type cannot be empty", nameof(analysisType));
 
             if (score < 0 || score > 100)
-                throw new ArgumentException("Score must be between 0 and 100", nameof(score));
+                throw new ArgumentOutOfRangeException(nameof(score), "Score must be between 0 and 100"); // Changed to ArgumentOutOfRangeException
 
-            if (!await ValidateAnalysisDataAsync(resultData))
+            if (!ValidateAnalysisDataAsync(resultData).Result) // Call async version and get result
                 throw new ArgumentException("Invalid JSON data", nameof(resultData));
         }
 
         /// <summary>
         /// Validates recommendation input
         /// </summary>
-        private Task ValidateRecommendationInputAsync(string title, int priority)
+        private void ValidateRecommendationInput(string title, int priority) // Made synchronous
         {
             if (string.IsNullOrWhiteSpace(title))
                 throw new ArgumentException("Title cannot be empty", nameof(title));
 
             if (priority < 1 || priority > 5)
                 throw new ArgumentException("Priority must be between 1 and 5", nameof(priority));
-
-            return Task.CompletedTask;
         }
 
         public Task<AnalysisResult> AnalyzeWebsiteAsync(Guid websiteId, string analysisType)
@@ -196,5 +168,15 @@ namespace AICO.Domain.Services
         {
             throw new NotImplementedException();
         }
+
+        // Remove incorrect explicit interface implementations below
+        // Task<AnalysisResult> IAnalysisService.CreateAnalysisEntity(...) NO LONGER NEEDED due to public sync method
+
+        // Task<AnalysisResult> IAnalysisService.CreateAnalysisAsync(...) NO LONGER NEEDED if public async method matches
+
+        // Task IAnalysisService.UpdateAnalysisAsync(...) NO LONGER NEEDED if public async method matches
+
+        // Task<bool> IAnalysisService.ValidateAnalysisDataAsync(...) NO LONGER NEEDED if public async method matches
+
     }
 }

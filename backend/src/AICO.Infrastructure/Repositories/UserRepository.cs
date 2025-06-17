@@ -28,29 +28,24 @@ namespace AICO.Infrastructure.Repositories
             return await _dbSet.AnyAsync(u => u.Email == email);
         }
 
-        public Task<User> GetByUsernameAsync(string username)
+        public async Task<User?> GetByUsernameAsync(string username)
         {
-            throw new NotImplementedException();
+            // Basic implementation: find user by username. Assumes Username is a property on User entity.
+            return await _dbSet.FirstOrDefaultAsync(u => u.Username == username);
         }
 
-        public Task<bool> IsEmailInUseAsync(string email)
+        public async Task<bool> IsEmailInUseAsync(string email)
         {
-            throw new NotImplementedException();
+            // Basic implementation: check if email exists. This is similar to ExistsByEmailAsync.
+            return await _dbSet.AnyAsync(u => u.Email == email);
         }
 
-        public Task<bool> IsUsernameInUseAsync(string username)
+        public async Task<bool> IsUsernameInUseAsync(string username)
         {
-            throw new NotImplementedException();
+            // Basic implementation: check if username exists. Assumes Username is a property on User entity.
+            return await _dbSet.AnyAsync(u => u.Username == username);
         }
 
-        Task IRepository<User>.UpdateAsync(User entity)
-        {
-            throw new NotImplementedException();
-        }
 
-        public Task DeleteByIdAsync(Guid id)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

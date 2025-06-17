@@ -4120,6 +4120,7 @@
           "Microsoft.AspNetCore.Authentication.JwtBearer": "8.0.0",
           "Microsoft.AspNetCore.OpenApi": "8.0.0",
           "Microsoft.EntityFrameworkCore.Design": "8.0.0",
+          "Microsoft.EntityFrameworkCore.InMemory": "8.0.0",
           "Serilog.AspNetCore": "8.0.0",
           "Swashbuckle.AspNetCore": "8.1.4"
         },
@@ -11849,6 +11850,7 @@
   "projectFileDependencyGroups": {
     "net8.0": [
       "AICO.API >= 1.0.0",
+      "AICO.Application >= 1.0.0",
       "AICO.Infrastructure >= 1.0.0",
       "FluentAssertions >= 6.12.0",
       "Microsoft.AspNetCore.Mvc.Testing >= 8.0.0",
@@ -11894,6 +11896,9 @@
           "projectReferences": {
             "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.API\\AICO.API.csproj": {
               "projectPath": "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.API\\AICO.API.csproj"
+            },
+            "c:\\Users\\toyin\\AICO\\backend\\src\\AICO.Application\\AICO.Application.csproj": {
+              "projectPath": "c:\\Users\\toyin\\AICO\\backend\\src\\AICO.Application\\AICO.Application.csproj"
             },
             "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.Infrastructure\\AICO.Infrastructure.csproj": {
               "projectPath": "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.Infrastructure\\AICO.Infrastructure.csproj"

@@ -15,7 +15,7 @@ namespace AICO.Domain.Interfaces.Repositories
         /// <summary>
         /// Gets a website by URL
         /// </summary>
-        Task<Website> GetByUrlAsync(string url);
+        Task<Website?> GetByUrlAsync(string url);
 
         /// <summary>
         /// Checks if a URL is already in use

@@ -42,8 +42,8 @@ namespace AICO.Domain.Tests.Repositories
             // Arrange
             var activeCampaigns = new List<Campaign>
             {
-                CreateTestCampaign(Guid.NewGuid(), "Active Campaign 1"),
-                CreateTestCampaign(Guid.NewGuid(), "Active Campaign 2")
+                CreateTestCampaign(Guid.NewGuid(), "Active Campaign 1", isActive: true),
+                CreateTestCampaign(Guid.NewGuid(), "Active Campaign 2", isActive: true)
             };
 
             _mockRepository.Setup(x => x.GetActiveCampaignsAsync())
@@ -72,17 +72,20 @@ namespace AICO.Domain.Tests.Repositories
             Assert.True(result);
         }
 
-        private Campaign CreateTestCampaign(Guid websiteId, string name)
+        private Campaign CreateTestCampaign(Guid websiteId, string name, bool isActive = false)
         {
-            return Campaign.Create(
-                websiteId,
+            var campaign = new Campaign(
                 name,
-                "Test Description",
-                DateTime.UtcNow.AddDays(1),
-                DateTime.UtcNow.AddDays(30),
-                1000m,
-                "https://example.com"
+                "Test Description", // Default description
+                websiteId,
+                Guid.NewGuid()    // Dummy UserId for test
             );
+
+            if (isActive)
+            {
+                campaign.Start(DateTime.UtcNow); 
+            }
+            return campaign;
         }
     }
 }

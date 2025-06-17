@@ -27,7 +27,8 @@ namespace AICO.Infrastructure.Tests.Repositories
         [Fact]
         public async Task GetByDomainAsync_ReturnsWebsite_WhenDomainExists()
         {
-            var website = new Website { Id = Guid.NewGuid(), Domain = "example.com", UserId = Guid.NewGuid() };
+            var userId = Guid.NewGuid();
+            var website = Website.Create(url: "http://example.com", name: "Example Site", userId: userId, domain: "example.com");
             _context.Websites.Add(website);
             await _context.SaveChangesAsync();
 
@@ -48,8 +49,8 @@ namespace AICO.Infrastructure.Tests.Repositories
         public async Task GetByUserIdAsync_ReturnsWebsites_ForGivenUserId()
         {
             var userId = Guid.NewGuid();
-            var website1 = new Website { Id = Guid.NewGuid(), Domain = "a.com", UserId = userId };
-            var website2 = new Website { Id = Guid.NewGuid(), Domain = "b.com", UserId = userId };
+            var website1 = Website.Create(url: "http://a.com", name: "Site A", userId: userId, domain: "a.com");
+            var website2 = Website.Create(url: "http://b.com", name: "Site B", userId: userId, domain: "b.com");
             _context.Websites.AddRange(website1, website2);
             await _context.SaveChangesAsync();
 
@@ -62,7 +63,8 @@ namespace AICO.Infrastructure.Tests.Repositories
         [Fact]
         public async Task ExistsByDomainAsync_ReturnsTrue_IfDomainExists()
         {
-            var website = new Website { Id = Guid.NewGuid(), Domain = "exists.com", UserId = Guid.NewGuid() };
+            var userId = Guid.NewGuid();
+            var website = Website.Create(url: "http://exists.com", name: "Exists Site", userId: userId, domain: "exists.com");
             _context.Websites.Add(website);
             await _context.SaveChangesAsync();
 

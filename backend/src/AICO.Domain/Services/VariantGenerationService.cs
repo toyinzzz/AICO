@@ -11,7 +11,7 @@ public class VariantGenerationService : IVariantGenerationService
         throw new NotImplementedException("Variant generation will be implemented in Phase 2");
     }
 
-    public Task<Variant> CreateCustomVariantAsync(Guid campaignId, string name, string htmlContent, string description = null)
+    public Task<Variant> CreateCustomVariantAsync(Guid campaignId, string name, string htmlContent, string? description = null)
     {
         throw new NotImplementedException("Custom variant creation will be implemented in Phase 2");
     }
