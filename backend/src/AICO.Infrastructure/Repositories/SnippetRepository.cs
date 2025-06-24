@@ -58,7 +58,7 @@ public class SnippetRepository : BaseRepository<Snippet>, ISnippetRepository
         throw new NotImplementedException();
     }
 
-    public Task DeleteByIdAsync(Guid id)
+    public override Task DeleteByIdAsync(Guid id)
     {
         throw new NotImplementedException();
     }

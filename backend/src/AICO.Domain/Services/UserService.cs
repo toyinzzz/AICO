@@ -1,90 +1,117 @@
 using AICO.Domain.Entities;
+using AICO.Domain.Interfaces.Repositories;
 using AICO.Domain.Interfaces.Services;
+using System.Security.Cryptography;
+
+using System.Text;
 
 namespace AICO.Domain.Services;
 
 public class UserService : IUserService
 {
-    // TODO: Inject IUserRepository and other necessary dependencies via constructor
+    private readonly IUserRepository _userRepository;
+    private readonly IJwtService _jwtService;
 
-    // Existing methods with NotImplementedException will be kept for now
-    // Add stubs for methods present in IUserService but missing in UserService
-
-    // Methods from IUserService already present (some marked as Phase 2, some not):
-    public Task<User> AuthenticateAsync(string email, string password)
+    public UserService(IUserRepository userRepository, IJwtService jwtService)
     {
-        throw new NotImplementedException();
+        _userRepository = userRepository;
+        _jwtService = jwtService;
     }
 
-    public Task ChangePasswordAsync(Guid id, string currentPassword, string newPassword)
+    public async Task<User> AuthenticateAsync(string email, string password)
     {
-        throw new NotImplementedException();
+        var user = await _userRepository.GetByEmailAsync(email);
+        if (user == null)
+            throw new UnauthorizedAccessException("Invalid credentials");
+
+        var hash = HashPassword(password, user.PasswordSalt);
+        if (user.PasswordHash != hash)
+            throw new UnauthorizedAccessException("Invalid credentials");
+
+        user.UpdateLastLoginDate();
+        await _userRepository.UpdateAsync(user);
+        return user;
     }
 
-    public Task<User> CreateUserAsync(string email, string firstName, string lastName, string? company = null)
+    public async Task<User> RegisterAsync(string email, string username, string firstName, string lastName, string password)
     {
-        throw new NotImplementedException("User management will be implemented in Phase 2");
+        if (await _userRepository.IsEmailInUseAsync(email))
+            throw new ArgumentException("Email already in use", nameof(email));
+        if (await _userRepository.IsUsernameInUseAsync(username))
+            throw new ArgumentException("Username already in use", nameof(username));
+
+        var salt = GenerateSalt();
+        var hash = HashPassword(password, salt);
+
+        var user = User.Create(email, username, firstName, lastName, hash, salt);
+        await _userRepository.AddAsync(user);
+        return user;
     }
 
-    public Task<User> GetByIdAsync(Guid id)
+    public async Task<User> GetByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        var user = await _userRepository.GetByIdAsync(id);
+        if (user == null)
+            throw new KeyNotFoundException("User not found");
+        return user;
     }
 
-    public Task<User?> GetUserByEmailAsync(string email)
+    public async Task<User> UpdateProfileAsync(Guid id, string firstName, string lastName, string username)
     {
-        throw new NotImplementedException("User management will be implemented in Phase 2");
+        var user = await _userRepository.GetByIdAsync(id);
+        if (user == null)
+            throw new KeyNotFoundException("User not found");
+
+        user.UpdateProfile(firstName, lastName, username);
+        await _userRepository.UpdateAsync(user);
+        return user;
     }
 
-    public Task<User> RegisterAsync(string email, string username, string firstName, string lastName, string password)
+    public async Task ChangePasswordAsync(Guid id, string currentPassword, string newPassword)
     {
-        throw new NotImplementedException();
+        var user = await _userRepository.GetByIdAsync(id);
+        if (user == null)
+            throw new KeyNotFoundException("User not found");
+
+        var currentHash = HashPassword(currentPassword, user.PasswordSalt);
+        if (user.PasswordHash != currentHash)
+            throw new UnauthorizedAccessException("Current password is incorrect");
+
+        var newSalt = GenerateSalt();
+        var newHash = HashPassword(newPassword, newSalt);
+        user.UpdatePassword(newHash, newSalt);
+        await _userRepository.UpdateAsync(user);
     }
 
-    public Task<User> UpdateProfileAsync(Guid id, string firstName, string lastName, string username)
+    public async Task VerifyEmailAsync(Guid id, string verificationToken)
     {
-        throw new NotImplementedException();
+        var user = await _userRepository.GetByIdAsync(id);
+        if (user == null)
+            throw new KeyNotFoundException("User not found");
+
+        if (!_jwtService.ValidateEmailVerificationToken(verificationToken, out var tokenUserId, out var tokenEmail))
+            throw new InvalidOperationException("Invalid or expired verification token");
+
+        if (id != tokenUserId || user.Email != tokenEmail)
+            throw new InvalidOperationException("Token does not match user");
+
+        user.VerifyEmail();
+        await _userRepository.UpdateAsync(user);
     }
 
-    public Task<User> UpdateUserAsync(Guid userId, string firstName, string lastName, string? company = null)
+    private static string GenerateSalt()
     {
-        throw new NotImplementedException("User management will be implemented in Phase 2");
+        var bytes = new byte[16];
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(bytes);
+        return Convert.ToBase64String(bytes);
     }
 
-    public Task<bool> ValidateUserAsync(Guid userId)
+    private static string HashPassword(string password, string salt)
     {
-        throw new NotImplementedException("User validation will be implemented in Phase 2");
+        using var sha256 = SHA256.Create();
+        var combined = Encoding.UTF8.GetBytes(password + salt);
+        var hash = sha256.ComputeHash(combined);
+        return Convert.ToBase64String(hash);
     }
-
-    public Task VerifyEmailAsync(Guid id, string verificationToken)
-    {
-        throw new NotImplementedException();
-    }
-
-    // Methods from IUserService that were NOT explicitly in UserService.cs before but are part of the interface
-    // (even if some were implicitly covered by other named methods that are now marked Phase 2)
-    // For clarity and to ensure the interface is fully implemented, we add stubs if they aren't covered by an existing method with the exact signature.
-
-    // Note: CreateUserAsync, GetUserByEmailAsync, UpdateUserAsync, ValidateUserAsync were already in UserService.cs but marked for Phase 2.
-    // The IUserService interface defines:
-    // AuthenticateAsync - present
-    // RegisterAsync - present
-    // GetByIdAsync - present
-    // UpdateProfileAsync - present
-    // ChangePasswordAsync - present
-    // VerifyEmailAsync - present
-
-    // It appears all methods from IUserService are already declared in UserService.cs.
-    // The issue might be with methods in IUserRepository not being fully utilized or implemented in UserService, or other services.
-    // For now, let's ensure all IUserService methods are explicitly present.
-    // The previous analysis showed UserService already had all of IUserService's methods defined.
-    // The main issue is the NotImplementedExceptions themselves, which is a task for developers as per INSTRUCTION_FOR_DEV.md.
-
-    // Let's re-verify the methods in IUserService vs UserService
-    // IUserService: AuthenticateAsync, RegisterAsync, GetByIdAsync, UpdateProfileAsync, ChangePasswordAsync, VerifyEmailAsync
-    // UserService: All of the above are present.
-    // It seems my previous thought about *missing* methods in UserService was incorrect. They are all there, just not implemented.
-    // The primary errors are the NotImplementedExceptions themselves.
-
-    // The next step should be to address the NotImplementedException in UserRepository.cs for GetByUsernameAsync, IsEmailInUseAsync, IsUsernameInUseAsync.
 }

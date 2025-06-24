@@ -1,7 +1,7 @@
 using AICO.Domain.ValueObjects;
-using System.ComponentModel.DataAnnotations;
 using AICO.Domain.Validators;
-using AICO.Domain.Entities; // Added for AbTestVariant
+using AICO.Domain.Events;
+using AICO.Domain.Interfaces.Events;
 
 namespace AICO.Domain.Entities
 {
@@ -144,15 +144,24 @@ namespace AICO.Domain.Entities
         /// </summary>
         public int Priority { get; private set; }
 
-        /// <summary>
-        /// Test variants
-        /// </summary>
-        public ICollection<AbTestVariant> Variants { get; private set; } = new List<AbTestVariant>();
+        private readonly List<AbTestVariant> _variants = new();
+        public IReadOnlyCollection<AbTestVariant> Variants => _variants.AsReadOnly();
 
-        /// <summary>
-        /// Conversions tracked for this test
-        /// </summary>
-        public ICollection<Conversion> Conversions { get; private set; } = new List<Conversion>();
+        private readonly List<Conversion> _conversions = new();
+        public IReadOnlyCollection<Conversion> Conversions => _conversions.AsReadOnly();
+
+        private readonly List<IDomainEvent> _domainEvents = new();
+        public new IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
+
+        public void AddDomainEvent(IDomainEvent domainEvent)
+        {
+            _domainEvents.Add(domainEvent);
+        }
+
+        public new void ClearDomainEvents()
+        {
+            _domainEvents.Clear();
+        }
 
         #endregion
 
@@ -161,7 +170,20 @@ namespace AICO.Domain.Entities
         /// <summary>
         /// Private constructor for EF Core
         /// </summary>
-        private AbTest() { }
+        public AbTest() 
+        {
+            Name = string.Empty;
+            Campaign = null!; // EF Core will populate this
+            TestType = null!; // EF Core will populate this, assuming it's a reference type
+            Website = null!;  // EF Core will populate this
+            TargetSelector = string.Empty;
+            OriginalContent = string.Empty;
+            PrimaryMetric = string.Empty;
+            // Initialize other non-nullable properties if necessary, though the warnings focused on these.
+            // Collections are already initialized: Variants and Conversions.
+        }
+
+
 
         /// <summary>
         /// Creates a new A/B test with essential parameters
@@ -266,27 +288,42 @@ namespace AICO.Domain.Entities
             if (Status != AbTestStatus.Draft)
                 throw new InvalidOperationException("Cannot modify variants after test starts");
 
-            if (Variants.Count >= 10)
+            if (_variants.Count >= 10)
                 throw new InvalidOperationException("Maximum 10 variants allowed per test");
 
             if (variant == null)
                 throw new ArgumentNullException(nameof(variant));
 
-            Variants.Add(variant);
+            _variants.Add(variant);
         }
 
         /// <summary>
         /// Removes a variant from the test
         /// </summary>
-        public void RemoveVariant(AbTestVariant variant)
+        public void RemoveVariant(Guid variantId)
         {
             if (Status != AbTestStatus.Draft)
                 throw new InvalidOperationException("Cannot modify variants after test starts");
 
-            if (variant == null)
-                throw new ArgumentNullException(nameof(variant));
+            var variant = _variants.FirstOrDefault(v => v.Id == variantId);
+            if (variant != null)
+            {
+                _variants.Remove(variant);
+            }
+        }
 
-            Variants.Remove(variant);
+        public void ClearVariants()
+        {
+            if (Status != AbTestStatus.Draft)
+                throw new InvalidOperationException("Cannot modify variants after test starts");
+            _variants.Clear();
+        }
+
+        public void AddConversion(Conversion conversion)
+        {
+            if (conversion == null) throw new ArgumentNullException(nameof(conversion));
+            // Additional validation can be added here
+            _conversions.Add(conversion);
         }
 
         /// <summary>
@@ -310,7 +347,9 @@ namespace AICO.Domain.Entities
                 throw new InvalidOperationException("Test cannot be marked ready - missing requirements");
 
             AbTestStateValidator.ValidateTransition(Status, AbTestStatus.ReadyToStart);
+            var oldStatus = Status;
             Status = AbTestStatus.ReadyToStart;
+            AddDomainEvent(new AbTestStatusChangedEvent(this.Id, oldStatus, Status));
         }
 
         /// <summary>
@@ -322,8 +361,10 @@ namespace AICO.Domain.Entities
                 throw new InvalidOperationException("Test cannot be started - missing requirements");
 
             AbTestStateValidator.ValidateTransition(Status, AbTestStatus.Running);
+            var oldStatus = Status;
             Status = AbTestStatus.Running;
             StartedAt = DateTime.UtcNow;
+            AddDomainEvent(new AbTestStatusChangedEvent(this.Id, oldStatus, Status));
         }
 
         /// <summary>
@@ -332,8 +373,10 @@ namespace AICO.Domain.Entities
         public void Pause()
         {
             AbTestStateValidator.ValidateTransition(Status, AbTestStatus.Paused);
+            var oldStatus = Status;
             Status = AbTestStatus.Paused;
             PausedAt = DateTime.UtcNow;
+            AddDomainEvent(new AbTestStatusChangedEvent(this.Id, oldStatus, Status));
         }
 
         /// <summary>
@@ -342,8 +385,10 @@ namespace AICO.Domain.Entities
         public void Resume()
         {
             AbTestStateValidator.ValidateTransition(Status, AbTestStatus.Running);
+            var oldStatus = Status;
             Status = AbTestStatus.Running;
             PausedAt = null;
+            AddDomainEvent(new AbTestStatusChangedEvent(this.Id, oldStatus, Status));
         }
 
         /// <summary>
@@ -352,8 +397,10 @@ namespace AICO.Domain.Entities
         public void Stop()
         {
             AbTestStateValidator.ValidateTransition(Status, AbTestStatus.Stopped);
+            var oldStatus = Status;
             Status = AbTestStatus.Stopped;
             EndedAt = DateTime.UtcNow;
+            AddDomainEvent(new AbTestStatusChangedEvent(this.Id, oldStatus, Status));
         }
 
         /// <summary>
@@ -362,8 +409,10 @@ namespace AICO.Domain.Entities
         public void Complete()
         {
             AbTestStateValidator.ValidateTransition(Status, AbTestStatus.Completed);
+            var oldStatus = Status;
             Status = AbTestStatus.Completed;
             EndedAt = DateTime.UtcNow;
+            AddDomainEvent(new AbTestStatusChangedEvent(this.Id, oldStatus, Status));
         }
 
         /// <summary>
@@ -374,7 +423,9 @@ namespace AICO.Domain.Entities
             if (Status != AbTestStatus.Completed && Status != AbTestStatus.Stopped)
                 throw new InvalidOperationException("Can only archive completed or stopped tests");
 
+            var oldStatus = Status;
             Status = AbTestStatus.Archived;
+            AddDomainEvent(new AbTestStatusChangedEvent(this.Id, oldStatus, Status));
         }
 
         /// <summary>
@@ -407,7 +458,7 @@ namespace AICO.Domain.Entities
         /// </summary>
         public bool HasMinimumSampleSize()
         {
-            var totalSamples = Variants.Sum(v => v.Views) + GetControlImpressions(); // Changed v.Impressions to v.Views
+            var totalSamples = Variants.Sum(v => v.Views);
             return totalSamples >= MinimumSampleSize;
         }
 
@@ -433,7 +484,7 @@ namespace AICO.Domain.Entities
             // For now, return the variant with the highest conversion rate
             return Variants
                 .Where(v => v.Conversions > 0)
-                .OrderByDescending(v => v.GetConversionRate()) // Changed v.ConversionRate to v.GetConversionRate()
+                .OrderByDescending(v => v.GetConversionRate())
                 .FirstOrDefault();
         }
 
@@ -465,6 +516,51 @@ namespace AICO.Domain.Entities
             // This would be implemented based on how you track control group impressions
             // For now, return 0 as placeholder
             return 0;
+        }
+
+        
+
+        public static AbTest Create(string name, string? description, Guid campaignId, TestType testType,
+                                    string targetSelector, string originalContent, string primaryMetric)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("A/B test name cannot be empty.", nameof(name));
+            }
+            if (campaignId == Guid.Empty)
+            {
+                throw new ArgumentException("CampaignId cannot be empty.", nameof(campaignId));
+            }
+            if (string.IsNullOrWhiteSpace(targetSelector))
+            {
+                throw new ArgumentException("Target selector cannot be empty.", nameof(targetSelector));
+            }
+            if (string.IsNullOrWhiteSpace(primaryMetric))
+            {
+                throw new ArgumentException("Primary metric cannot be empty.", nameof(primaryMetric));
+            }
+
+            var abTest = new AbTest
+            {
+                Name = name,
+                Description = description,
+                CampaignId = campaignId,
+                TestType = testType,
+                TargetSelector = targetSelector,
+                OriginalContent = originalContent,
+                PrimaryMetric = primaryMetric,
+                Status = AbTestStatus.Draft,
+                TrafficPercentage = 50m,
+                MinimumSampleSize = 1000,
+                SignificanceLevel = 0.05m,
+                StatisticalPower = 0.8m,
+                MinimumDurationDays = 7,
+                IsGlobalTest = true,
+                IsEnabled = true,
+                Priority = 5
+            };
+
+            return abTest;
         }
 
         #endregion

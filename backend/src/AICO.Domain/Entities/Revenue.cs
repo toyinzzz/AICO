@@ -83,6 +83,12 @@ namespace AICO.Domain.Entities
         public Guid? VariantId { get; private set; }
 
         /// <summary>
+        /// Indicates if this revenue event is for a control group
+        /// </summary>
+        public bool IsControl { get; private set; }
+        public Guid? UserId1 { get; }
+
+        /// <summary>
         /// Private constructor for EF Core
         /// </summary>
         private Revenue() { }
@@ -94,7 +100,7 @@ namespace AICO.Domain.Entities
                       DateTime? revenueDate = null, string currency = "USD",
                       Guid? conversionId = null, Guid? campaignId = null,
                       string? transactionId = null, string? metadata = null,
-                      Guid? sessionId = null, Guid? variantId = null)
+                      Guid? sessionId = null, Guid? variantId = null, bool isControl = false)
         {
             WebsiteId = websiteId;
             UserId = userId;
@@ -108,6 +114,24 @@ namespace AICO.Domain.Entities
             RevenueDate = revenueDate ?? DateTime.UtcNow;
             SessionId = sessionId;
             VariantId = variantId;
+            IsControl = isControl;
+        }
+
+        public Revenue(Guid websiteId, Guid? userId, Guid? conversionId, Guid campaignId, decimal amount, string currency, string source, string transactionId, string metadata, DateTime revenueDate, Guid? sessionId, Guid variantId, bool isControl)
+        {
+            WebsiteId = websiteId;
+            UserId1 = userId;
+            ConversionId = conversionId;
+            CampaignId = campaignId;
+            Amount = amount;
+            Currency = currency;
+            Source = source;
+            TransactionId = transactionId;
+            Metadata = metadata;
+            RevenueDate = revenueDate;
+            SessionId = sessionId;
+            VariantId = variantId;
+            IsControl = isControl;
         }
 
         /// <summary>

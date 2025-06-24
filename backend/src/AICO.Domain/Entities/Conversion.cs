@@ -59,7 +59,11 @@ namespace AICO.Domain.Entities
         public virtual Session? Session { get; private set; }
 
         // Private constructor for EF Core
-        private Conversion() { }
+        private Conversion()
+        {
+            GoalName = null!;
+            ConversionType = null!;
+        }
 
         /// <summary>
         /// Creates a new conversion

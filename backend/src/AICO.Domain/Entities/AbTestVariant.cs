@@ -1,11 +1,12 @@
 using System.ComponentModel.DataAnnotations;
+using AICO.Domain.Interfaces;
 
 namespace AICO.Domain.Entities
 {
     /// <summary>
     /// Represents a variant within an A/B test.
     /// </summary>
-    public class AbTestVariant : BaseEntity
+    public class AbTestVariant : BaseEntity, IAuditableEntity
     {
         /// <summary>
         /// The ID of the A/B test this variant belongs to.
@@ -32,6 +33,8 @@ namespace AICO.Domain.Entities
         /// </summary>
         public string Content { get; private set; }
 
+        public int? AiConfidenceScore { get; private set; } 
+
         /// <summary>
         /// Percentage of traffic allocated to this variant (0-100).
         /// </summary>
@@ -56,7 +59,12 @@ namespace AICO.Domain.Entities
         /// <summary>
         /// Private constructor for EF Core.
         /// </summary>
-        private AbTestVariant() { }
+        private AbTestVariant() 
+        {
+            AbTest = null!; // EF Core will populate this
+            Name = string.Empty;
+            Content = string.Empty;
+        }
 
         /// <summary>
         /// Creates a new A/B test variant.
@@ -104,5 +112,6 @@ namespace AICO.Domain.Entities
             }
             return (decimal)Conversions / Views * 100;
         }
+        
     }
 }

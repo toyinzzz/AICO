@@ -1,5 +1,20 @@
-public class MCPPerformanceTests
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using AICO.Application.Interfaces.Services;
+using Xunit;
+
+public interface IMCPPerformanceTests
 {
+    Task CalculateMCP_ConcurrentCalculations_ShouldHandleCorrectly();
+    void CalculateMCP_WithLargeDataset_ShouldCompleteWithinTimeLimit();
+}
+
+public class MCPPerformanceTests : IMCPPerformanceTests
+{
+    private IProfitTrackingService _profitTrackingService;
+
     [Fact]
     public void CalculateMCP_WithLargeDataset_ShouldCompleteWithinTimeLimit()
     {
@@ -22,14 +37,14 @@ public class MCPPerformanceTests
     {
         // Arrange
         var tasks = new List<Task<decimal>>();
-        
+
         // Act - Run 100 concurrent MCP calculations
         for (int i = 0; i < 100; i++)
         {
             var task = Task.Run(() => _profitTrackingService.CalculateMCP(1000m, 100, 1100m, 110));
             tasks.Add(task);
         }
-        
+
         var results = await Task.WhenAll(tasks);
 
         // Assert

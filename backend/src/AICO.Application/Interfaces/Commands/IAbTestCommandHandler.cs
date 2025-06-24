@@ -1,6 +1,4 @@
 using AICO.Domain.Entities;
-using System;
-using System.Threading.Tasks;
 
 namespace AICO.Application.Interfaces.Commands
 {
@@ -10,19 +8,39 @@ namespace AICO.Application.Interfaces.Commands
         string Name,
         string Description,
         string TestType,
+        int V,
+        string TargetSelector,
+        string OriginalContent,
+        string PrimaryMetric,
         int TrafficSplit,
-        string SuccessMetric,
         DateTime StartDate,
         DateTime? EndDate
-    ) : ICommand<AbTest>;
+    ) : ICommand<AbTest>
+    {
+        private Guid id;
+        private string v1;
+        private string v2;
+        private string v3;
+        private int v4;
+        private string v5;
+        private string v6;
+        private string v7;
+        private string v8;
+        private string v9;
+        private string v10;
+
+        
+    }
 
     public record UpdateAbTestCommand(
         Guid Id,
         string Name,
         string Description,
         string TestType,
+        string TargetSelector,
+        string OriginalContent,
+        string PrimaryMetric,
         int TrafficSplit,
-        string SuccessMetric,
         DateTime StartDate,
         DateTime? EndDate
     ) : ICommand<AbTest>;
@@ -44,5 +62,11 @@ namespace AICO.Application.Interfaces.Commands
         ICommandHandler<StopAbTestCommand, AbTest>,
         ICommandHandler<CompleteAbTestCommand, AbTest>
     {
+        Task DeleteAbTestAsync(Guid id);
+        Task CompleteAbTestAsync(Guid id);
+        Task<AbTest> CreateAbTestAsync(CreateAbTestCommand command); // Fixed generic type
+        Task StartAbTestAsync(Guid id);
+        Task StopAbTestAsync(Guid id);
+        Task UpdateAbTestAsync(UpdateAbTestCommand command);
     }
 }

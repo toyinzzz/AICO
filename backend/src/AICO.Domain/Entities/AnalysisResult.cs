@@ -52,6 +52,8 @@ namespace AICO.Domain.Entities
         private AnalysisResult()
         {
             Recommendations = new List<Recommendation>();
+            AnalysisType = string.Empty; // Initialize non-nullable string
+            ResultData = string.Empty;   // Initialize non-nullable string
         }
 
         // Static factory method for controlled creation

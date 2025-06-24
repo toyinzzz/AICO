@@ -26,5 +26,6 @@ namespace AICO.Domain.Interfaces.Repositories
         /// Gets websites by industry
         /// </summary>
         Task<IEnumerable<Website>> GetByIndustryAsync(string industry);
+        Task<IEnumerable<Website>> GetByOwnerIdAsync(Guid userId);
     }
 }

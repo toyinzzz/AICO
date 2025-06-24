@@ -1,0 +1,27 @@
+﻿  Wiederherzustellende Projekte werden ermittelt...
+  Alle Projekte sind f├╝r die Wiederherstellung auf dem neuesten Stand.
+  AICO.Shared -> C:\Users\toyin\AICO\backend\src\AICO.Shared\bin\Debug\net8.0\AICO.Shared.dll
+  AICO.Domain -> C:\Users\toyin\AICO\backend\src\AICO.Domain\bin\Debug\net8.0\AICO.Domain.dll
+  AICO.Application -> C:\Users\toyin\AICO\backend\src\AICO.Application\bin\Debug\net8.0\AICO.Application.dll
+  AICO.Domain.Tests -> C:\Users\toyin\AICO\backend\tests\AICO.Domain.Tests\bin\Debug\net8.0\AICO.Domain.Tests.dll
+C:\Users\toyin\AICO\backend\src\AICO.Infrastructure\Repositories\RecommendationRepository.cs(5,7): warning CS0105: Die using-Direktive f├╝r "AICO.Domain.Entities" ist bereits vorher in diesem Namespace aufgetreten. [C:\Users\toyin\AICO\backend\src\AICO.Infrastructure\AICO.Infrastructure.csproj]
+C:\Users\toyin\AICO\backend\src\AICO.Infrastructure\ExternalServices\AIService.cs(6,30): error CS0535: "AIService" implementiert den Schnittstellenmember "IAIService.AnalyzePageAsync(string)" nicht. [C:\Users\toyin\AICO\backend\src\AICO.Infrastructure\AICO.Infrastructure.csproj]
+C:\Users\toyin\AICO\backend\src\AICO.Infrastructure\ExternalServices\AIService.cs(6,30): error CS0535: "AIService" implementiert den Schnittstellenmember "IAIService.GenerateCopyAsync(string, int)" nicht. [C:\Users\toyin\AICO\backend\src\AICO.Infrastructure\AICO.Infrastructure.csproj]
+C:\Users\toyin\AICO\backend\src\AICO.Infrastructure\ExternalServices\AIService.cs(6,30): error CS0535: "AIService" implementiert den Schnittstellenmember "IAIService.GenerateHeadlinesAsync(string, int)" nicht. [C:\Users\toyin\AICO\backend\src\AICO.Infrastructure\AICO.Infrastructure.csproj]
+C:\Users\toyin\AICO\backend\src\AICO.Infrastructure\ExternalServices\AIService.cs(6,30): error CS0535: "AIService" implementiert den Schnittstellenmember "IAIService.GenerateCtasAsync(string, int)" nicht. [C:\Users\toyin\AICO\backend\src\AICO.Infrastructure\AICO.Infrastructure.csproj]
+C:\Users\toyin\AICO\backend\src\AICO.Infrastructure\Repositories\SessionRepository.cs(44,33): warning CS8613: Die NULL-Zul├ñssigkeit von Verweistypen im R├╝ckgabetyp von "Task<Session?> SessionRepository.GetActiveSessionAsync(Guid websiteId, string visitorId)" entspricht nicht dem implizit implementierten Member "Task<Session> ISessionRepository.GetActiveSessionAsync(Guid websiteId, string visitorId)". [C:\Users\toyin\AICO\backend\src\AICO.Infrastructure\AICO.Infrastructure.csproj]
+C:\Users\toyin\AICO\backend\src\AICO.Infrastructure\Repositories\SnippetRepository.cs(61,17): warning CS0114: "SnippetRepository.DeleteByIdAsync(Guid)" blendet den vererbten Member "BaseRepository<Snippet>.DeleteByIdAsync(Guid)" aus. Damit der aktuelle Member diese Implementierung ├╝berschreibt, f├╝gen Sie das override-Schl├╝sselwort hinzu. Ansonsten f├╝gen Sie das new-Schl├╝sselwort hinzu. [C:\Users\toyin\AICO\backend\src\AICO.Infrastructure\AICO.Infrastructure.csproj]
+
+Fehler beim Buildvorgang.
+
+C:\Users\toyin\AICO\backend\src\AICO.Infrastructure\Repositories\RecommendationRepository.cs(5,7): warning CS0105: Die using-Direktive f├╝r "AICO.Domain.Entities" ist bereits vorher in diesem Namespace aufgetreten. [C:\Users\toyin\AICO\backend\src\AICO.Infrastructure\AICO.Infrastructure.csproj]
+C:\Users\toyin\AICO\backend\src\AICO.Infrastructure\Repositories\SessionRepository.cs(44,33): warning CS8613: Die NULL-Zul├ñssigkeit von Verweistypen im R├╝ckgabetyp von "Task<Session?> SessionRepository.GetActiveSessionAsync(Guid websiteId, string visitorId)" entspricht nicht dem implizit implementierten Member "Task<Session> ISessionRepository.GetActiveSessionAsync(Guid websiteId, string visitorId)". [C:\Users\toyin\AICO\backend\src\AICO.Infrastructure\AICO.Infrastructure.csproj]
+C:\Users\toyin\AICO\backend\src\AICO.Infrastructure\Repositories\SnippetRepository.cs(61,17): warning CS0114: "SnippetRepository.DeleteByIdAsync(Guid)" blendet den vererbten Member "BaseRepository<Snippet>.DeleteByIdAsync(Guid)" aus. Damit der aktuelle Member diese Implementierung ├╝berschreibt, f├╝gen Sie das override-Schl├╝sselwort hinzu. Ansonsten f├╝gen Sie das new-Schl├╝sselwort hinzu. [C:\Users\toyin\AICO\backend\src\AICO.Infrastructure\AICO.Infrastructure.csproj]
+C:\Users\toyin\AICO\backend\src\AICO.Infrastructure\ExternalServices\AIService.cs(6,30): error CS0535: "AIService" implementiert den Schnittstellenmember "IAIService.AnalyzePageAsync(string)" nicht. [C:\Users\toyin\AICO\backend\src\AICO.Infrastructure\AICO.Infrastructure.csproj]
+C:\Users\toyin\AICO\backend\src\AICO.Infrastructure\ExternalServices\AIService.cs(6,30): error CS0535: "AIService" implementiert den Schnittstellenmember "IAIService.GenerateCopyAsync(string, int)" nicht. [C:\Users\toyin\AICO\backend\src\AICO.Infrastructure\AICO.Infrastructure.csproj]
+C:\Users\toyin\AICO\backend\src\AICO.Infrastructure\ExternalServices\AIService.cs(6,30): error CS0535: "AIService" implementiert den Schnittstellenmember "IAIService.GenerateHeadlinesAsync(string, int)" nicht. [C:\Users\toyin\AICO\backend\src\AICO.Infrastructure\AICO.Infrastructure.csproj]
+C:\Users\toyin\AICO\backend\src\AICO.Infrastructure\ExternalServices\AIService.cs(6,30): error CS0535: "AIService" implementiert den Schnittstellenmember "IAIService.GenerateCtasAsync(string, int)" nicht. [C:\Users\toyin\AICO\backend\src\AICO.Infrastructure\AICO.Infrastructure.csproj]
+    3 Warnung(en)
+    4 Fehler
+
+Verstrichene Zeit 00:00:06.11

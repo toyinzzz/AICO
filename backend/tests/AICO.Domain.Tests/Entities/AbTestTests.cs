@@ -1,12 +1,26 @@
 using AICO.Domain.Entities;
+using AICO.Domain.Events;
 using AICO.Domain.ValueObjects;
-using Moq;
 using Xunit;
 
 namespace AICO.Domain.Tests.Entities
 {
     public class AbTestTests
     {
+        private AbTest CreateValidAbTest()
+        {
+            var abTest = AbTest.Create(
+                "Test A/B Test",
+                "Test Description",
+                Guid.NewGuid(),
+                TestType.Create("Button Color"),
+                ".cta-button",
+                "Buy Now",
+                "conversion_rate"
+            );
+            return abTest;
+        }
+
         [Fact]
         public void Create_WithValidData_ShouldReturnAbTest()
         {
@@ -15,21 +29,12 @@ namespace AICO.Domain.Tests.Entities
             var name = "Test A/B Test";
             var description = "Test Description";
             var testType = TestType.Create("Button Color");
-            var trafficSplit = 50;
             var successMetric = "conversion_rate";
-            var startDate = DateTime.UtcNow.AddDays(1);
-            var endDate = DateTime.UtcNow.AddDays(30);
-
-            // Arrange - Add missing constructor params
             var targetSelector = ".cta-button";
             var originalContent = "Buy Now";
 
             // Act
-            var abTest = new AbTest(name, description, campaignId, testType, targetSelector, originalContent, successMetric);
-            // Set properties not in the simple constructor
-            abTest.GetType().GetProperty("TrafficPercentage").SetValue(abTest, (decimal)trafficSplit); // TrafficPercentage is decimal
-            abTest.GetType().GetProperty("PlannedEndDate").SetValue(abTest, endDate);
-            // StartDate is set by StartTest method, not directly in constructor or as a simple property setter for planned start
+            var abTest = AbTest.Create(name, description, campaignId, testType, targetSelector, originalContent, successMetric);
 
             // Assert
             Assert.NotNull(abTest);
@@ -37,102 +42,103 @@ namespace AICO.Domain.Tests.Entities
             Assert.Equal(name, abTest.Name);
             Assert.Equal(description, abTest.Description);
             Assert.Equal(testType, abTest.TestType);
-            Assert.Equal((decimal)trafficSplit, abTest.TrafficPercentage);
-            Assert.Equal(successMetric, abTest.PrimaryMetric); // SuccessMetric maps to PrimaryMetric
-            // Assert.Equal(startDate, abTest.StartDate); // StartDate is not a direct property for planned start, StartedAt is for actual start
-            Assert.Equal(endDate, abTest.PlannedEndDate);
+            Assert.Equal(successMetric, abTest.PrimaryMetric);
             Assert.Equal(AbTestStatus.Draft, abTest.Status);
+            Assert.Empty(abTest.Variants);
+            Assert.Empty(abTest.Conversions);
+            Assert.Empty(abTest.DomainEvents);
+        }
+
+        [Fact]
+        public void AddVariant_ShouldAddVariantToList()
+        {
+            // Arrange
+            var abTest = CreateValidAbTest();
+            var variant = new AbTestVariant(abTest.Id, "Variant A", "Test content", 50m, null, true);
+
+            // Act
+            abTest.AddVariant(variant);
+
+            // Assert
+            Assert.Single(abTest.Variants);
+            Assert.Contains(variant, abTest.Variants);
+        }
+
+        [Fact]
+        public void RemoveVariant_ShouldRemoveVariantFromList()
+        {
+            // Arrange
+            var abTest = CreateValidAbTest();
+            var variant = new AbTestVariant(abTest.Id, "Variant A", "Test content", 50m, null, true);
+            abTest.AddVariant(variant);
+
+            // Act
+            abTest.RemoveVariant(variant.Id);
+
+            // Assert
+            Assert.Empty(abTest.Variants);
+        }
+
+        [Fact]
+        public void ClearVariants_ShouldClearVariantList()
+        {
+            // Arrange
+            var abTest = CreateValidAbTest();
+            var variant1 = new AbTestVariant(abTest.Id, "Variant A", "Test content", 50m, null, true);
+            var variant2 = new AbTestVariant(abTest.Id, "Variant B", "Test content", 50m, null, false);
+            abTest.AddVariant(variant1);
+            abTest.AddVariant(variant2);
+
+            // Act
+            abTest.ClearVariants();
+
+            // Assert
+            Assert.Empty(abTest.Variants);
+        }
+
+        [Fact]
+        public void AddConversion_ShouldAddConversionToList()
+        {
+            // Arrange
+            var abTest = CreateValidAbTest();
+            var conversion = Conversion.Create(abTest.Id, ConversionType.Create("click"), DateTime.UtcNow.ToString(), 100.0m);
+
+            // Act
+            abTest.AddConversion(conversion);
+
+            // Assert
+            Assert.Single(abTest.Conversions);
+            Assert.Contains(conversion, abTest.Conversions);
         }
 
         [Theory]
-        [InlineData(-1)]
-        [InlineData(0)]
-        [InlineData(101)]
-        public void Create_WithInvalidTrafficSplit_ShouldThrowArgumentException(int invalidTrafficSplit)
+        [InlineData(nameof(AbTest.Start), AbTestStatus.Draft, AbTestStatus.Running)]
+        [InlineData(nameof(AbTest.Pause), AbTestStatus.Running, AbTestStatus.Paused)]
+        [InlineData(nameof(AbTest.Stop), AbTestStatus.Running, AbTestStatus.Stopped)]
+        [InlineData(nameof(AbTest.Complete), AbTestStatus.Running, AbTestStatus.Completed)]
+        [InlineData(nameof(AbTest.Archive), AbTestStatus.Completed, AbTestStatus.Archived)]
+        [InlineData(nameof(AbTest.Resume), AbTestStatus.Paused, AbTestStatus.Running)]
+        [InlineData(nameof(AbTest.MarkReadyToStart), AbTestStatus.Draft, AbTestStatus.ReadyToStart)]
+        public void StatusChangeMethods_ShouldRaiseAbTestStatusChangedEvent(string methodName, AbTestStatus initialStatus, AbTestStatus newStatus)
         {
             // Arrange
-            var campaignId = Guid.NewGuid();
-            var testType = TestType.Create("Button Color");
-            var startDate = DateTime.UtcNow.AddDays(1);
-            var endDate = DateTime.UtcNow.AddDays(30);
+            var abTest = CreateValidAbTest();
+            abTest.GetType().GetProperty("Status").SetValue(abTest, initialStatus);
+            abTest.ClearDomainEvents();
 
-            // Arrange - Add missing constructor params
-            var targetSelector = ".cta-button";
-            var originalContent = "Buy Now";
+            // Act
+            abTest.GetType().GetMethod(methodName).Invoke(abTest, null);
 
-            // Act & Assert
-            // The constructor sets a default TrafficPercentage. Direct validation for range is on property or via a setter method.
-            // For this test, we'll create the object and then try to set an invalid TrafficPercentage if a public setter existed.
-            // Since TrafficPercentage is private set, we can't directly test this scenario easily without a dedicated method.
-            // We'll assert that creation works, and the default is applied.
-            var abTest = new AbTest("Test", "Description", campaignId, testType, targetSelector, originalContent, "conversion_rate");
-            // If there was a method like abTest.SetTrafficSplit(invalidTrafficSplit), we'd test that.
-            // For now, we check the default or a valid set if possible.
-            // Assert.Throws<ArgumentOutOfRangeException>(() => abTest.GetType().GetProperty("TrafficPercentage").SetValue(abTest, (decimal)invalidTrafficSplit));
-            // The above would fail as Range attribute validation happens typically at a higher level (e.g. EF Core, MVC model binding)
-            // Let's check if the default is set correctly
-            Assert.Equal(50m, abTest.TrafficPercentage); // Default is 50m
-        }
+            // Assert
+            var domainEvent = abTest.DomainEvents.FirstOrDefault();
+            Assert.NotNull(domainEvent);
+            Assert.IsType<AbTestStatusChangedEvent>(domainEvent);
 
-        // [Fact]
-        // public void StartTest_WithValidState_ShouldUpdateStatusAndStartDate()
-        // {
-        //     // Arrange
-        //     var abTest = CreateValidAbTest();
-        //     // var mockValidator = new Mock<IAbTestStateValidationService>(); // IAbTestStateValidationService is not defined
-        //     // mockValidator.Setup(x => x.CanTransitionTo(AbTestStatus.Draft, AbTestStatus.Running))
-        //     //             .Returns(true);
-        // 
-        //     // Act
-        //     // abTest.StartTest(mockValidator.Object); // StartTest method with this signature does not exist
-        //     // The AbTest class has Start(IAbTestStateValidationService validator) method.
-        //     // We would need a concrete or mock implementation of IAbTestStateValidationService.
-        //     // For now, this test is commented out.
-        // 
-        //     // Assert
-        //     // Assert.Equal(AbTestStatus.Running, abTest.Status);
-        //     // Assert.True(abTest.StartedAt.HasValue); // Property is StartedAt, not ActualStartDate
-        //     // Assert.True(abTest.StartedAt.Value <= DateTime.UtcNow);
-        // }
-        // 
-        // [Fact]
-        // public void CompleteTest_WithValidState_ShouldUpdateStatusAndEndDate()
-        // {
-        //     // Arrange
-        //     var abTest = CreateValidAbTest();
-        //     // var mockValidator = new Mock<IAbTestStateValidationService>(); // IAbTestStateValidationService is not defined
-        //     // mockValidator.Setup(x => x.CanTransitionTo(AbTestStatus.Running, AbTestStatus.Completed))
-        //     //             .Returns(true);
-        // 
-        //     // Start the test first
-        //     // abTest.GetType().GetProperty("Status")?.SetValue(abTest, AbTestStatus.Running);
-        //     // abTest.GetType().GetProperty("StartedAt")?.SetValue(abTest, DateTime.UtcNow.AddDays(-1));
-        // 
-        //     // Act
-        //     // abTest.CompleteTest(mockValidator.Object); // CompleteTest method with this signature does not exist
-        //     // The AbTest class has Complete(IAbTestStateValidationService validator) method.
-        //     // For now, this test is commented out.
-        // 
-        //     // Assert
-        //     // Assert.Equal(AbTestStatus.Completed, abTest.Status);
-        //     // Assert.True(abTest.EndedAt.HasValue); // Property is EndedAt, not ActualEndDate
-        //     // Assert.True(abTest.EndedAt.Value <= DateTime.UtcNow);
-        // }
-
-        private AbTest CreateValidAbTest()
-        {
-            var abTest = new AbTest(
-                "Test A/B Test",
-                "Test Description",
-                Guid.NewGuid(),
-                TestType.Create("Button Color"),
-                ".cta-button", // targetSelector
-                "Buy Now",     // originalContent
-                "conversion_rate"
-            );
-            abTest.GetType().GetProperty("TrafficPercentage").SetValue(abTest, 50m);
-            abTest.GetType().GetProperty("PlannedEndDate").SetValue(abTest, DateTime.UtcNow.AddDays(30));
-            return abTest;
+            var statusChangedEvent = (AbTestStatusChangedEvent)domainEvent;
+            Assert.Equal(abTest.Id, statusChangedEvent.AbTestId);
+            Assert.Equal(initialStatus, statusChangedEvent.OldStatus);
+            Assert.Equal(newStatus, statusChangedEvent.NewStatus);
+            Assert.Equal(newStatus, abTest.Status);
         }
     }
 }

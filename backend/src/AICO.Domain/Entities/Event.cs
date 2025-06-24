@@ -54,7 +54,10 @@ namespace AICO.Domain.Entities
         public virtual Session? Session { get; private set; }
 
         // Private constructor for EF Core
-        private Event() { }
+        private Event()
+        {
+            EventType = null!;
+        }
 
         /// <summary>
         /// Creates a new event

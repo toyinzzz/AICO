@@ -15,24 +15,7 @@ public class ConversionRepository : BaseRepository<Conversion>, IConversionRepos
     {
     }
 
-    public async Task<IEnumerable<Conversion>> GetByWebsiteIdAsync(Guid websiteId)
-    {
-        return await _context.Conversions
-            .Where(c => c.WebsiteId == websiteId)
-            .OrderByDescending(c => c.CreatedAt)
-            .ToListAsync();
-    }
-
-    public async Task<IEnumerable<Conversion>> GetByUserIdAsync(Guid userId)
-    {
-        return await _context.Conversions
-            .Include(c => c.Session) // Eagerly load the Session
-            .Where(c => c.Session != null && c.Session.UserId == userId)
-            .OrderByDescending(c => c.CreatedAt)
-            .ToListAsync();
-    }
-
-    public async Task<IEnumerable<Conversion>?> GetByWebsiteIdAsync(Guid websiteId, DateTime? startDate = null, DateTime? endDate = null)
+    public async Task<IEnumerable<Conversion>> GetConversionsByWebsiteIdAsync(Guid websiteId, DateTime? startDate = null, DateTime? endDate = null)
     {
         var query = _context.Conversions.Where(c => c.WebsiteId == websiteId);
         if (startDate.HasValue)
@@ -42,7 +25,7 @@ public class ConversionRepository : BaseRepository<Conversion>, IConversionRepos
         return await query.OrderByDescending(c => c.CreatedAt).ToListAsync();
     }
 
-    public async Task<IEnumerable<Conversion>?> GetBySessionIdAsync(Guid sessionId)
+    public async Task<IEnumerable<Conversion>> GetConversionsBySessionIdAsync(Guid sessionId)
     {
         return await _context.Conversions
             .Where(c => c.SessionId == sessionId)
@@ -50,7 +33,7 @@ public class ConversionRepository : BaseRepository<Conversion>, IConversionRepos
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<Conversion>?> GetByTypeAsync(Guid websiteId, string conversionType, DateTime? startDate = null, DateTime? endDate = null)
+    public async Task<IEnumerable<Conversion>> GetConversionsByTypeAsync(Guid websiteId, string conversionType, DateTime? startDate = null, DateTime? endDate = null)
     {
         var query = _context.Conversions.Where(c => c.WebsiteId == websiteId && c.ConversionType.ToString() == conversionType);
         if (startDate.HasValue)
@@ -60,7 +43,7 @@ public class ConversionRepository : BaseRepository<Conversion>, IConversionRepos
         return await query.OrderByDescending(c => c.CreatedAt).ToListAsync();
     }
 
-    public async Task<IEnumerable<Conversion>?> GetByGoalAsync(Guid websiteId, string goalName, DateTime? startDate = null, DateTime? endDate = null)
+    public async Task<IEnumerable<Conversion>> GetConversionsByGoalAsync(Guid websiteId, string goalName, DateTime? startDate = null, DateTime? endDate = null)
     {
         // Assuming GoalName is a property on Conversion entity
         var query = _context.Conversions.Where(c => c.WebsiteId == websiteId && c.GoalName == goalName);
@@ -69,6 +52,42 @@ public class ConversionRepository : BaseRepository<Conversion>, IConversionRepos
         if (endDate.HasValue)
             query = query.Where(c => c.CreatedAt <= endDate.Value);
         return await query.OrderByDescending(c => c.CreatedAt).ToListAsync();
+    }
+
+    public async Task<IEnumerable<(DateTime Date, int Count, decimal? Value)>> GetConversionTrendsAsync(Guid websiteId, string timeframe, string? goalName = null, DateTime? startDate = null, DateTime? endDate = null)
+    {
+        var query = _context.Conversions.Where(c => c.WebsiteId == websiteId);
+
+        if (!string.IsNullOrEmpty(goalName))
+            query = query.Where(c => c.GoalName == goalName);
+
+        if (startDate.HasValue)
+            query = query.Where(c => c.CreatedAt >= startDate.Value);
+
+        if (endDate.HasValue)
+            query = query.Where(c => c.CreatedAt <= endDate.Value);
+
+        // Group by day or week
+        var groupedQuery = timeframe.ToLower() == "week"
+            ? query.GroupBy(c => EF.Functions.DateFromParts(
+                c.CreatedAt.Year,
+                c.CreatedAt.Month,
+                c.CreatedAt.Day - ((int)c.CreatedAt.DayOfWeek)))
+            : query.GroupBy(c => EF.Functions.DateFromParts(c.CreatedAt.Year, c.CreatedAt.Month, c.CreatedAt.Day));
+
+        // Aggregate the data
+        var trends = await groupedQuery
+            .Select(g => new
+            {
+                Date = g.Key,
+                Count = g.Count(),
+                Value = g.Sum(c => c.Value)
+            })
+            .OrderBy(x => x.Date)
+            .ToListAsync();
+
+        // Convert to tuple list
+        return trends.Select(t => (t.Date, t.Count, t.Value)).ToList();
     }
 
     public async Task<int> GetCountAsync(Guid websiteId, string? goalName = null, DateTime? startDate = null, DateTime? endDate = null)
@@ -102,16 +121,16 @@ public class ConversionRepository : BaseRepository<Conversion>, IConversionRepos
         return (totalValue, currency);
     }
 
-    public async Task<IEnumerable<(DateTime Date, int Count, decimal? Value)>?> GetTrendsAsync(Guid websiteId, string timeframe, string? goalName = null)
-    {
-        // Placeholder: Actual trend calculation would involve grouping by date based on timeframe.
-        // Returning empty list for now.
-        return await Task.FromResult<IEnumerable<(DateTime Date, int Count, decimal? Value)>?>(new List<(DateTime Date, int Count, decimal? Value)>());
-    }
+
 
     public async Task BulkInsertAsync(IEnumerable<Conversion> conversions)
     {
         await _context.Conversions.AddRangeAsync(conversions);
         await _context.SaveChangesAsync();
+    }
+
+    public Task<IEnumerable<(DateTime Date, int Count, decimal? Value)>?> GetTrendsAsync(Guid websiteId, string timeframe, string? goalName = null)
+    {
+        throw new NotImplementedException();
     }
 }

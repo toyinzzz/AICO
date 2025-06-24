@@ -15,7 +15,7 @@ namespace AICO.Domain.Entities
         /// <summary>
         /// Entity identifier
         /// </summary>
-        public Guid Id { get; protected set; } = Guid.NewGuid();
+        public Guid Id { get; set; } = Guid.NewGuid();
 
         /// <summary>
         /// When the entity was created

@@ -39,5 +39,20 @@ namespace AICO.Domain.DTOs
         /// Additional context or requirements
         /// </summary>
         public string AdditionalContext { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Number of variants to generate
+        /// </summary>
+        public int NumberOfVariants { get; set; } = 3;
+
+        /// <summary>
+        /// Generation prompt for AI
+        /// </summary>
+        public string GenerationPrompt { get; set; } = string.Empty;
+
+        /// <summary>
+        /// A/B Test ID this request is for
+        /// </summary>
+        public Guid AbTestId { get; set; }
     }
 }

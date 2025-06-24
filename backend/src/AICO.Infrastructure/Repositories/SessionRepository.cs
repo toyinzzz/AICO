@@ -41,10 +41,10 @@ public class SessionRepository : BaseRepository<Session>, ISessionRepository
             .ToListAsync();
     }
 
-    public async Task<Session?> GetActiveSessionAsync(Guid websiteId, string visitorId)
+    public async Task<Session> GetActiveSessionAsync(Guid websiteId, string visitorId)
     {
         return await _context.Sessions
-            .FirstOrDefaultAsync(s => s.WebsiteId == websiteId && s.VisitorId == visitorId && s.EndedAt == null);
+            .FirstAsync(s => s.WebsiteId == websiteId && s.VisitorId == visitorId && s.EndedAt == null);
     }
 
     public async Task<IEnumerable<Session>> GetActiveSessionsAsync(Guid websiteId)

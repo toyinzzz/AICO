@@ -1,11 +1,12 @@
 using AICO.Infrastructure.Data;
 using AICO.Infrastructure.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.InMemory; // Ensure this line is active
+using AICO.Application.Interfaces.Services;
 using AICO.Application.Commands;
 using AICO.Application.Interfaces.Commands;
 using AICO.Application.Interfaces.Queries;
 using AICO.Application.Queries;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,6 +57,7 @@ builder.Services.AddScoped<IVariantQueryHandler, VariantQueryHandler>();
 builder.Services.AddScoped<IConversionEventQueryHandler, ConversionEventQueryHandler>();
 
 builder.Services.AddExternalServices();
+
 
 // Add HTTP Client for external services
 builder.Services.AddHttpClient();

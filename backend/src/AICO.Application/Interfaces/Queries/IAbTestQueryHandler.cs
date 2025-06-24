@@ -20,5 +20,6 @@ namespace AICO.Application.Interfaces.Queries
         IQueryHandler<GetRunningAbTestsQuery, IEnumerable<AbTest>>,
         IQueryHandler<GetCompletedAbTestsQuery, IEnumerable<AbTest>>
     {
+        Task <AbTest> GetAbTestByIdAsync(Guid campaignId);
     }
 }

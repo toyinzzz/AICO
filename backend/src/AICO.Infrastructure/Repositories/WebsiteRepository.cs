@@ -52,5 +52,10 @@ namespace AICO.Infrastructure.Repositories
         {
             return UpdateAsync(entity);
         }
+
+        public Task<IEnumerable<Website>> GetByOwnerIdAsync(Guid userId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

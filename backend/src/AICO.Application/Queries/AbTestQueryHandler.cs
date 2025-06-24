@@ -16,41 +16,42 @@ namespace AICO.Application.Queries
             _abTestRepository = abTestRepository ?? throw new ArgumentNullException(nameof(abTestRepository));
         }
 
-        public Task<AbTest?> HandleAsync(GetAbTestByIdQuery query)
+        public Task<AbTest> GetAbTestByIdAsync(Guid campaignId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<AbTest?> HandleAsync(GetAbTestByIdQuery query)
         {
             if (query == null) throw new ArgumentNullException(nameof(query));
             if (query.Id == Guid.Empty) throw new ArgumentException("A/B test ID cannot be empty.", nameof(query.Id));
-            // TODO: Implement logic to get A/B test by ID
-            throw new NotImplementedException();
+            
+            return await _abTestRepository.GetByIdAsync(query.Id);
         }
 
-        public Task<IEnumerable<AbTest>> HandleAsync(GetAbTestsByCampaignIdQuery query)
+        public async Task<IEnumerable<AbTest>> HandleAsync(GetAbTestsByCampaignIdQuery query)
         {
             if (query == null) throw new ArgumentNullException(nameof(query));
             if (query.CampaignId == Guid.Empty) throw new ArgumentException("Campaign ID cannot be empty.", nameof(query.CampaignId));
-            // TODO: Implement logic to get A/B tests by Campaign ID
-            throw new NotImplementedException();
+            return await _abTestRepository.GetByCampaignIdAsync(query.CampaignId);
         }
 
-        public Task<IEnumerable<AbTest>> HandleAsync(GetActiveAbTestsQuery query)
+        public async Task<IEnumerable<AbTest>> HandleAsync(GetActiveAbTestsQuery query)
         {
             if (query == null) throw new ArgumentNullException(nameof(query));
-            // TODO: Implement logic to get active A/B tests
-            throw new NotImplementedException();
+            return await _abTestRepository.GetActiveAsync();
         }
 
-        public Task<IEnumerable<AbTest>> HandleAsync(GetRunningAbTestsQuery query)
+        public async Task<IEnumerable<AbTest>> HandleAsync(GetRunningAbTestsQuery query)
         {
-            if (query == null) throw new ArgumentNullException(nameof(query));
-            // TODO: Implement logic to get running A/B tests
-            throw new NotImplementedException();
+            ArgumentNullException.ThrowIfNull(query);
+            return await _abTestRepository.GetByStatusAsync(AbTestStatus.Running);
         }
 
-        public Task<IEnumerable<AbTest>> HandleAsync(GetCompletedAbTestsQuery query)
+        public async Task<IEnumerable<AbTest>> HandleAsync(GetCompletedAbTestsQuery query)
         {
-            if (query == null) throw new ArgumentNullException(nameof(query));
-            // TODO: Implement logic to get completed A/B tests
-            throw new NotImplementedException();
+            ArgumentNullException.ThrowIfNull(query);
+            return await _abTestRepository.GetByStatusAsync(AbTestStatus.Completed);
         }
     }
 }

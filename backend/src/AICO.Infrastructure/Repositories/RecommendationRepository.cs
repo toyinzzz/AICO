@@ -2,7 +2,6 @@ using AICO.Domain.Entities;
 using AICO.Domain.Interfaces.Repositories;
 using AICO.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using AICO.Domain.Entities; // Added for RecommendationStatus enum
 
 namespace AICO.Infrastructure.Repositories;
 

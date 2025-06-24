@@ -2,6 +2,7 @@
 
 using AICO.Domain.Entities;
 using AICO.Domain.Interfaces;
+using AICO.Domain.Interfaces.Repositories;
 using AICO.Domain.Interfaces.Services;
 using System.Text.Json;
 
@@ -14,15 +15,23 @@ namespace AICO.Domain.Services
     {
         private readonly IAuditService _auditService;
         private readonly IRecommendationService _recommendationService;
+        private readonly IAnalysisResultRepository _analysisResultRepository;
+        private readonly IRecommendationRepository _recommendationRepository;
 
-        public AnalysisService(IAuditService auditService, IRecommendationService recommendationService)
+        public AnalysisService(
+            IAuditService auditService,
+            IRecommendationService recommendationService,
+            IAnalysisResultRepository analysisResultRepository,
+            IRecommendationRepository recommendationRepository)
         {
             _auditService = auditService ?? throw new ArgumentNullException(nameof(auditService));
             _recommendationService = recommendationService ?? throw new ArgumentNullException(nameof(recommendationService));
+            _analysisResultRepository = analysisResultRepository ?? throw new ArgumentNullException(nameof(analysisResultRepository));
+            _recommendationRepository = recommendationRepository ?? throw new ArgumentNullException(nameof(recommendationRepository));
         }
 
         /// <summary>
-        /// Creates a new analysis result entity
+        /// Creates a new analysis result entity. This is typically a synchronous factory method.
         /// </summary>
         public AnalysisResult CreateAnalysisEntity(Guid websiteId, string analysisType, int score, string resultData, string summary)
         {
@@ -30,18 +39,19 @@ namespace AICO.Domain.Services
         }
 
         /// <summary>
-        /// Creates a new analysis result, performing asynchronous operations if necessary.
+        /// Creates a new analysis result asynchronously.
         /// </summary>
         public async Task<AnalysisResult> CreateAnalysisAsync(Guid websiteId, string analysisType, int score, string resultData, string summary)
         {
-            ValidateAnalysisInput(analysisType, score, resultData); // Keep this validation for now
+            ValidateAnalysisInput(analysisType, score, resultData);
             var analysis = AnalysisResult.Create(websiteId, analysisType, score, resultData, summary);
-            _auditService.SetCreationAudit(analysis); // Assuming this can be called in an async context
-            return await Task.FromResult(analysis); // Correctly return a Task<AnalysisResult>
+            _auditService.SetCreationAudit(analysis);
+            await _analysisResultRepository.AddAsync(analysis);
+            return analysis;
         }
 
         /// <summary>
-        /// Updates an existing analysis result, performing asynchronous operations if necessary.
+        /// Updates an existing analysis result asynchronously.
         /// </summary>
         public async Task UpdateAnalysisAsync(AnalysisResult analysis, int newScore, string newResultData, string newSummary)
         {
@@ -52,8 +62,8 @@ namespace AICO.Domain.Services
             analysis.Score = newScore;
             analysis.ResultData = newResultData;
             analysis.Summary = newSummary;
-            _auditService.UpdateModificationDate(analysis); // Assuming this can be called in an async context
-            // No explicit return needed for Task method if all paths are async or complete
+            _auditService.UpdateModificationDate(analysis);
+            await _analysisResultRepository.UpdateAsync(analysis);
         }
 
         /// <summary>
@@ -62,27 +72,70 @@ namespace AICO.Domain.Services
         public async Task<bool> ValidateAnalysisDataAsync(string resultData)
         {
             if (string.IsNullOrWhiteSpace(resultData))
-                return await Task.FromResult(true);
+                return true;
             try
             {
                 JsonDocument.Parse(resultData);
-                return await Task.FromResult(true);
+                return true;
             }
             catch (JsonException)
             {
-                return await Task.FromResult(false);
+                return false;
             }
         }
 
         /// <summary>
-        /// Adds a recommendation to an analysis result
+        /// Analyzes a website asynchronously (Dummy-Implementierung).
         /// </summary>
-        public async Task AddRecommendationAsync(AnalysisResult analysis, string title, string description, int priority, string category)
+        public async Task<AnalysisResult> AnalyzeWebsiteAsync(Guid websiteId, string analysisType)
         {
-            if (analysis == null)
-                throw new ArgumentNullException(nameof(analysis));
+            var resultData = "{\"status\":\"ok\"}";
+            var summary = $"Analysis of type {analysisType} completed.";
+            var score = 80;
+            var analysis = AnalysisResult.Create(websiteId, analysisType, score, resultData, summary);
+            _auditService.SetCreationAudit(analysis);
+            await _analysisResultRepository.AddAsync(analysis);
+            return analysis;
+        }
 
-            // Create the recommendation using the recommendation service
+        /// <summary>
+        /// Gets an analysis result by ID asynchronously.
+        /// </summary>
+        public async Task<AnalysisResult> GetAnalysisResultByIdAsync(Guid id)
+        {
+            return await _analysisResultRepository.GetByIdAsync(id);
+        }
+
+        /// <summary>
+        /// Gets all analysis results for a website asynchronously.
+        /// </summary>
+        public async Task<IEnumerable<AnalysisResult>> GetAnalysisResultsByWebsiteIdAsync(Guid websiteId)
+        {
+            return await _analysisResultRepository.GetByWebsiteIdAsync(websiteId);
+        }
+
+        /// <summary>
+        /// Gets the latest analysis result for a website asynchronously.
+        /// </summary>
+        public async Task<AnalysisResult> GetLatestAnalysisResultAsync(Guid websiteId)
+        {
+            return await _analysisResultRepository.GetLatestByWebsiteIdAsync(websiteId);
+        }
+
+        // Fix for CS0272: Use a method to add recommendations instead of directly setting the property.
+        // Fix for IDE0028: Simplify collection initialization using object initializer syntax.
+
+        /// <summary>
+        /// Adds a recommendation to an analysis result asynchronously.
+        /// </summary>
+        public async Task<Recommendation> AddRecommendationAsync(Guid analysisResultId, string title, string description, int priority, string category)
+        {
+            var analysis = await _analysisResultRepository.GetByIdAsync(analysisResultId);
+            if (analysis == null)
+                throw new ArgumentException("AnalysisResult not found.", nameof(analysisResultId));
+
+            ValidateRecommendationInput(title, priority);
+
             var recommendation = await _recommendationService.CreateRecommendationAsync(
                 analysis.Id,
                 title,
@@ -91,36 +144,75 @@ namespace AICO.Domain.Services
                 category
             );
 
-            // Ensure Recommendations collection is initialized
-            var recommendations = analysis.Recommendations as ICollection<Recommendation> ?? new List<Recommendation>();
-            recommendations.Add(recommendation);
+            // Ensure Recommendations collection is initialized and add the recommendation
+            if (analysis.Recommendations == null)
+            {
+                var recommendations = new List<Recommendation> { recommendation };
+                analysis.GetType().GetProperty(nameof(AnalysisResult.Recommendations))?.SetValue(analysis, recommendations);
+            }
+            else
+            {
+                analysis.Recommendations.Add(recommendation);
+            }
 
-            // Update the recommendations collection using reflection (consider a public setter or method on AnalysisResult)
-            typeof(AnalysisResult).GetProperty("Recommendations").SetValue(analysis, recommendations);
-
-            // Update audit information for the analysis
             _auditService.UpdateModificationDate(analysis);
+            await _analysisResultRepository.UpdateAsync(analysis);
+            await _recommendationRepository.AddAsync(recommendation);
+
+            return recommendation;
         }
 
         /// <summary>
-        /// Validates analysis input
+        /// Gets recommendations for an analysis result asynchronously.
         /// </summary>
-        private void ValidateAnalysisInput(string analysisType, int score, string resultData) // Made synchronous
+        public async Task<IEnumerable<Recommendation>> GetRecommendationsByAnalysisResultIdAsync(Guid analysisResultId)
+        {
+            return await _recommendationRepository.GetByAnalysisResultIdAsync(analysisResultId);
+        }
+
+        /// <summary>
+        /// Marks a recommendation as implemented asynchronously.
+        /// </summary>
+        public async Task MarkRecommendationAsImplementedAsync(Guid recommendationId)
+        {
+            var recommendation = await _recommendationRepository.GetByIdAsync(recommendationId);
+            if (recommendation == null)
+                throw new ArgumentException("Recommendation not found", nameof(recommendationId));
+            recommendation.MarkAsImplemented();
+            await _recommendationRepository.UpdateAsync(recommendation);
+        }
+
+        /// <summary>
+        /// Marks a recommendation as not implemented asynchronously.
+        /// </summary>
+        public async Task MarkRecommendationAsNotImplementedAsync(Guid recommendationId)
+        {
+            var recommendation = await _recommendationRepository.GetByIdAsync(recommendationId);
+            if (recommendation == null)
+                throw new ArgumentException("Recommendation not found", nameof(recommendationId));
+            recommendation.MarkAsPending();
+            await _recommendationRepository.UpdateAsync(recommendation);
+        }
+
+        /// <summary>
+        /// Validates analysis input (internal helper).
+        /// </summary>
+        private void ValidateAnalysisInput(string analysisType, int score, string resultData)
         {
             if (string.IsNullOrWhiteSpace(analysisType))
                 throw new ArgumentException("Analysis type cannot be empty", nameof(analysisType));
 
             if (score < 0 || score > 100)
-                throw new ArgumentOutOfRangeException(nameof(score), "Score must be between 0 and 100"); // Changed to ArgumentOutOfRangeException
+                throw new ArgumentOutOfRangeException(nameof(score), "Score must be between 0 and 100");
 
-            if (!ValidateAnalysisDataAsync(resultData).Result) // Call async version and get result
+            if (!ValidateAnalysisDataAsync(resultData).Result)
                 throw new ArgumentException("Invalid JSON data", nameof(resultData));
         }
 
         /// <summary>
-        /// Validates recommendation input
+        /// Validates recommendation input (internal helper).
         /// </summary>
-        private void ValidateRecommendationInput(string title, int priority) // Made synchronous
+        private void ValidateRecommendationInput(string title, int priority)
         {
             if (string.IsNullOrWhiteSpace(title))
                 throw new ArgumentException("Title cannot be empty", nameof(title));
@@ -128,55 +220,5 @@ namespace AICO.Domain.Services
             if (priority < 1 || priority > 5)
                 throw new ArgumentException("Priority must be between 1 and 5", nameof(priority));
         }
-
-        public Task<AnalysisResult> AnalyzeWebsiteAsync(Guid websiteId, string analysisType)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<AnalysisResult> GetAnalysisResultByIdAsync(Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<AnalysisResult>> GetAnalysisResultsByWebsiteIdAsync(Guid websiteId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<AnalysisResult> GetLatestAnalysisResultAsync(Guid websiteId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Recommendation> AddRecommendationAsync(Guid analysisResultId, string title, string description, int priority, string category)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<Recommendation>> GetRecommendationsByAnalysisResultIdAsync(Guid analysisResultId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task MarkRecommendationAsImplementedAsync(Guid recommendationId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task MarkRecommendationAsNotImplementedAsync(Guid recommendationId)
-        {
-            throw new NotImplementedException();
-        }
-
-        // Remove incorrect explicit interface implementations below
-        // Task<AnalysisResult> IAnalysisService.CreateAnalysisEntity(...) NO LONGER NEEDED due to public sync method
-
-        // Task<AnalysisResult> IAnalysisService.CreateAnalysisAsync(...) NO LONGER NEEDED if public async method matches
-
-        // Task IAnalysisService.UpdateAnalysisAsync(...) NO LONGER NEEDED if public async method matches
-
-        // Task<bool> IAnalysisService.ValidateAnalysisDataAsync(...) NO LONGER NEEDED if public async method matches
-
     }
 }

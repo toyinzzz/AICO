@@ -16,6 +16,11 @@ namespace AICO.Domain.DTOs
         public double PredictedConversionImprovement { get; set; }
 
         /// <summary>
+        /// Predicted conversion rate (percentage)
+        /// </summary>
+        public double PredictedConversionRate { get; set; }
+
+        /// <summary>
         /// Confidence level of the prediction (0-1)
         /// </summary>
         public double ConfidenceLevel { get; set; }

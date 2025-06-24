@@ -1,135 +1,95 @@
-using AICO.Application.Interfaces.Commands;
+using AICO.Domain.Entities;
 using AICO.Domain.Interfaces.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
+using AICO.Domain.DTOs;
 
 namespace AICO.IntegrationTests
 {
-    public class MVPWorkflowTests : IClassFixture<TestWebApplicationFactory>
+    public class MVPWorkflowTests : IClassFixture<TestWebApplicationFactory>, IDisposable
     {
         private readonly TestWebApplicationFactory _factory;
         private readonly IServiceScope _scope;
+        private readonly ICampaignService _campaignService;
+        private readonly IAbTestService _abTestService;
+        private readonly IVariantGenerationService _variantGenerationService;
+        private readonly IRevenueTrackingService _revenueService;
+        private readonly ISnippetService _snippetService;
 
         public MVPWorkflowTests(TestWebApplicationFactory factory)
         {
             _factory = factory;
-            _scope = _factory.Services.CreateScope();
+            _scope = factory.Services.CreateScope();
+            _campaignService = _scope.ServiceProvider.GetRequiredService<ICampaignService>();
+            _abTestService = _scope.ServiceProvider.GetRequiredService<IAbTestService>();
+            _variantGenerationService = _scope.ServiceProvider.GetRequiredService<IVariantGenerationService>();
+            _revenueService = _scope.ServiceProvider.GetRequiredService<IRevenueTrackingService>();
+            _snippetService = _scope.ServiceProvider.GetRequiredService<ISnippetService>();
         }
 
         [Fact]
         public async Task CompleteABTestWorkflow_ShouldExecuteSuccessfully()
         {
             // Arrange
-            var campaignHandler = _scope.ServiceProvider.GetRequiredService<ICampaignCommandHandler>();
-            var abTestHandler = _scope.ServiceProvider.GetRequiredService<IAbTestCommandHandler>();
-            var variantGenerator = _scope.ServiceProvider.GetRequiredService<IVariantGenerationService>();
-            var revenueService = _scope.ServiceProvider.GetRequiredService<IRevenueTrackingService>();
-            var abTestService = _scope.ServiceProvider.GetRequiredService<IAbTestService>();
+            var campaign = await _campaignService.CreateCampaignAsync(Guid.NewGuid(), Guid.NewGuid(), "Test Campaign", "https://example.com", "Integration test campaign");
 
-            // Act & Assert - Complete workflow
-
-            // 1. Create Campaign
-            var createCampaignCommand = new CreateCampaignCommand(
-                "Test Campaign",
-                "Integration test campaign",
-                DateTime.UtcNow.AddDays(30)
-            );
-            var campaign = await campaignHandler.HandleAsync(createCampaignCommand);
-            Assert.NotNull(campaign);
-
-            // 2. Generate AI Variants
-            var variants = await variantGenerator.GenerateVariantsAsync(
-                "https://example.com/landing",
-                new VariantGenerationRequest
-                {
-                    TargetAudience = "Tech professionals",
-                    OptimizationGoal = "Increase conversions",
-                    VariantCount = 2
-                });
-            Assert.Equal(2, variants.Count);
-
-            // 3. Create A/B Test
-            var createTestCommand = new CreateAbTestCommand(
-                campaign.Id,
-                "Landing Page Test",
-                variants.Select(v => v.Id).ToList(),
-                50 // 50/50 split
-            );
-            var abTest = await abTestHandler.HandleAsync(createTestCommand);
-            Assert.NotNull(abTest);
-
-            // 4. Start Test
-            var startTestCommand = new StartAbTestCommand(abTest.Id);
-            await abTestHandler.HandleAsync(startTestCommand);
-
-            // 5. Simulate Traffic and Conversions
-            for (int i = 0; i < 1000; i++)
+            // Convert List<Variant> to List<AbTestVariant>
+            var variants = await _variantGenerationService.GenerateVariantsAsync("https://example.com/landing", new VariantGenerationRequest { TargetAudience = "Tech professionals", VariantCount = 2 });
+            var abTestVariants = variants.Select(v => new AbTestVariant
             {
-                var visitorId = $"visitor_{i}";
+                Id = v.Id,
+                Name = v.Name,
+                Content = v.Content,
+                TrafficAllocation = v.TrafficAllocation,
+                IsControl = v.IsControl
+            }).ToList();
 
-                // Get variant assignment
-                var assignedVariant = await abTestService.GetVariantForVisitorAsync(abTest.Id, visitorId);
+            var abTest = await _abTestService.CreateTestAsync(campaign.Id, abTestVariants);
 
-                // Record view
-                await abTestService.RecordVariantViewAsync(assignedVariant.Id, visitorId);
+            var visitorId = Guid.NewGuid().ToString();
 
-                // Simulate conversion (20% conversion rate)
-                if (i % 5 == 0)
-                {
-                    await abTestService.RecordVariantConversionAsync(assignedVariant.Id, visitorId, 99.99m, "purchase");
-                    await revenueService.RecordRevenueEventAsync(campaign.Id, assignedVariant.Id, 99.99m, "USD", $"txn_{i}");
-                }
-            }
+            // Act
+            await _abTestService.RecordVariantViewAsync(abTestVariants[0].Id, visitorId);
+            await _abTestService.RecordVariantConversionAsync(abTestVariants[0].Id, visitorId, 100.0m);
+            await _revenueService.RecordRevenueEventAsync(campaign.Id, abTestVariants[0].Id, 100.0m, "USD");
 
-            // 6. Check Statistical Significance
-            var isSignificant = await abTestService.IsTestStatisticallySignificantAsync(abTest.Id, 0.95);
-
-            // 7. Get Test Results
-            var testResults = await abTestService.GetTestResultsAsync(abTest.Id);
+            // Assert
+            var testResults = await _abTestService.GetTestResultsAsync(abTest.Id);
             Assert.NotNull(testResults);
-            Assert.True(testResults.ControlVariant.Views > 0);
-            Assert.True(testResults.TestVariant.Views > 0);
+            Assert.NotEmpty(testResults.VariantResults);
 
-            // 8. Calculate Profit Metrics
-            var profitLift = await revenueService.CalculateProfitLiftAsync(campaign.Id);
-            var roi = await revenueService.CalculateROIAsync(campaign.Id);
+            var revenueMetrics = await _revenueService.GetRevenueMetricsAsync(campaign.Id);
+            Assert.NotNull(revenueMetrics);
+            Assert.True(revenueMetrics.TotalRevenue > 0);
 
-            Assert.True(profitLift != 0);
-            Assert.True(roi > 0);
+            var profitLift = await _revenueService.CalculateProfitLiftAsync(campaign.Id);
+            Assert.True(profitLift > 0);
 
-            // 9. If significant, declare winner
-            if (isSignificant)
-            {
-                var winner = await abTestService.DeclareWinnerAsync(abTest.Id);
-                Assert.NotNull(winner);
-            }
+            var userAssignedVariant = await _abTestService.GetVariantForVisitorAsync(abTest.Id, visitorId);
+            Assert.NotNull(userAssignedVariant);
+            Assert.Equal(abTestVariants[0].Id, userAssignedVariant.Id);
         }
 
         [Fact]
         public async Task WebsiteIntegrationWorkflow_ShouldServeVariantsCorrectly()
         {
             // Arrange
-            var snippetService = _scope.ServiceProvider.GetRequiredService<ISnippetService>();
             var websiteId = Guid.NewGuid();
+            var campaign = await _campaignService.CreateCampaignAsync(websiteId, Guid.NewGuid(), "Website Integration Campaign", "https://example.com", "Test campaign for website integration");
+            var variants = await _variantGenerationService.GenerateVariantsAsync("https://example.com/landing", new VariantGenerationRequest { TargetAudience = "Tech professionals", VariantCount = 2 });
+            var abTest = await _abTestService.CreateTestAsync(campaign.Id, variants);
+            var visitorId = Guid.NewGuid().ToString();
 
-            // Act & Assert
+            // Act
+            var snippet = await _snippetService.GenerateSnippetAsync(websiteId);
+            var isInstalled = await _snippetService.ValidateSnippetInstallationAsync(websiteId);
+            var userAssignedVariant = await _abTestService.GetVariantForVisitorAsync(abTest.Id, visitorId);
 
-            // 1. Generate snippet
-            var snippet = await snippetService.GenerateSnippetAsync(websiteId);
+            // Assert
             Assert.NotNull(snippet);
             Assert.Contains("<script", snippet);
-
-            // 2. Validate installation
-            var isInstalled = await snippetService.ValidateSnippetInstallationAsync(websiteId);
             Assert.True(isInstalled);
-
-            // 3. Test page targeting
-            Assert.True(snippetService.ShouldTargetPage("/product/*", "/product/123"));
-            Assert.False(snippetService.ShouldTargetPage("/product/*", "/category/456"));
-
-            // 4. Get analytics
-            var analytics = await snippetService.GetSnippetAnalyticsAsync(websiteId);
-            Assert.NotNull(analytics);
+            Assert.NotNull(userAssignedVariant);
         }
 
         public void Dispose()

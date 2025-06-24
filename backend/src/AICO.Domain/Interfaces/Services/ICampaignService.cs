@@ -11,7 +11,7 @@ namespace AICO.Domain.Interfaces.Services
         /// <summary>
         /// Creates a new A/B testing campaign
         /// </summary>
-        Task<Campaign?> CreateCampaignAsync(Guid websiteId, string name, string targetUrl, string? description = null);
+        Task<Campaign?> CreateCampaignAsync(Guid websiteId, Guid userId, string name, string targetUrl, string? description = null);
 
         /// <summary>
         /// Gets a campaign by ID

@@ -1,4 +1,5 @@
 using AICO.Domain.Entities;
+using AICO.Domain.Interfaces.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using AICO.Domain.ValueObjects; // Assuming this is where your Value Objects like Money are

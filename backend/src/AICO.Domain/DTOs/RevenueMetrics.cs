@@ -99,5 +99,7 @@ namespace AICO.Domain.DTOs
         /// Metrics calculated timestamp
         /// </summary>
         public DateTime CalculatedAt { get; set; } = DateTime.UtcNow;
+        public int NumberOfConversions { get; internal set; }
+        public int Conversions { get; set; }
     }
 }

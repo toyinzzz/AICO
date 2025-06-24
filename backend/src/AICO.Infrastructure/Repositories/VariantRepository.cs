@@ -27,7 +27,7 @@ namespace AICO.Infrastructure.Repositories
         {
             return await _dbSet
                 .Include(v => v.AbTest)
-                .Where(v => v.AbTest.CampaignId == campaignId)
+                .Where(v => v.AbTest != null && v.AbTest.CampaignId == campaignId)
                 .ToListAsync();
         }
 
