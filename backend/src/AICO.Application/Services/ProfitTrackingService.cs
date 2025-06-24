@@ -3,71 +3,59 @@ using AICO.Domain.Interfaces.Services;
 using AICO.Domain.Interfaces.Repositories;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+using AICO.Domain.Entities;
+using AICO.Application.Interfaces.Services;
 
 namespace AICO.Application.Services
 {
     public class ProfitTrackingService : IProfitTrackingService
     {
         private const int MinimumSampleSize = 30;
+        private const decimal MaxMcpCap = 1000m;
         private readonly IRevenueRepository _revenueRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IWebsiteService _websiteService;
+        private readonly ILogger<ProfitTrackingService> _logger;
 
         public ProfitTrackingService(
             IRevenueRepository revenueRepository,
             IHttpContextAccessor httpContextAccessor,
-            IWebsiteService websiteService)
+            IWebsiteService websiteService,
+            ILogger<ProfitTrackingService> logger)
         {
             _revenueRepository = revenueRepository;
             _httpContextAccessor = httpContextAccessor;
             _websiteService = websiteService;
+            _logger = logger;
         }
 
         public decimal CalculateMCP(decimal controlRevenue, int controlConversions, decimal variantRevenue, int variantConversions)
         {
             ValidateInputs(controlRevenue, controlConversions, variantRevenue, variantConversions);
-            var controlRPC = controlConversions == 0 ? 0 : controlRevenue / controlConversions;
-            var variantRPC = variantConversions == 0 ? 0 : variantRevenue / variantConversions;
-            
-            // Handle zero control RPC case properly
+            var controlRPC = controlRevenue / controlConversions;
+            var variantRPC = variantRevenue / variantConversions;
+
             if (controlRPC == 0)
             {
-                // If both are zero, there's no lift
                 if (variantRPC == 0) return 0;
-                
-                // If control is zero but variant has value, it's a significant improvement
-                // but we cap it to avoid overflow
-                return 1000; // Cap at 1000% improvement instead of MaxValue
+                return MaxMcpCap;
             }
-            
-            // Protect against potential overflow
-            try
-            {
-                var mcp = ((variantRPC - controlRPC) / controlRPC) * 100;
-                
-                // Cap extreme values to reasonable limits
-                if (mcp > 1000) return 1000;
-                if (mcp < -1000) return -1000;
-                
-                return Math.Round(mcp, 4);
-            }
-            catch (OverflowException)
-            {
-                // If calculation causes overflow, determine if it's positive or negative
-                return variantRPC > controlRPC ? 1000 : -1000;
-            }
+
+            var mcp = ((variantRPC - controlRPC) / controlRPC) * 100;
+            return Math.Clamp(Math.Round(mcp, 4), -MaxMcpCap, MaxMcpCap);
         }
 
         public decimal CalculateMCPWithCurrency(decimal controlRevenue, int controlConversions, decimal variantRevenue, int variantConversions, string currency)
         {
-            // TODO: For MVP, we assume all values are already normalized to the same currency
-            // In a future implementation, this method should:
-            // 1. Use a currency conversion service to normalize all values to a base currency
-            // 2. Apply appropriate exchange rates based on the transaction dates
-            // 3. Handle currency fluctuations over time
-            // 4. Consider implementing ICurrencyConversionService for proper dependency injection
+            // IMPORTANT: All monetary values must be provided in the same currency.
+            // The currency parameter is for reference/documentation purposes only.
+            // No currency conversion is performed in the MVP version.
             //
-            // For now, we pass through to the standard MCP calculation
+            // Future enhancements may include:
+            // - Currency conversion service integration
+            // - Exchange rate handling
+            // - Historical rate support
             return CalculateMCP(controlRevenue, controlConversions, variantRevenue, variantConversions);
         }
 
@@ -101,58 +89,68 @@ namespace AICO.Application.Services
 
         public async Task<Revenue> ProcessStripeWebhookAsync(StripeWebhookEvent stripeEvent)
         {
-            var sessionId = stripeEvent.Data.Metadata?.GetValueOrDefault("session_id");
-            var variantId = stripeEvent.Data.Metadata?.GetValueOrDefault("variant_id");
-            var websiteIdStr = stripeEvent.Data.Metadata?.GetValueOrDefault("website_id");
-            var userIdStr = stripeEvent.Data.Metadata?.GetValueOrDefault("user_id");
-            var amount = stripeEvent.Data.Amount;
-            var currency = stripeEvent.Data.Currency ?? "USD";
-            
-            var websiteId = GetWebsiteIdFromContext(websiteIdStr);
-            var userId = GetUserIdFromContext(userIdStr);
-
-            // Ownership-Check: Use the interface-compliant ValidateOwnershipAsync
-            if (websiteId != Guid.Empty && userId != Guid.Empty)
+            try
             {
-                var isOwner = await _websiteService.ValidateOwnershipAsync(websiteId, userId);
-                if (!isOwner)
-                    throw new UnauthorizedAccessException($"User {userId} does not own website {websiteId}");
-            }
+                var sessionId = stripeEvent.Data.Metadata?.GetValueOrDefault("session_id");
+                var variantId = stripeEvent.Data.Metadata?.GetValueOrDefault("variant_id");
+                var websiteIdStr = stripeEvent.Data.Metadata?.GetValueOrDefault("website_id");
+                var userIdStr = stripeEvent.Data.Metadata?.GetValueOrDefault("user_id");
+                var amount = stripeEvent.Data.Amount;
+                var currency = stripeEvent.Data.Currency ?? "USD";
 
-            // FIXED: Better GUID parsing with proper error handling
-            Guid? sessionGuid = null;
-            if (!string.IsNullOrEmpty(sessionId))
+                var websiteId = GetWebsiteIdFromContext(websiteIdStr);
+                var userId = GetUserIdFromContext(userIdStr);
+
+                // Ownership-Check: Use the interface-compliant ValidateOwnershipAsync
+                if (websiteId != Guid.Empty && userId != Guid.Empty)
+                {
+                    var isOwner = await _websiteService.ValidateOwnershipAsync(websiteId, userId);
+                    if (!isOwner)
+                    {
+                        _logger.LogWarning("Unauthorized access: User {UserId} does not own website {WebsiteId}", userId, websiteId);
+                        throw new UnauthorizedAccessException($"User {userId} does not own website {websiteId}");
+                    }
+                }
+
+                // FIXED: Better GUID parsing with proper error handling
+                Guid? sessionGuid = null;
+                if (!string.IsNullOrEmpty(sessionId))
+                {
+                    if (Guid.TryParse(sessionId, out var parsedSessionId))
+                        sessionGuid = parsedSessionId;
+                    else
+                        throw new ArgumentException($"Invalid session_id format: {sessionId}");
+                }
+
+                Guid? variantGuid = null;
+                if (!string.IsNullOrEmpty(variantId))
+                {
+                    if (Guid.TryParse(variantId, out var parsedVariantId))
+                        variantGuid = parsedVariantId;
+                    else
+                        throw new ArgumentException($"Invalid variant_id format: {variantId}");
+                }
+
+                var revenue = new Revenue(
+                    websiteId: websiteId,
+                    userId: userId,
+                    amount: amount / 100m,
+                    source: "stripe",
+                    currency: currency,
+                    transactionId: stripeEvent.Data.Id,
+                    sessionId: sessionGuid,
+                    variantId: variantGuid
+                );
+
+                await _revenueRepository.AddAsync(revenue);
+                _logger.LogInformation("Revenue added for website {WebsiteId}, user {UserId}, amount {Amount}", websiteId, userId, amount);
+                return revenue;
+            }
+            catch (Exception ex)
             {
-                if (Guid.TryParse(sessionId, out var parsedSessionId))
-                    sessionGuid = parsedSessionId;
-                else
-                    throw new ArgumentException($"Invalid session_id format: {sessionId}");
+                _logger.LogError(ex, "Error processing Stripe webhook event: {EventId}", stripeEvent?.Data?.Id);
+                throw;
             }
-
-            Guid? variantGuid = null;
-            if (!string.IsNullOrEmpty(variantId))
-            {
-                if (Guid.TryParse(variantId, out var parsedVariantId))
-                    variantGuid = parsedVariantId;
-                else
-                    throw new ArgumentException($"Invalid variant_id format: {variantId}");
-            }
-
-            var revenue = new Revenue(
-                abTestId: Guid.Empty,
-                websiteId: websiteId,
-                websiteId: websiteId,
-                userId: userId,
-                amount: amount / 100m,
-                source: "stripe",
-                currency: currency,
-                transactionId: stripeEvent.Data.Id,
-                sessionId: sessionGuid,
-                variantId: variantGuid
-            );
-            
-            await _revenueRepository.AddAsync(revenue);
-            return revenue;
         }
 
         public async Task<RevenueReport> GenerateRevenueReportAsync(Guid abTestId, DateTime startDate, DateTime endDate)
@@ -182,7 +180,7 @@ namespace AICO.Application.Services
 
             // Find control variant (assuming it's the one with Guid.Empty or a specific flag in your data model)
             var controlVariantId = Guid.Empty; // Adjust this based on your actual control variant identification logic
-            
+
             if (revenueByVariant.ContainsKey(controlVariantId) && conversionsByVariant.ContainsKey(controlVariantId))
             {
                 var controlRevenue = revenueByVariant[controlVariantId];
@@ -245,7 +243,7 @@ namespace AICO.Application.Services
             // Try to parse from metadata first
             if (!string.IsNullOrEmpty(websiteIdStr) && Guid.TryParse(websiteIdStr, out var websiteIdFromMetadata))
                 return websiteIdFromMetadata;
-            
+
             // Fall back to claims
             var context = _httpContextAccessor.HttpContext;
             if (context?.User?.Identity?.IsAuthenticated == true)
@@ -254,7 +252,7 @@ namespace AICO.Application.Services
                 if (!string.IsNullOrEmpty(websiteIdClaim) && Guid.TryParse(websiteIdClaim, out var websiteIdFromClaim))
                     return websiteIdFromClaim;
             }
-            
+
             return Guid.Empty;
         }
 
@@ -263,7 +261,7 @@ namespace AICO.Application.Services
             // Try to parse from metadata first
             if (!string.IsNullOrEmpty(userIdStr) && Guid.TryParse(userIdStr, out var userIdFromMetadata))
                 return userIdFromMetadata;
-            
+
             // Fall back to claims
             var context = _httpContextAccessor.HttpContext;
             if (context?.User?.Identity?.IsAuthenticated == true)
@@ -272,7 +270,7 @@ namespace AICO.Application.Services
                 if (!string.IsNullOrEmpty(userIdClaim) && Guid.TryParse(userIdClaim, out var userIdFromClaim))
                     return userIdFromClaim;
             }
-            
+
             return Guid.Empty;
         }
 

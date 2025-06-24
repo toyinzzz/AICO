@@ -149,7 +149,7 @@ namespace AICO.UnitTests.Domain.Services
             // Assert
             Assert.NotNull(result);
             Assert.Equal(5, result.Count);
-            Assert.All(result, cta => Assert.Contains("Buy\|Get\|Order\|Add\|Purchase", cta));
+            Assert.All(result, cta => Assert.Contains("Buy|Get|Order|Add|Purchase", cta));
         }
     }
 }

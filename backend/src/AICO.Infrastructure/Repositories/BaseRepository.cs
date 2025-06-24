@@ -17,12 +17,9 @@ namespace AICO.Infrastructure.Repositories
             _dbSet = _context.Set<T>();
         }
 
-        public virtual async Task<T> GetByIdAsync(Guid id)
+        public virtual async Task<T?> GetByIdAsync(Guid id)
         {
-            var entity = await _dbSet.FindAsync(id);
-            if (entity == null)
-                throw new InvalidOperationException($"Entity with id {id} not found");
-            return entity;
+            return await _dbSet.FindAsync(id);
         }
 
         public virtual async Task<IEnumerable<T>> GetAllAsync()
@@ -62,7 +59,11 @@ namespace AICO.Infrastructure.Repositories
         public virtual async Task DeleteByIdAsync(Guid id)
         {
             var entity = await GetByIdAsync(id);
-            await DeleteAsync(entity);
+            if (entity != null)
+            {
+                await DeleteAsync(entity);
+            }
+            // If entity is null, it's already deleted or never existed
         }
 
         public virtual async Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate)

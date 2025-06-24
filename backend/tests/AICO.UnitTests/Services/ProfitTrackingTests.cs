@@ -287,13 +287,35 @@ namespace AICO.UnitTests.Services
         }
 
         // Add to ProfitTrackingTests class
-        [Theory]
-        [InlineData(decimal.MinValue, 1, 1000, 100)] // Minimum decimal value
-        [InlineData(1000, int.MaxValue, 1100, int.MaxValue)] // Maximum int values
-        public void CalculateMCP_WithBoundaryValues_ShouldHandleCorrectly(decimal controlRevenue, int controlConversions, decimal variantRevenue, int variantConversions)
+        [Fact]
+        public void CalculateMCP_WithMinDecimalValue_ShouldHandleCorrectly()
         {
-            // Test boundary conditions
+            // Arrange
+            var controlRevenue = decimal.MinValue;
+            var controlConversions = 1;
+            var variantRevenue = 1000m;
+            var variantConversions = 100;
+
+            // Act
             var result = _profitTrackingService.CalculateMCP(controlRevenue, controlConversions, variantRevenue, variantConversions);
+
+            // Assert
+            Assert.True(decimal.IsFinite(result));
+        }
+
+        [Fact]
+        public void CalculateMCP_WithMaxIntValues_ShouldHandleCorrectly()
+        {
+            // Arrange
+            var controlRevenue = 1000m;
+            var controlConversions = int.MaxValue;
+            var variantRevenue = 1100m;
+            var variantConversions = int.MaxValue;
+
+            // Act
+            var result = _profitTrackingService.CalculateMCP(controlRevenue, controlConversions, variantRevenue, variantConversions);
+            
+            // Assert
             Assert.True(decimal.IsFinite(result));
         }
 

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using AICO.Infrastructure.Data; // Added this line
 
 namespace AICO.IntegrationTests
 {
@@ -14,15 +15,15 @@ namespace AICO.IntegrationTests
             {
                 // Remove the app's ApplicationDbContext registration
                 var descriptor = services.SingleOrDefault(
-                    d => d.ServiceType == typeof(DbContextOptions<ApplicationDbContext>));
+                    d => d.ServiceType == typeof(DbContextOptions<AicoDbContext>));
 
                 if (descriptor != null)
                 {
                     services.Remove(descriptor);
                 }
 
-                // Add ApplicationDbContext using an in-memory database for testing
-                services.AddDbContext<ApplicationDbContext>(options =>
+                // Add AicoDbContext using an in-memory database for testing
+                services.AddDbContext<AicoDbContext>(options =>
                 {
                     options.UseInMemoryDatabase("InMemoryDbForTesting");
                 });
@@ -33,7 +34,7 @@ namespace AICO.IntegrationTests
                 // Create a scope to obtain a reference to the database context
                 using var scope = sp.CreateScope();
                 var scopedServices = scope.ServiceProvider;
-                var db = scopedServices.GetRequiredService<ApplicationDbContext>();
+                var db = scopedServices.GetRequiredService<AicoDbContext>();
                 var logger = scopedServices.GetRequiredService<ILogger<TestWebApplicationFactory>>();
 
                 // Ensure the database is created
@@ -51,7 +52,7 @@ namespace AICO.IntegrationTests
             });
         }
 
-        private static void SeedTestData(ApplicationDbContext context)
+        private static void SeedTestData(AicoDbContext context)
         {
             // Add any test data seeding logic here
         }

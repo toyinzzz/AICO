@@ -1,4 +1,7 @@
-using AICO.Application.Interfaces.ExternalServices;
+using System;
+using System.Threading.Tasks;
+using AICO.Domain.Interfaces.Services;
+using AICO.Infrastructure.ExternalServices;
 using Moq;
 using Stripe;
 using Xunit;
@@ -9,7 +12,7 @@ namespace AICO.UnitTests.Infrastructure.Services
     {
         private readonly Mock<PaymentIntentService> _mockPaymentIntentService;
         private readonly Mock<CustomerService> _mockCustomerService;
-        private readonly StripePaymentService _paymentService;
+        private readonly IStripePaymentService _paymentService;
 
         public StripePaymentServiceTests()
         {
@@ -103,5 +106,7 @@ namespace AICO.UnitTests.Infrastructure.Services
             Assert.NotNull(result);
             Assert.Equal("active", result.Status);
         }
+
+       
     }
 }

@@ -49,9 +49,5 @@ namespace AICO.Domain.Interfaces.Repositories
         /// </summary>
         Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate);
 
-        /// <summary>
-        /// Gets or sets the URL
-        /// </summary>
-        public string? Url { get; set; }
     }
 }

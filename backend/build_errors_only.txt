@@ -1,0 +1,27 @@
+﻿
+C:\Users\toyin\AICO\backend\src\AICO.Application\Services\JwtService.cs(7,27): error CS0246: Der 
+Typ- oder Namespacename "IJwtService" wurde nicht gefunden (m├Âglicherweise fehlt eine 
+using-Direktive oder ein Assemblyverweis). 
+[C:\Users\toyin\AICO\backend\src\AICO.Application\AICO.Application.csproj]
+C:\Users\toyin\AICO\backend\src\AICO.Application\Services\JwtService.cs(9,22): error CS0246: Der 
+Typ- oder Namespacename "IConfiguration" wurde nicht gefunden (m├Âglicherweise fehlt eine 
+using-Direktive oder ein Assemblyverweis). 
+[C:\Users\toyin\AICO\backend\src\AICO.Application\AICO.Application.csproj]
+C:\Users\toyin\AICO\backend\src\AICO.Application\Services\JwtService.cs(12,23): error CS0246: Der 
+Typ- oder Namespacename "IConfiguration" wurde nicht gefunden (m├Âglicherweise fehlt eine 
+using-Direktive oder ein Assemblyverweis). 
+[C:\Users\toyin\AICO\backend\src\AICO.Application\AICO.Application.csproj]
+C:\Users\toyin\AICO\backend\src\AICO.Application\Services\JwtService.cs(7,27): error CS0246: Der 
+Typ- oder Namespacename "IJwtService" wurde nicht gefunden (m├Âglicherweise fehlt eine 
+using-Direktive oder ein Assemblyverweis). 
+[C:\Users\toyin\AICO\backend\src\AICO.Application\AICO.Application.csproj]
+C:\Users\toyin\AICO\backend\src\AICO.Application\Services\JwtService.cs(9,22): error CS0246: Der 
+Typ- oder Namespacename "IConfiguration" wurde nicht gefunden (m├Âglicherweise fehlt eine 
+using-Direktive oder ein Assemblyverweis). 
+[C:\Users\toyin\AICO\backend\src\AICO.Application\AICO.Application.csproj]
+C:\Users\toyin\AICO\backend\src\AICO.Application\Services\JwtService.cs(12,23): error CS0246: Der 
+Typ- oder Namespacename "IConfiguration" wurde nicht gefunden (m├Âglicherweise fehlt eine 
+using-Direktive oder ein Assemblyverweis). 
+[C:\Users\toyin\AICO\backend\src\AICO.Application\AICO.Application.csproj]
+
+

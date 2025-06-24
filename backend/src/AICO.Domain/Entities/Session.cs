@@ -13,6 +13,11 @@ namespace AICO.Domain.Entities
         public Guid WebsiteId { get; private set; }
 
         /// <summary>
+        /// The ID of the user this session belongs to (optional, if the user is logged in)
+        /// </summary>
+        public Guid? UserId { get; private set; }
+
+        /// <summary>
         /// Unique identifier for the visitor (cookie-based)
         /// </summary>
         public string VisitorId { get; private set; }
@@ -20,17 +25,17 @@ namespace AICO.Domain.Entities
         /// <summary>
         /// User agent string from the browser/client
         /// </summary>
-        public string UserAgent { get; private set; }
+        public string? UserAgent { get; private set; }
 
         /// <summary>
         /// IP address of the client
         /// </summary>
-        public string IpAddress { get; private set; }
+        public string? IpAddress { get; private set; }
 
         /// <summary>
         /// Referrer URL if available
         /// </summary>
-        public string Referrer { get; private set; }
+        public string? Referrer { get; private set; }
 
         /// <summary>
         /// First page visited in this session
@@ -65,12 +70,26 @@ namespace AICO.Domain.Entities
         /// <summary>
         /// Collection of events in this session
         /// </summary>
-        public virtual ICollection<Event> Events { get; private set; }
+        public virtual ICollection<Event>? Events { get; private set; }
+
+        /// <summary>
+        /// Collection of conversions in this session
+        /// </summary>
+        public virtual ICollection<Conversion>? Conversions { get; private set; }
+
+        /// <summary>
+        /// Navigation property to the user (optional)
+        /// </summary>
+        public virtual User? User { get; private set; }
 
         // Private constructor for EF Core
         private Session()
         {
+            VisitorId = string.Empty;
+            EntryPage = string.Empty;
+            Website = null; // Nullable, so null is fine
             Events = new List<Event>();
+            Conversions = new List<Conversion>();
         }
 
         /// <summary>
@@ -80,9 +99,9 @@ namespace AICO.Domain.Entities
             Guid websiteId,
             string visitorId,
             string entryPage,
-            string userAgent = null,
-            string ipAddress = null,
-            string referrer = null)
+            string? userAgent = null,
+            string? ipAddress = null,
+            string? referrer = null)
         {
             if (string.IsNullOrWhiteSpace(visitorId))
                 throw new ArgumentException("Visitor ID cannot be null or empty", nameof(visitorId));

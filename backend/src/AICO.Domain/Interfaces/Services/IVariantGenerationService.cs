@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using AICO.Domain.DTOs;
 using AICO.Domain.Entities;
 
@@ -16,7 +19,7 @@ namespace AICO.Domain.Interfaces.Services
         /// <summary>
         /// Creates a custom variant manually
         /// </summary>
-        Task<Variant> CreateCustomVariantAsync(Guid campaignId, string name, string htmlContent, string description = null);
+        Task<Variant> CreateCustomVariantAsync(Guid campaignId, string name, string htmlContent, string? description = null);
 
         /// <summary>
         /// Analyzes page content and structure
@@ -52,5 +55,10 @@ namespace AICO.Domain.Interfaces.Services
         /// Estimates variant performance before testing
         /// </summary>
         Task<VariantPerformancePrediction> PredictVariantPerformanceAsync(Variant variant, PageAnalysis baselineAnalysis);
+
+        // Methods for serving and tracking variants (to be implemented)
+        Task<Variant?> ServeVariantAsync(string userId, Guid abTestId); // Assuming Variant is the return type
+        Task<bool> TrackConversionAsync(string userId, Guid variantId, decimal revenue); // Assuming bool for success
+        Task<VariantStatsDto?> GetVariantStatsAsync(Guid variantId); // Assuming a DTO for stats
     }
 }

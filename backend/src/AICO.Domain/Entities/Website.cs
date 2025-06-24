@@ -11,17 +11,25 @@ namespace AICO.Domain.Entities
     {
         public string Url { get; private set; }
         public string Name { get; private set; }
-        public string Description { get; private set; }
-        public string Industry { get; private set; }
+        public string? Description { get; private set; }
+        public string? Industry { get; private set; }
         public Guid UserId { get; private set; }
-        public virtual User User { get; private set; }
-        public virtual ICollection<AnalysisResult> AnalysisResults { get; private set; }
+        public virtual User? User { get; private set; }
+        public virtual ICollection<AnalysisResult>? AnalysisResults { get; private set; }
         public DateTime? LastAnalyzedAt { get; private set; }
 
         // Add the missing Domain property  
-        public string Domain { get; private set; }
+        public string? Domain { get; private set; }
 
-        public static Website Create(string url, string name, Guid userId, string description = null, string industry = null, string domain = null)
+        // Private constructor for EF Core
+        private Website()
+        {
+            Url = string.Empty;
+            Name = string.Empty;
+            AnalysisResults = new List<AnalysisResult>(); // Initialize collection
+        }
+
+        public static Website Create(string url, string name, Guid userId, string? description = null, string? industry = null, string? domain = null)
         {
             return new Website
             {
@@ -34,22 +42,25 @@ namespace AICO.Domain.Entities
             };
         }
 
-        internal void Update(string name, string description, string industry, string domain)
+        public void Update(string name, string? description, string? industry, string? domain)
         {
             Name = name;
             Description = description;
             Industry = industry;
             Domain = domain;
+            MarkAsUpdated();
         }
 
-        internal void UpdateUrl(string url)
+        public void UpdateUrl(string url)
         {
             Url = url;
+            MarkAsUpdated();
         }
 
-        internal void UpdateLastAnalyzedAt()
+        public void UpdateLastAnalyzedAt()
         {
             LastAnalyzedAt = DateTime.UtcNow;
+            MarkAsUpdated();
         }
     }
 }

@@ -2,7 +2,6 @@ using AICO.Application.Interfaces.Commands;
 using AICO.Domain.Entities;
 using AICO.Domain.Interfaces.Repositories;
 using AICO.Domain.Interfaces.Services;
-using AICO.Domain.ValueObjects;
 using Moq;
 using Xunit;
 
@@ -29,11 +28,14 @@ namespace AICO.UnitTests.Application.Commands
                 Guid.NewGuid(),
                 "Test A/B Test",
                 "Test Description",
-                TestType.Create("Button Color"),
+                "Button Color",
                 50,
                 "conversion_rate",
                 DateTime.UtcNow.AddDays(1),
-                DateTime.UtcNow.AddDays(30)
+                DateTime.UtcNow.AddDays(30),
+                "#cta-button",
+                "Buy Now",
+                "Get Started"
             );
 
             var expectedAbTest = AbTest.Create(
@@ -44,7 +46,10 @@ namespace AICO.UnitTests.Application.Commands
                 command.TrafficSplit,
                 command.SuccessMetric,
                 command.StartDate,
-                command.EndDate
+                command.EndDate,
+                command.TargetSelector,
+                command.OriginalContent,
+                command.PrimaryMetric
             );
 
             _mockAbTestRepository.Setup(r => r.AddAsync(It.IsAny<AbTest>()))
@@ -71,11 +76,14 @@ namespace AICO.UnitTests.Application.Commands
                 Guid.NewGuid(),
                 "Test",
                 "Description",
-                TestType.Create("Button Color"),
+                "Button Color",
                 50,
                 "conversion_rate",
                 DateTime.UtcNow.AddDays(1),
-                DateTime.UtcNow.AddDays(30)
+                DateTime.UtcNow.AddDays(30),
+                "#cta-button",
+                "Buy Now",
+                "Get Started"
             );
 
             _mockAbTestRepository.Setup(r => r.GetByIdAsync(abTestId))

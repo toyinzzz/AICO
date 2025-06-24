@@ -1,0 +1,7 @@
+C:\Users\toyin\AICO\backend\tests\AICO.UnitTests\bin\Debug\net8.0\CoverletSourceRootsMapping_AICO.UnitTests
+C:\Users\toyin\AICO\backend\tests\AICO.UnitTests\obj\Debug\net8.0\AICO.UnitTests.csproj.AssemblyReference.cache
+C:\Users\toyin\AICO\backend\tests\AICO.UnitTests\obj\Debug\net8.0\AICO.UnitTests.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\toyin\AICO\backend\tests\AICO.UnitTests\obj\Debug\net8.0\AICO.UnitTests.AssemblyInfoInputs.cache
+C:\Users\toyin\AICO\backend\tests\AICO.UnitTests\obj\Debug\net8.0\AICO.UnitTests.AssemblyInfo.cs
+C:\Users\toyin\AICO\backend\tests\AICO.UnitTests\obj\Debug\net8.0\AICO.UnitTests.csproj.CoreCompileInputs.cache
+C:\Users\toyin\AICO\backend\tests\AICO.UnitTests\obj\Debug\net8.0\AICO.UnitTests.sourcelink.json

@@ -13,26 +13,26 @@ namespace AICO.Domain.Entities
         /// </summary>
         [Required]
         public Guid WebsiteId { get; private set; }
-        public Website Website { get; private set; }
+        public Website? Website { get; private set; }
 
         /// <summary>
         /// User who owns this revenue record
         /// </summary>
         [Required]
         public Guid UserId { get; private set; }
-        public User User { get; private set; }
+        public User? User { get; private set; }
 
         /// <summary>
         /// Associated conversion (optional)
         /// </summary>
         public Guid? ConversionId { get; private set; }
-        public Conversion Conversion { get; private set; }
+        public Conversion? Conversion { get; private set; }
 
         /// <summary>
         /// Associated campaign (optional)
         /// </summary>
         public Guid? CampaignId { get; private set; }
-        public Campaign Campaign { get; private set; }
+        public Campaign? Campaign { get; private set; }
 
         /// <summary>
         /// Revenue amount
@@ -59,12 +59,12 @@ namespace AICO.Domain.Entities
         /// Transaction ID or reference
         /// </summary>
         [MaxLength(200)]
-        public string TransactionId { get; private set; }
+        public string? TransactionId { get; private set; }
 
         /// <summary>
         /// Additional metadata as JSON
         /// </summary>
-        public string Metadata { get; private set; }
+        public string? Metadata { get; private set; }
 
         /// <summary>
         /// Date when revenue was generated
@@ -83,6 +83,12 @@ namespace AICO.Domain.Entities
         public Guid? VariantId { get; private set; }
 
         /// <summary>
+        /// Indicates if this revenue event is for a control group
+        /// </summary>
+        public bool IsControl { get; private set; }
+        public Guid? UserId1 { get; }
+
+        /// <summary>
         /// Private constructor for EF Core
         /// </summary>
         private Revenue() { }
@@ -93,8 +99,8 @@ namespace AICO.Domain.Entities
         public Revenue(Guid websiteId, Guid userId, decimal amount, string source,
                       DateTime? revenueDate = null, string currency = "USD",
                       Guid? conversionId = null, Guid? campaignId = null,
-                      string transactionId = null, string metadata = null,
-                      Guid? sessionId = null, Guid? variantId = null)
+                      string? transactionId = null, string? metadata = null,
+                      Guid? sessionId = null, Guid? variantId = null, bool isControl = false)
         {
             WebsiteId = websiteId;
             UserId = userId;
@@ -108,6 +114,24 @@ namespace AICO.Domain.Entities
             RevenueDate = revenueDate ?? DateTime.UtcNow;
             SessionId = sessionId;
             VariantId = variantId;
+            IsControl = isControl;
+        }
+
+        public Revenue(Guid websiteId, Guid? userId, Guid? conversionId, Guid campaignId, decimal amount, string currency, string source, string transactionId, string metadata, DateTime revenueDate, Guid? sessionId, Guid variantId, bool isControl)
+        {
+            WebsiteId = websiteId;
+            UserId1 = userId;
+            ConversionId = conversionId;
+            CampaignId = campaignId;
+            Amount = amount;
+            Currency = currency;
+            Source = source;
+            TransactionId = transactionId;
+            Metadata = metadata;
+            RevenueDate = revenueDate;
+            SessionId = sessionId;
+            VariantId = variantId;
+            IsControl = isControl;
         }
 
         /// <summary>
@@ -122,17 +146,4 @@ namespace AICO.Domain.Entities
             UpdatedAt = DateTime.UtcNow;
         }
     }
-}
-
-public class Revenue : BaseEntity
-{
-    public Guid SessionId { get; set; }
-    public Guid VariantId { get; set; }
-    public decimal Amount { get; set; }
-    public string Currency { get; set; }
-    public DateTime RecordedAt { get; set; }
-    
-    // Navigation properties
-    public Session Session { get; set; }
-    public Variant Variant { get; set; }
 }

@@ -36,12 +36,12 @@ namespace AICO.Domain.Entities
         /// <summary>
         /// The currency of the value (if applicable)
         /// </summary>
-        public string Currency { get; private set; }
+        public string? Currency { get; private set; }
 
         /// <summary>
         /// Additional data about the conversion in JSON format
         /// </summary>
-        public string ConversionData { get; private set; }
+        public string? ConversionData { get; private set; }
 
         /// <summary>
         /// When the conversion occurred
@@ -51,15 +51,19 @@ namespace AICO.Domain.Entities
         /// <summary>
         /// Navigation property to the website
         /// </summary>
-        public virtual Website Website { get; private set; }
+        public virtual Website? Website { get; private set; }
 
         /// <summary>
         /// Navigation property to the session
         /// </summary>
-        public virtual Session Session { get; private set; }
+        public virtual Session? Session { get; private set; }
 
         // Private constructor for EF Core
-        private Conversion() { }
+        private Conversion()
+        {
+            GoalName = null!;
+            ConversionType = null!;
+        }
 
         /// <summary>
         /// Creates a new conversion
@@ -67,10 +71,10 @@ namespace AICO.Domain.Entities
         public static Conversion Create(
             Guid websiteId,
             ConversionType conversionType,
-            string goalName,
+            string? goalName, // Made nullable
             decimal? value = null,
-            string currency = null,
-            string conversionData = null,
+            string? currency = null,
+            string? conversionData = null,
             Guid? sessionId = null)
         {
             if (conversionType == null)
@@ -113,16 +117,19 @@ namespace AICO.Domain.Entities
         /// </summary>
         public static Conversion Create(
             Guid websiteId,
-            string conversionType,
-            string goalName,
+            string? conversionType, // Made nullable
+            string? goalName, // Made nullable
             decimal? value = null,
-            string currency = null,
-            string conversionData = null,
+            string? currency = null,
+            string? conversionData = null,
             Guid? sessionId = null)
         {
+            if (string.IsNullOrWhiteSpace(conversionType))
+                throw new ArgumentException("Conversion type cannot be null or empty", nameof(conversionType));
+
             return Create(
                 websiteId,
-                ConversionType.Create(conversionType),
+                ConversionType.Create(conversionType), 
                 goalName,
                 value,
                 currency,

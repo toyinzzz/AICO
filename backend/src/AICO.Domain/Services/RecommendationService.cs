@@ -1,5 +1,6 @@
 using AICO.Domain.Entities;
 using AICO.Domain.Interfaces;
+using AICO.Domain.Interfaces.Services;
 
 namespace AICO.Domain.Services
 {
@@ -18,23 +19,23 @@ namespace AICO.Domain.Services
         /// <summary>
         /// Creates a new recommendation entity
         /// </summary>
-        public Recommendation CreateRecommendationEntity(Guid analysisResultId, string title, string description, int priority, string category)
+        public Recommendation CreateRecommendationEntity(Guid analysisResultId, string title, string description, int priority, string recommendationType)
         {
-            return Recommendation.Create(analysisResultId, title, description, priority, category);
+            return Recommendation.Create(analysisResultId, title, description, priority, recommendationType);
         }
 
         /// <summary>
         /// Creates a new recommendation
         /// </summary>
-        public async Task<Recommendation> CreateRecommendationAsync(Guid analysisResultId, string title, string description, int priority, string category)
+        public async Task<Recommendation> CreateRecommendationAsync(Guid analysisResultId, string title, string description, int priority, string recommendationType)
         {
             // Validation is done in the entity factory method
 
             // Create the recommendation using the factory method
-            var recommendation = Recommendation.Create(analysisResultId, title, description, priority, category);
+            var recommendation = Recommendation.Create(analysisResultId, title, description, priority, recommendationType);
 
             // Set audit information
-            _auditService.SetCreationAudit(recommendation);
+            _auditService.SetCreationAudit(recommendation, null); // Pass null for userId
 
             return recommendation;
         }
@@ -42,7 +43,7 @@ namespace AICO.Domain.Services
         /// <summary>
         /// Updates an existing recommendation
         /// </summary>
-        public async Task UpdateRecommendationAsync(Recommendation recommendation, string title, string description, int priority, string category)
+        public async Task UpdateRecommendationAsync(Recommendation recommendation, string title, string description, int priority, string recommendationType)
         {
             if (recommendation == null)
                 throw new ArgumentNullException(nameof(recommendation));
@@ -57,11 +58,14 @@ namespace AICO.Domain.Services
             if (priority < 1 || priority > 5)
                 throw new ArgumentException("Priority must be between 1 and 5", nameof(priority));
 
-            // Update the recommendation using safe internal methods (no reflection needed)
-            recommendation.UpdateDetails(title, description, priority, category);
+            // Update the recommendation properties directly
+            recommendation.UpdateTitle(title);
+            recommendation.UpdateDescription(description);
+            recommendation.UpdatePriority(priority);
+            recommendation.UpdateRecommendationType(recommendationType);
             
             // Update audit information
-            _auditService.UpdateModificationDate(recommendation);
+            _auditService.UpdateModificationDate(recommendation, null); // Explicitly pass null for userId
             
             // Note: Persistence should be handled by the calling application service
         }
@@ -74,22 +78,7 @@ namespace AICO.Domain.Services
             if (recommendation == null)
                 throw new ArgumentNullException(nameof(recommendation));
 
-            // Create a new implemented recommendation
-            var implementedRecommendation = Recommendation.CreateImplemented(
-                recommendation.AnalysisResultId,
-                recommendation.Title,
-                recommendation.Description,
-                recommendation.Priority,
-                recommendation.RecommendationType,
-                DateTime.UtcNow
-            );
-
-            // Copy the ID from the original recommendation
-            typeof(BaseEntity).GetProperty("Id").SetValue(implementedRecommendation, recommendation.Id);
-
-            // Copy the implementation status to the original recommendation
-            typeof(Recommendation).GetProperty("IsImplemented").SetValue(recommendation, true);
-            typeof(Recommendation).GetProperty("ImplementedAt").SetValue(recommendation, DateTime.UtcNow);
+            recommendation.MarkAsImplemented();
 
             // Update audit information
             _auditService.UpdateModificationDate(recommendation);
@@ -105,21 +94,7 @@ namespace AICO.Domain.Services
             if (recommendation == null)
                 throw new ArgumentNullException(nameof(recommendation));
 
-            // Create a new non-implemented recommendation
-            var nonImplementedRecommendation = Recommendation.Create(
-                recommendation.AnalysisResultId,
-                recommendation.Title,
-                recommendation.Description,
-                recommendation.Priority,
-                recommendation.RecommendationType
-            );
-
-            // Copy the ID from the original recommendation
-            typeof(BaseEntity).GetProperty("Id").SetValue(nonImplementedRecommendation, recommendation.Id);
-
-            // Copy the implementation status to the original recommendation
-            typeof(Recommendation).GetProperty("IsImplemented").SetValue(recommendation, false);
-            typeof(Recommendation).GetProperty("ImplementedAt").SetValue(recommendation, null);
+            recommendation.MarkAsPending();
 
             // Update audit information
             _auditService.UpdateModificationDate(recommendation);
@@ -135,7 +110,8 @@ namespace AICO.Domain.Services
             try
             {
                 // Validation is done by trying to create a dummy recommendation
-                Recommendation.Create(Guid.Empty, title, null, priority, null);
+                // Assuming a general category for validation purposes
+                Recommendation.Create(Guid.NewGuid(), title, "Validation Description", priority, "General");
                 return Task.FromResult(true);
             }
             catch (ArgumentException)

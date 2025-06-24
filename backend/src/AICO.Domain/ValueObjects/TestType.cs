@@ -45,10 +45,10 @@ namespace AICO.Domain.ValueObjects
         /// </summary>
         public static IReadOnlyList<TestType> GetPredefinedTypes() => _predefinedTypes.AsReadOnly();
 
-        public bool Equals(TestType other) =>
+        public bool Equals(TestType? other) =>
             other != null && string.Equals(Value, other.Value, StringComparison.OrdinalIgnoreCase);
 
-        public override bool Equals(object obj) => Equals(obj as TestType);
+        public override bool Equals(object? obj) => Equals(obj as TestType);
 
         public override int GetHashCode() =>
             Value?.ToLowerInvariant().GetHashCode() ?? 0;

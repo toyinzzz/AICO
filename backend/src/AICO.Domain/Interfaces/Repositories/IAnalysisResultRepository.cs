@@ -15,7 +15,7 @@ namespace AICO.Domain.Interfaces.Repositories
         /// <summary>
         /// Gets the latest analysis result for a specific website
         /// </summary>
-        Task<AnalysisResult> GetLatestByWebsiteIdAsync(Guid websiteId);
+        Task<AnalysisResult?> GetLatestByWebsiteIdAsync(Guid websiteId);
 
         /// <summary>
         /// Gets analysis results by type for a specific website

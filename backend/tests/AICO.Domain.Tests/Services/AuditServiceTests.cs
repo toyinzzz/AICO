@@ -1,5 +1,6 @@
 using AICO.Domain.Entities;
 using AICO.Domain.Interfaces;
+using AICO.Domain.Interfaces.Services; // Added this line
 using AICO.Domain.Services;
 using Xunit;
 
@@ -27,10 +28,9 @@ namespace AICO.Domain.Tests.Services
                 "salt");
 
             // Act
-            _auditService.UpdateModificationDate(user);
+            _auditService.UpdateModificationDate(user, "testuser"); // Pass userId
 
             // Assert
-            Assert.NotNull(user.ModifiedAt);
             Assert.True(user.ModifiedAt > DateTime.UtcNow.AddMinutes(-1));
             Assert.True(user.ModifiedAt <= DateTime.UtcNow);
         }
@@ -52,7 +52,6 @@ namespace AICO.Domain.Tests.Services
 
             // Assert
             Assert.Equal("admin", user.ModifiedBy);
-            Assert.NotNull(user.ModifiedAt);
             Assert.True(user.ModifiedAt > DateTime.UtcNow.AddMinutes(-1));
             Assert.True(user.ModifiedAt <= DateTime.UtcNow);
         }
@@ -62,7 +61,7 @@ namespace AICO.Domain.Tests.Services
         {
             // Act & Assert
             var exception = Assert.Throws<ArgumentNullException>(() =>
-                _auditService.UpdateModificationDate(null));
+                _auditService.UpdateModificationDate(null, null)); // Pass null for userId
 
             Assert.Equal("entity", exception.ParamName);
         }
@@ -80,10 +79,9 @@ namespace AICO.Domain.Tests.Services
                 "salt");
 
             // Act
-            _auditService.SetCreationAudit(user);
+            _auditService.SetCreationAudit(user, "System"); // Pass userId
 
             // Assert
-            Assert.NotNull(user.CreatedAt);
             Assert.True(user.CreatedAt > DateTime.UtcNow.AddMinutes(-1));
             Assert.True(user.CreatedAt <= DateTime.UtcNow);
             Assert.Equal("System", user.CreatedBy);
@@ -106,7 +104,6 @@ namespace AICO.Domain.Tests.Services
 
             // Assert
             Assert.Equal("admin", user.CreatedBy);
-            Assert.NotNull(user.CreatedAt);
             Assert.True(user.CreatedAt > DateTime.UtcNow.AddMinutes(-1));
             Assert.True(user.CreatedAt <= DateTime.UtcNow);
         }
@@ -116,7 +113,7 @@ namespace AICO.Domain.Tests.Services
         {
             // Act & Assert
             var exception = Assert.Throws<ArgumentNullException>(() =>
-                _auditService.SetCreationAudit(null));
+                _auditService.SetCreationAudit(null, null)); // Pass null for userId
 
             Assert.Equal("entity", exception.ParamName);
         }

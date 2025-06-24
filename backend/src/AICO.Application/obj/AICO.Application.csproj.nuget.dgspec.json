@@ -73,9 +73,21 @@
               "target": "Package",
               "version": "[2.3.0, )"
             },
+            "Microsoft.Extensions.Configuration.Abstractions": {
+              "target": "Package",
+              "version": "[9.0.6, )"
+            },
             "Microsoft.Extensions.DependencyInjection.Abstractions": {
               "target": "Package",
               "version": "[8.0.0, )"
+            },
+            "Microsoft.IdentityModel.JsonWebTokens": {
+              "target": "Package",
+              "version": "[8.12.1, )"
+            },
+            "System.IdentityModel.Tokens.Jwt": {
+              "target": "Package",
+              "version": "[8.12.1, )"
             }
           },
           "imports": [
@@ -125,7 +137,11 @@
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
-            "projectReferences": {}
+            "projectReferences": {
+              "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.Shared\\AICO.Shared.csproj": {
+                "projectPath": "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.Shared\\AICO.Shared.csproj"
+              }
+            }
           }
         },
         "warningProperties": {
@@ -147,6 +163,10 @@
             "FluentValidation": {
               "target": "Package",
               "version": "[11.8.1, )"
+            },
+            "MathNet.Numerics": {
+              "target": "Package",
+              "version": "[5.0.0, )"
             },
             "MediatR": {
               "target": "Package",
@@ -225,7 +245,7 @@
             },
             "System.Text.Json": {
               "target": "Package",
-              "version": "[8.0.0, )"
+              "version": "[8.0.5, )"
             }
           },
           "imports": [

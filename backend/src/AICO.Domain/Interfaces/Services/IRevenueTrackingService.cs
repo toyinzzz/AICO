@@ -11,7 +11,7 @@ namespace AICO.Domain.Interfaces.Services
         /// <summary>
         /// Records a revenue event for a specific variant
         /// </summary>
-        Task RecordRevenueEventAsync(Guid campaignId, Guid variantId, decimal amount, string currency, string transactionId = null);
+        Task RecordRevenueEventAsync(Guid campaignId, Guid variantId, decimal amount, string currency, string? transactionId = null, bool isControl = false);
 
         /// <summary>
         /// Calculates profit lift for a campaign
@@ -52,5 +52,10 @@ namespace AICO.Domain.Interfaces.Services
         /// Gets profit attribution by traffic source
         /// </summary>
         Task<Dictionary<string, decimal>> GetProfitByTrafficSourceAsync(Guid campaignId);
+
+        /// <summary>
+        /// Generates a revenue report for a campaign
+        /// </summary>
+        Task<RevenueReport> GenerateRevenueReportAsync(Guid campaignId, DateTime startDate, DateTime endDate);
     }
 }

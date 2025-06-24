@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AICO.Domain")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e7b90d5612ae574fd68c1f1f3193ebc41df23e12")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+dff3b7f02222938aa88651cedf4b889d3d2bb27f")]
 [assembly: System.Reflection.AssemblyProductAttribute("AICO.Domain")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AICO.Domain")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
