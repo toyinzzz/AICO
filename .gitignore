@@ -6,6 +6,16 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+# .NET build artifacts
+**/obj/
+**/bin/
+*.pem
+*.key
+*.crt
+*.csr
+*.p12
+*.pfx
+*.p7b
 
 # General
 .env
@@ -60,8 +70,21 @@ env/
 .pytest_cache/
 .mypy_cache/
 instance/
-.ipynb_checkpoints
+.ipynb_checkpoints  
+# Miscellaneous
+# .DS_Store (MacOS)
+.DS_Store
+# Thumbs.db (Windows)
+Thumbs.db
+# Localized resource files
+*.resx
 
 # Docker (if you build images locally and have context files you don't want to commit)
+
+.dockerignore
+# If you use Docker Compose:
+
+# If you use Docker Swarm:
+docker-swarm.yml
 # .dockerignore is preferred, but if not used:
 # specific files/folders related to local docker build context

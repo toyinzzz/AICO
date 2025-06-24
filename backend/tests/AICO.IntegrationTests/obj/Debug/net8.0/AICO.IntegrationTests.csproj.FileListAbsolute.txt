@@ -1,8 +1,0 @@
-C:\Users\toyin\AICO\backend\tests\AICO.IntegrationTests\bin\Debug\net8.0\CoverletSourceRootsMapping_AICO.IntegrationTests
-C:\Users\toyin\AICO\backend\tests\AICO.IntegrationTests\obj\Debug\net8.0\AICO.IntegrationTests.csproj.AssemblyReference.cache
-C:\Users\toyin\AICO\backend\tests\AICO.IntegrationTests\obj\Debug\net8.0\MvcTestingAppManifest.json
-C:\Users\toyin\AICO\backend\tests\AICO.IntegrationTests\obj\Debug\net8.0\AICO.IntegrationTests.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\toyin\AICO\backend\tests\AICO.IntegrationTests\obj\Debug\net8.0\AICO.IntegrationTests.AssemblyInfoInputs.cache
-C:\Users\toyin\AICO\backend\tests\AICO.IntegrationTests\obj\Debug\net8.0\AICO.IntegrationTests.AssemblyInfo.cs
-C:\Users\toyin\AICO\backend\tests\AICO.IntegrationTests\obj\Debug\net8.0\AICO.IntegrationTests.csproj.CoreCompileInputs.cache
-C:\Users\toyin\AICO\backend\tests\AICO.IntegrationTests\obj\Debug\net8.0\AICO.IntegrationTests.sourcelink.json
