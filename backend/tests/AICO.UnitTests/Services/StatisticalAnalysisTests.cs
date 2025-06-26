@@ -1,3 +1,4 @@
+using AICO.Domain.Services;
 using Xunit;
 
 namespace AICO.UnitTests.Services

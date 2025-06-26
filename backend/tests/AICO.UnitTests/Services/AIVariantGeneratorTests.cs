@@ -1,4 +1,5 @@
 using AICO.Application.Interfaces.ExternalServices;
+using AICO.Domain.Services;
 using Moq;
 using Xunit;
 
@@ -20,13 +21,8 @@ namespace AICO.UnitTests.Services
         {
             // Arrange
             var originalContent = "<button class='btn'>Buy Now</button>";
-            var brandGuidelines = new BrandGuidelines
-            {
-                PrimaryColor = "#007bff",
-                SecondaryColor = "#6c757d",
-                FontFamily = "Arial, sans-serif",
-                ToneOfVoice = "Professional"
-            };
+            var variantCount = 3;
+            var testGoal = "Increase click-through rate";
 
             var expectedVariants = new List<AIGeneratedVariant>
             {
@@ -44,11 +40,11 @@ namespace AICO.UnitTests.Services
                 }
             };
 
-            _mockAIService.Setup(s => s.GenerateVariantsAsync(originalContent, brandGuidelines))
+            _mockAIService.Setup(s => s.GenerateVariantsAsync(originalContent, variantCount, testGoal))
                 .ReturnsAsync(expectedVariants);
 
             // Act
-            var result = await _variantGenerator.GenerateVariantsAsync(originalContent, brandGuidelines);
+            var result = await _variantGenerator.GenerateVariantsAsync(originalContent, variantCount, testGoal);
 
             // Assert
             Assert.NotNull(result);
@@ -56,41 +52,21 @@ namespace AICO.UnitTests.Services
             Assert.All(result, v => Assert.True(v.ConfidenceScore > 0.7m));
         }
 
+
+
         [Fact]
-        public async Task ValidateBrandConsistency_WithValidVariant_ShouldReturnTrue()
+        public async Task OptimizeContent_WithTargetAudience_ShouldReturnOptimizedContent()
         {
             // Arrange
-            var variant = "<button style='color: #007bff; font-family: Arial;'>Buy Now</button>";
-            var brandGuidelines = new BrandGuidelines
-            {
-                PrimaryColor = "#007bff",
-                FontFamily = "Arial, sans-serif"
-            };
+            var content = "Buy now for great deals!";
+            var targetAudience = "young professionals";
 
             // Act
-            var isConsistent = await _variantGenerator.ValidateBrandConsistencyAsync(variant, brandGuidelines);
+            var optimizedContent = await _variantGenerator.OptimizeContent(content, targetAudience);
 
             // Assert
-            Assert.True(isConsistent);
-        }
-
-        [Theory]
-        [InlineData("<button style='color: red;'>Buy</button>", false)] // Wrong color
-        [InlineData("<button style='font-family: Comic Sans;'>Buy</button>", false)] // Wrong font
-        public async Task ValidateBrandConsistency_WithInvalidVariant_ShouldReturnFalse(string variant, bool expected)
-        {
-            // Arrange
-            var brandGuidelines = new BrandGuidelines
-            {
-                PrimaryColor = "#007bff",
-                FontFamily = "Arial, sans-serif"
-            };
-
-            // Act
-            var isConsistent = await _variantGenerator.ValidateBrandConsistencyAsync(variant, brandGuidelines);
-
-            // Assert
-            Assert.Equal(expected, isConsistent);
+            Assert.NotNull(optimizedContent);
+            Assert.NotEmpty(optimizedContent);
         }
     }
 }

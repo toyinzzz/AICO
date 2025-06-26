@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using AICO.Domain.Interfaces.Services;
+using AICO.Application.Interfaces.ExternalServices;
 using AICO.Infrastructure.ExternalServices;
 using Moq;
 using Stripe;
@@ -12,7 +12,7 @@ namespace AICO.UnitTests.Infrastructure.Services
     {
         private readonly Mock<PaymentIntentService> _mockPaymentIntentService;
         private readonly Mock<CustomerService> _mockCustomerService;
-        private readonly IStripePaymentService _paymentService;
+        private readonly AICO.Application.Interfaces.ExternalServices.IPaymentService _paymentService;
 
         public StripePaymentServiceTests()
         {

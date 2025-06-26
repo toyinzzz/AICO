@@ -1,19 +1,31 @@
+using System.Diagnostics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using AICO.Application.Interfaces.Services;
+using AICO.Application.Services;
 using Xunit;
 
-public interface IMCPPerformanceTests
+namespace AICO.UnitTests.Services
 {
-    Task CalculateMCP_ConcurrentCalculations_ShouldHandleCorrectly();
-    void CalculateMCP_WithLargeDataset_ShouldCompleteWithinTimeLimit();
-}
+    public class MCPPerformanceTests
+    {
+        private readonly IProfitTrackingService _profitTrackingService;
 
-public class MCPPerformanceTests : IMCPPerformanceTests
-{
-    private IProfitTrackingService _profitTrackingService;
+        public MCPPerformanceTests()
+        {
+            var mockRevenueRepository = new Mock<IRevenueRepository>();
+            var mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
+            var mockWebsiteService = new Mock<IWebsiteService>();
+            var mockLogger = new Mock<ILogger<ProfitTrackingService>>();
+            
+            _profitTrackingService = new ProfitTrackingService(
+                mockRevenueRepository.Object,
+                mockHttpContextAccessor.Object,
+                mockWebsiteService.Object,
+                mockLogger.Object);
+        }
 
     [Fact]
     public void CalculateMCP_WithLargeDataset_ShouldCompleteWithinTimeLimit()
@@ -49,5 +61,6 @@ public class MCPPerformanceTests : IMCPPerformanceTests
 
         // Assert
         Assert.All(results, r => Assert.True(Math.Abs(r - 10.0m) < 0.1m));
+    }
     }
 }

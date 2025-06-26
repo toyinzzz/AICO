@@ -1,4 +1,5 @@
 using AICO.Domain.Entities;
+using AICO.Domain.ValueObjects;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using AICO.Domain.Interfaces.Services; // For IVariantGenerationService
@@ -28,14 +29,14 @@ namespace AICO.IntegrationTests
             var abTest = await CreateActiveAbTestAsync(websiteId);
 
             // Act
-            var snippet = await _snippetService.GenerateTrackingSnippetAsync(websiteId);
+            var snippet = await _snippetService.GenerateSnippetAsync(websiteId);
 
             // Assert
             Assert.NotNull(snippet);
-            Assert.Contains("AICO", snippet.Content);
-            Assert.Contains("trackConversion", snippet.Content);
-            Assert.Contains(abTest.Id.ToString(), snippet.Content);
-            Assert.Contains("variant", snippet.Content.ToLower());
+            Assert.Contains("AICO", snippet);
+            Assert.Contains("trackConversion", snippet);
+            Assert.Contains(abTest.Id.ToString(), snippet);
+            Assert.Contains("variant", snippet.ToLower());
         }
 
         [Fact]
@@ -95,14 +96,13 @@ namespace AICO.IntegrationTests
         {
             var campaignId = Guid.NewGuid();
             var abTest = AbTest.Create(
-                campaignId,
                 "Integration Test",
                 "Test Description",
+                campaignId,
                 TestType.Create("Button Color"),
-                50,
-                "conversion_rate",
-                DateTime.UtcNow.AddDays(-1),
-                DateTime.UtcNow.AddDays(30)
+                "button",
+                "original content",
+                "conversion_rate"
             );
 
             // Start the test
@@ -110,9 +110,18 @@ namespace AICO.IntegrationTests
             return abTest;
         }
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _scope?.Dispose();
+            }
+        }
+
         public void Dispose()
         {
-            _scope?.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

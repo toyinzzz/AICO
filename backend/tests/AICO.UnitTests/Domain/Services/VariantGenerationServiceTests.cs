@@ -1,4 +1,5 @@
 using AICO.Application.Interfaces.ExternalServices;
+using AICO.Domain.DTOs;
 using AICO.Domain.Entities;
 using AICO.Domain.Interfaces.Services;
 using Moq;
@@ -31,9 +32,9 @@ namespace AICO.UnitTests.Domain.Services
 
             var expectedVariants = new List<Variant>
             {
-                new Variant(Guid.NewGuid(), "Variant A", "<html>Variant A content</html>"),
-                new Variant(Guid.NewGuid(), "Variant B", "<html>Variant B content</html>"),
-                new Variant(Guid.NewGuid(), "Variant C", "<html>Variant C content</html>")
+                new Variant("Variant A", Guid.NewGuid(), "<html>Variant A content</html>", 33.33m),
+                new Variant("Variant B", Guid.NewGuid(), "<html>Variant B content</html>", 33.33m),
+                new Variant("Variant C", Guid.NewGuid(), "<html>Variant C content</html>", 33.34m)
             };
 
             _mockVariantService.Setup(x => x.GenerateVariantsAsync(originalPageUrl, request))
@@ -79,7 +80,7 @@ namespace AICO.UnitTests.Domain.Services
         public async Task ValidateVariantAsync_WithValidVariant_ShouldReturnSuccess()
         {
             // Arrange
-            var variant = new Variant(Guid.NewGuid(), "Test Variant", "<html><body>Valid content</body></html>");
+            var variant = new Variant("Test Variant", Guid.NewGuid(), "<html><body>Valid content</body></html>", 100m, true);
             var expectedResult = new VariantValidationResult
             {
                 IsValid = true,
@@ -106,7 +107,7 @@ namespace AICO.UnitTests.Domain.Services
         public async Task ValidateVariantAsync_WithInvalidContent_ShouldReturnFailure(string invalidContent, string reason)
         {
             // Arrange
-            var variant = new Variant(Guid.NewGuid(), "Invalid Variant", invalidContent);
+            var variant = new Variant("Invalid Variant", Guid.NewGuid(), invalidContent, 100m, true);
             var expectedResult = new VariantValidationResult
             {
                 IsValid = false,

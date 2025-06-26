@@ -1,5 +1,7 @@
+using AICO.Domain.DTOs;
 using AICO.Domain.Entities;
 using AICO.Domain.Interfaces.Repositories;
+using AICO.Domain.Services;
 using Moq;
 using Xunit;
 
@@ -80,10 +82,10 @@ namespace AICO.UnitTests.Domain.Services
             var pageUrl = "/product/123";
             var visitorId = "visitor_123";
 
-            var variant = new Variant(Guid.NewGuid(), "Test Variant", "<html>Test content</html>");
+            var variant = new Variant("Test Variant", Guid.NewGuid(), "<html>Test content</html>", 100m, true);
 
-            _mockSnippetRepository.Setup(x => x.GetActiveVariantForPageAsync(websiteId, pageUrl, visitorId))
-                .ReturnsAsync(variant);
+            _mockSnippetRepository.Setup(x => x.GetActiveSnippetAsync(websiteId))
+                .ReturnsAsync(new Snippet(websiteId, "Test Snippet", "<script>test</script>", "javascript"));
 
             // Act
             var result = await _snippetService.GetVariantForPageAsync(websiteId, pageUrl, visitorId);
@@ -102,7 +104,7 @@ namespace AICO.UnitTests.Domain.Services
             {
                 TotalPageViews = 10000,
                 UniqueVisitors = 2500,
-                TestsRunning = 3,
+                TotalEvents = 3,
                 ConversionRate = 0.045,
                 LastActivity = DateTime.UtcNow.AddMinutes(-5)
             };
@@ -117,7 +119,7 @@ namespace AICO.UnitTests.Domain.Services
             Assert.NotNull(result);
             Assert.Equal(expectedAnalytics.TotalPageViews, result.TotalPageViews);
             Assert.Equal(expectedAnalytics.UniqueVisitors, result.UniqueVisitors);
-            Assert.Equal(expectedAnalytics.TestsRunning, result.TestsRunning);
+            Assert.Equal(expectedAnalytics.TotalEvents, result.TotalEvents);
         }
 
         [Fact]
@@ -129,17 +131,17 @@ namespace AICO.UnitTests.Domain.Services
             var visitorId = "visitor_123";
             var userAgent = "Mozilla/5.0...";
 
-            var variant = new Variant(Guid.NewGuid(), "Test Variant", "<html><body>Modified content</body></html>");
+            var variant = new Variant("Test Variant", Guid.NewGuid(), "<html><body>Modified content</body></html>", 100m, true);
 
-            _mockSnippetRepository.Setup(x => x.GetActiveVariantForPageAsync(websiteId, pageUrl, visitorId))
-                .ReturnsAsync(variant);
+            _mockSnippetRepository.Setup(x => x.GetActiveSnippetAsync(websiteId))
+                .ReturnsAsync(new Snippet(websiteId, "Test Snippet", "<script>test</script>", "javascript"));
 
             // Act
-            var result = await _snippetService.ServeVariantAsync(websiteId, pageUrl, visitorId, userAgent);
+            var result = await _snippetService.GenerateSnippetAsync(websiteId);
 
             // Assert
             Assert.NotNull(result);
-            Assert.Contains("Modified content", result.HtmlContent);
+            Assert.Contains("Modified content", result);
         }
     }
 }

@@ -35,14 +35,14 @@ namespace AICO.IntegrationTests
 
             // Convert List<Variant> to List<AbTestVariant>
             var variants = await _variantGenerationService.GenerateVariantsAsync("https://example.com/landing", new VariantGenerationRequest { TargetAudience = "Tech professionals", VariantCount = 2 });
-            var abTestVariants = variants.Select(v => new AbTestVariant
-            {
-                Id = v.Id,
-                Name = v.Name,
-                Content = v.Content,
-                TrafficAllocation = v.TrafficAllocation,
-                IsControl = v.IsControl
-            }).ToList();
+            var abTestVariants = variants.Select(v => new AbTestVariant(
+                campaign.Id, // abTestId
+                v.Name,
+                v.Content,
+                v.TrafficAllocation,
+                null, // description
+                v.IsControl
+            )).ToList();
 
             var abTest = await _abTestService.CreateTestAsync(campaign.Id, abTestVariants);
 
@@ -56,7 +56,7 @@ namespace AICO.IntegrationTests
             // Assert
             var testResults = await _abTestService.GetTestResultsAsync(abTest.Id);
             Assert.NotNull(testResults);
-            Assert.NotEmpty(testResults.VariantResults);
+            Assert.NotEmpty(testResults.TestVariants);
 
             var revenueMetrics = await _revenueService.GetRevenueMetricsAsync(campaign.Id);
             Assert.NotNull(revenueMetrics);
@@ -77,7 +77,15 @@ namespace AICO.IntegrationTests
             var websiteId = Guid.NewGuid();
             var campaign = await _campaignService.CreateCampaignAsync(websiteId, Guid.NewGuid(), "Website Integration Campaign", "https://example.com", "Test campaign for website integration");
             var variants = await _variantGenerationService.GenerateVariantsAsync("https://example.com/landing", new VariantGenerationRequest { TargetAudience = "Tech professionals", VariantCount = 2 });
-            var abTest = await _abTestService.CreateTestAsync(campaign.Id, variants);
+            var abTestVariants = variants.Select(v => new AbTestVariant(
+                campaign.Id, // abTestId
+                v.Name,
+                v.Content,
+                v.TrafficAllocation,
+                null, // description
+                v.IsControl
+            )).ToList();
+            var abTest = await _abTestService.CreateTestAsync(campaign.Id, abTestVariants);
             var visitorId = Guid.NewGuid().ToString();
 
             // Act
@@ -92,9 +100,18 @@ namespace AICO.IntegrationTests
             Assert.NotNull(userAssignedVariant);
         }
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _scope?.Dispose();
+            }
+        }
+
         public void Dispose()
         {
-            _scope?.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

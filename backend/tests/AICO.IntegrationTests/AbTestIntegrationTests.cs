@@ -33,12 +33,12 @@ namespace AICO.IntegrationTests
                 "Test Description",
                 "Button Color",
                 50,
-                "conversion_rate",
-                DateTime.UtcNow.AddDays(1).ToString("o"), // Fix: Convert DateTime to ISO 8601 string  
-                DateTime.UtcNow.AddDays(30).ToString("o"), // Fix: Convert DateTime to ISO 8601 string  
                 "#cta-button",
                 "Buy Now",
-                "Get Started"
+                "conversion_rate",
+                50,
+                DateTime.UtcNow.AddDays(1),
+                DateTime.UtcNow.AddDays(30)
             );
 
             // Act  
@@ -66,12 +66,12 @@ namespace AICO.IntegrationTests
                 "Test Description",
                 "Text Content",
                 60,
-                "click_rate",
-                DateTime.UtcNow.AddDays(1).ToString("o"), // Fix: Convert DateTime to ISO 8601 string  
-                DateTime.UtcNow.AddDays(30).ToString("o"), // Fix: Convert DateTime to ISO 8601 string  
                 "#cta-button",
                 "Buy Now",
-                "Get Started"
+                "click_rate",
+                60,
+                DateTime.UtcNow.AddDays(1),
+                DateTime.UtcNow.AddDays(30)
             );
 
             // Act  
@@ -105,12 +105,12 @@ namespace AICO.IntegrationTests
                 "Test Description",
                 "Button Color",
                 150, // Invalid traffic split
-                "conversion_rate",
-                DateTime.UtcNow.AddDays(1).ToString("o"), // Fix: Convert DateTime to ISO 8601 string  
-                DateTime.UtcNow.AddDays(30).ToString("o"), // Fix: Convert DateTime to ISO 8601 string  
                 "#cta-button",
                 "Buy Now",
-                "Get Started"
+                "conversion_rate",
+                150,
+                DateTime.UtcNow.AddDays(1),
+                DateTime.UtcNow.AddDays(30)
             );
 
             // Act & Assert
@@ -131,12 +131,12 @@ namespace AICO.IntegrationTests
                 null,
                 "Button Color",
                 50,
-                null, // Missing primary metric
-                DateTime.UtcNow.AddDays(1).ToString("o"), // Fix: Convert DateTime to ISO 8601 string  
-                DateTime.UtcNow.AddDays(30).ToString("o"), // Fix: Convert DateTime to ISO 8601 string  
                 "#cta-button",
                 "Buy Now",
-                "Get Started"
+                null, // Missing primary metric
+                50,
+                DateTime.UtcNow.AddDays(1),
+                DateTime.UtcNow.AddDays(30)
             );
 
             AbTest abTest = await _commandHandler.CreateAbTestAsync(command);

@@ -1,4 +1,5 @@
 using AICO.Domain.Entities;
+using AICO.Domain.Services;
 using Xunit;
 
 namespace AICO.UnitTests.Domain.Services
@@ -18,8 +19,8 @@ namespace AICO.UnitTests.Domain.Services
             // Arrange
             var variants = new List<Variant>
             {
-                new Variant(Guid.NewGuid(), "Control", "<html>Control</html>"),
-                new Variant(Guid.NewGuid(), "Variant A", "<html>Variant A</html>")
+                new Variant("Control", Guid.NewGuid(), "<html>Control</html>", 50m, true),
+                new Variant("Variant A", Guid.NewGuid(), "<html>Variant A</html>", 50m)
             };
             var trafficSplit = 50; // 50/50 split
             var assignments = new Dictionary<Guid, int>();
@@ -28,7 +29,7 @@ namespace AICO.UnitTests.Domain.Services
             for (int i = 0; i < 1000; i++)
             {
                 var userId = $"user_{i}";
-                var assignedVariant = _trafficSplitter.AssignVariant(userId, variants, trafficSplit);
+                var assignedVariant = _trafficSplitter.AssignVariant(variants, userId);
 
                 if (!assignments.ContainsKey(assignedVariant.Id))
                     assignments[assignedVariant.Id] = 0;
@@ -49,16 +50,16 @@ namespace AICO.UnitTests.Domain.Services
             // Arrange
             var variants = new List<Variant>
             {
-                new Variant(Guid.NewGuid(), "Control", "<html>Control</html>"),
-                new Variant(Guid.NewGuid(), "Variant A", "<html>Variant A</html>")
+                new Variant("Control", Guid.NewGuid(), "<html>Control</html>", 50m, true),
+                new Variant("Variant A", Guid.NewGuid(), "<html>Variant A</html>", 50m)
             };
             var userId = "consistent_user";
             var trafficSplit = 50;
 
             // Act - Assign same user multiple times
-            var firstAssignment = _trafficSplitter.AssignVariant(userId, variants, trafficSplit);
-            var secondAssignment = _trafficSplitter.AssignVariant(userId, variants, trafficSplit);
-            var thirdAssignment = _trafficSplitter.AssignVariant(userId, variants, trafficSplit);
+            var firstAssignment = _trafficSplitter.AssignVariant(variants, userId);
+                var secondAssignment = _trafficSplitter.AssignVariant(variants, userId);
+                var thirdAssignment = _trafficSplitter.AssignVariant(variants, userId);
 
             // Assert - Should always get the same variant
             Assert.Equal(firstAssignment.Id, secondAssignment.Id);
@@ -73,8 +74,8 @@ namespace AICO.UnitTests.Domain.Services
         public void AssignVariant_WithCustomSplit_ShouldRespectTrafficAllocation(int variantPercentage)
         {
             // Arrange
-            var controlVariant = new Variant(Guid.NewGuid(), "Control", "<html>Control</html>");
-            var testVariant = new Variant(Guid.NewGuid(), "Test", "<html>Test</html>");
+            var controlVariant = new Variant("Control", Guid.NewGuid(), "<html>Control</html>", 50m, true);
+            var testVariant = new Variant("Test", Guid.NewGuid(), "<html>Test</html>", 50m);
             var variants = new List<Variant> { controlVariant, testVariant };
 
             var assignments = new Dictionary<Guid, int>();
@@ -84,7 +85,7 @@ namespace AICO.UnitTests.Domain.Services
             for (int i = 0; i < totalAssignments; i++)
             {
                 var userId = $"user_{i}";
-                var assignedVariant = _trafficSplitter.AssignVariant(userId, variants, variantPercentage);
+                var assignedVariant = _trafficSplitter.AssignVariant(variants, userId);
 
                 if (!assignments.ContainsKey(assignedVariant.Id))
                     assignments[assignedVariant.Id] = 0;
@@ -105,10 +106,10 @@ namespace AICO.UnitTests.Domain.Services
             // Arrange
             var variants = new List<Variant>
             {
-                new Variant(Guid.NewGuid(), "Control", "<html>Control</html>"),
-                new Variant(Guid.NewGuid(), "Variant A", "<html>Variant A</html>"),
-                new Variant(Guid.NewGuid(), "Variant B", "<html>Variant B</html>"),
-                new Variant(Guid.NewGuid(), "Variant C", "<html>Variant C</html>")
+                new Variant("Control", Guid.NewGuid(), "<html>Control</html>", 25m, true),
+                new Variant("Variant A", Guid.NewGuid(), "<html>Variant A</html>", 25m),
+                new Variant("Variant B", Guid.NewGuid(), "<html>Variant B</html>", 25m),
+                new Variant("Variant C", Guid.NewGuid(), "<html>Variant C</html>", 25m)
             };
             var trafficSplit = 25; // Equal 25% split among 4 variants
             var assignments = new Dictionary<Guid, int>();
@@ -118,7 +119,7 @@ namespace AICO.UnitTests.Domain.Services
             for (int i = 0; i < totalAssignments; i++)
             {
                 var userId = $"user_{i}";
-                var assignedVariant = _trafficSplitter.AssignVariant(userId, variants, trafficSplit);
+                var assignedVariant = _trafficSplitter.AssignVariant(variants, userId);
 
                 if (!assignments.ContainsKey(assignedVariant.Id))
                     assignments[assignedVariant.Id] = 0;

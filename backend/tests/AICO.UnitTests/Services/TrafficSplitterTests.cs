@@ -1,4 +1,5 @@
 using AICO.Domain.Entities;
+using AICO.Domain.Services;
 using Xunit;
 
 namespace AICO.UnitTests.Services
@@ -18,8 +19,8 @@ namespace AICO.UnitTests.Services
             // Arrange
             var variants = new List<Variant>
             {
-                Variant.Create(Guid.NewGuid(), "Control", "Original", 50, ".btn {}", true),
-                Variant.Create(Guid.NewGuid(), "Variant A", "Modified", 50, ".btn { color: red; }", false)
+                new Variant("Control", Guid.NewGuid(), "Original", 50, true),
+                new Variant("Variant A", Guid.NewGuid(), "Modified", 50, false)
             };
 
             var assignments = new Dictionary<Guid, int>();
@@ -52,8 +53,8 @@ namespace AICO.UnitTests.Services
             var userId = "user123";
             var variants = new List<Variant>
             {
-                Variant.Create(Guid.NewGuid(), "Control", "Original", 50, ".btn {}", true),
-                Variant.Create(Guid.NewGuid(), "Variant A", "Modified", 50, ".btn { color: red; }", false)
+                new Variant("Control", Guid.NewGuid(), "Original", 50, true),
+                new Variant("Variant A", Guid.NewGuid(), "Modified", 50, false)
             };
 
             // Act
@@ -75,8 +76,8 @@ namespace AICO.UnitTests.Services
             // Arrange
             var variants = new List<Variant>
             {
-                Variant.Create(Guid.NewGuid(), "Control", "Original", controlPercentage, ".btn {}", true),
-                Variant.Create(Guid.NewGuid(), "Variant A", "Modified", variantPercentage, ".btn { color: red; }", false)
+                new Variant("Control", Guid.NewGuid(), "Original", controlPercentage, true),
+                new Variant("Variant A", Guid.NewGuid(), "Modified", variantPercentage, false)
             };
 
             var assignments = new Dictionary<Guid, int>();

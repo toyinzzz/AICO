@@ -1,5 +1,7 @@
 using AICO.Domain.Entities;
+using AICO.Domain.DTOs;
 using AICO.Domain.Interfaces.Services;
+using AICO.Domain.Services;
 using Moq;
 using Xunit;
 
@@ -8,12 +10,12 @@ namespace AICO.UnitTests.Domain.Services
     public class StatisticalSignificanceTests
     {
         private readonly Mock<IAbTestService> _mockAbTestService;
-        private readonly StatisticalSignificanceCalculator _calculator;
+        private readonly StatisticalAnalysisService _calculator;
 
         public StatisticalSignificanceTests()
         {
             _mockAbTestService = new Mock<IAbTestService>();
-            _calculator = new StatisticalSignificanceCalculator();
+            _calculator = new StatisticalAnalysisService();
         }
 
         [Theory]
@@ -31,7 +33,7 @@ namespace AICO.UnitTests.Domain.Services
             var variantRate = (double)variantConversions / variantViews;
 
             // Act
-            var result = _calculator.IsStatisticallySignificant(
+            var result = _calculator.CalculateSignificance(
                 controlViews, controlConversions,
                 variantViews, variantConversions,
                 confidenceLevel);
@@ -53,30 +55,30 @@ namespace AICO.UnitTests.Domain.Services
                 {
                     Views = 5000,
                     Conversions = 250,
-                    ConversionRate = 0.05
+                    ConversionRate = 0.05m
                 },
                 TestVariant = new VariantResults
                 {
                     Views = 5000,
                     Conversions = 350,
-                    ConversionRate = 0.07
+                    ConversionRate = 0.07m
                 }
             };
 
             _mockAbTestService.Setup(x => x.GetTestResultsAsync(testId))
                 .ReturnsAsync(testResults);
-            _mockAbTestService.Setup(x => x.IsTestStatisticallySignificantAsync(testId, 0.95))
+            _mockAbTestService.Setup(x => x.IsTestStatisticallySignificantAsync(testId, 0.95m))
                 .ReturnsAsync(true);
 
             // Act
-            var result = await _mockAbTestService.Object.IsTestStatisticallySignificantAsync(testId, 0.95);
+            var result = await _mockAbTestService.Object.IsTestStatisticallySignificantAsync(testId, 0.95m);
 
             // Assert
             Assert.True(result);
         }
 
         [Fact]
-        public void CalculateRequiredSampleSize_WithValidParameters_ShouldReturnCorrectSize()
+        public void CalculateMinimumSampleSize_WithValidParameters_ShouldReturnCorrectSize()
         {
             // Arrange
             var baselineConversionRate = 0.05; // 5%
@@ -85,7 +87,7 @@ namespace AICO.UnitTests.Domain.Services
             var significanceLevel = 0.05; // 95% confidence
 
             // Act
-            var sampleSize = _calculator.CalculateRequiredSampleSize(
+            var sampleSize = _calculator.CalculateMinimumSampleSize(
                 baselineConversionRate,
                 minimumDetectableEffect,
                 power,
@@ -102,7 +104,7 @@ namespace AICO.UnitTests.Domain.Services
             // Arrange
             var testId = Guid.NewGuid();
             var winningVariantId = Guid.NewGuid();
-            var winningVariant = new Variant(winningVariantId, "Winner", "<html>Winner</html>");
+            var winningVariant = new AbTestVariant(testId, "Winner", "<html>Winner</html>", 100m, "Winner description", true);
 
             _mockAbTestService.Setup(x => x.IsTestStatisticallySignificantAsync(testId, 0.95))
                 .ReturnsAsync(true);
@@ -131,14 +133,14 @@ namespace AICO.UnitTests.Domain.Services
 
             // Act
             var interval = _calculator.CalculateConfidenceInterval(
-                conversions, views, confidenceLevel);
+                views, conversions, views, conversions, confidenceLevel);
 
             // Assert
-            Assert.True(interval.LowerBound >= 0);
-            Assert.True(interval.UpperBound <= 1);
-            Assert.True(interval.LowerBound <= conversionRate);
-            Assert.True(interval.UpperBound >= conversionRate);
-            Assert.True(interval.LowerBound < interval.UpperBound);
+            Assert.True(interval.Lower >= 0);
+            Assert.True(interval.Upper <= 1);
+            Assert.True(interval.Lower <= conversionRate);
+            Assert.True(interval.Upper >= conversionRate);
+            Assert.True(interval.Lower < interval.Upper);
         }
     }
 }

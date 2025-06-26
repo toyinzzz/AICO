@@ -2,6 +2,7 @@ using AICO.Application.Interfaces.Commands;
 using AICO.Domain.Entities;
 using AICO.Domain.Interfaces.Repositories;
 using AICO.Domain.Interfaces.Services;
+using AICO.Domain.ValueObjects;
 using Moq;
 using Xunit;
 
@@ -31,7 +32,7 @@ namespace AICO.UnitTests.Application.Commands
                 "Button Color",
                 50,
                 "conversion_rate",
-                DateTime.UtcNow.AddDays(1),
+                DateTime.UtcNow.AddDays(1).ToString("O"),
                 DateTime.UtcNow.AddDays(30),
                 "#cta-button",
                 "Buy Now",
@@ -72,18 +73,16 @@ namespace AICO.UnitTests.Application.Commands
         {
             // Arrange
             var abTestId = Guid.NewGuid();
+            var campaignId = Guid.NewGuid();
+            var testType = TestType.Create("Button Color");
             var abTest = AbTest.Create(
-                Guid.NewGuid(),
                 "Test",
                 "Description",
-                "Button Color",
-                50,
-                "conversion_rate",
-                DateTime.UtcNow.AddDays(1),
-                DateTime.UtcNow.AddDays(30),
+                campaignId,
+                testType,
                 "#cta-button",
                 "Buy Now",
-                "Get Started"
+                "conversion_rate"
             );
 
             _mockAbTestRepository.Setup(r => r.GetByIdAsync(abTestId))
