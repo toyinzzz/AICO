@@ -16,6 +16,16 @@ namespace AICO.Domain.DTOs
         public List<string> Errors { get; set; } = new();
 
         /// <summary>
+        /// Validation errors if any (alias for Errors)
+        /// </summary>
+        public List<string> ValidationErrors { get; set; } = new();
+
+        /// <summary>
+        /// Brand consistency score (0.0 to 1.0)
+        /// </summary>
+        public double BrandConsistencyScore { get; set; }
+
+        /// <summary>
         /// Validation warnings
         /// </summary>
         public List<string> Warnings { get; set; } = new();

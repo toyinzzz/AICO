@@ -5,7 +5,12 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using AICO.Application.Interfaces.Services;
 using AICO.Application.Services;
+using Microsoft.Extensions.Logging;
+using Moq;
 using Xunit;
+using AICO.Domain.Interfaces.Repositories;
+using AICO.Domain.Interfaces.Services;
+using Microsoft.AspNetCore.Http;
 
 namespace AICO.UnitTests.Services
 {

@@ -26,6 +26,21 @@ namespace AICO.Domain.DTOs
         public long TotalSessions { get; set; }
 
         /// <summary>
+        /// Unique visitors count
+        /// </summary>
+        public long UniqueVisitors { get; set; }
+
+        /// <summary>
+        /// Conversion rate percentage
+        /// </summary>
+        public double ConversionRate { get; set; }
+
+        /// <summary>
+        /// Last activity timestamp
+        /// </summary>
+        public DateTime LastActivity { get; set; }
+
+        /// <summary>
         /// Average session duration in seconds
         /// </summary>
         public double AverageSessionDuration { get; set; }

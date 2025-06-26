@@ -1,6 +1,9 @@
+using AICO.Domain.DTOs;
 using AICO.Domain.Entities;
 using AICO.Domain.Interfaces.Repositories;
 using AICO.Domain.Services;
+using AICO.Shared.Interfaces;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
