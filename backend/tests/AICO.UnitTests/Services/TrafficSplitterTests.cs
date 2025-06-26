@@ -17,10 +17,11 @@ namespace AICO.UnitTests.Services
         public void AssignVariant_WithEqualSplit_ShouldDistributeEvenly()
         {
             // Arrange
+            var abTestId = Guid.NewGuid();
             var variants = new List<Variant>
             {
-                new Variant("Control", Guid.NewGuid(), "Original", 50, true),
-                new Variant("Variant A", Guid.NewGuid(), "Modified", 50, false)
+                new Variant("Control", abTestId, "Original", 50, true),
+                new Variant("Variant A", abTestId, "Modified", 50, false)
             };
 
             var assignments = new Dictionary<Guid, int>();
@@ -30,7 +31,7 @@ namespace AICO.UnitTests.Services
             for (int i = 0; i < totalAssignments; i++)
             {
                 var userId = Guid.NewGuid().ToString();
-                var assignedVariant = _trafficSplitter.AssignVariant(userId, variants);
+                var assignedVariant = _trafficSplitter.AssignVariant(variants, userId);
 
                 if (!assignments.ContainsKey(assignedVariant.Id))
                     assignments[assignedVariant.Id] = 0;
@@ -51,16 +52,17 @@ namespace AICO.UnitTests.Services
         {
             // Arrange
             var userId = "user123";
+            var abTestId = Guid.NewGuid();
             var variants = new List<Variant>
             {
-                new Variant("Control", Guid.NewGuid(), "Original", 50, true),
-                new Variant("Variant A", Guid.NewGuid(), "Modified", 50, false)
+                new Variant("Control", abTestId, "Original", 50, true),
+                new Variant("Variant A", abTestId, "Modified", 50, false)
             };
 
             // Act
-            var firstAssignment = _trafficSplitter.AssignVariant(userId, variants);
-            var secondAssignment = _trafficSplitter.AssignVariant(userId, variants);
-            var thirdAssignment = _trafficSplitter.AssignVariant(userId, variants);
+            var firstAssignment = _trafficSplitter.AssignVariant(variants, userId);
+            var secondAssignment = _trafficSplitter.AssignVariant(variants, userId);
+            var thirdAssignment = _trafficSplitter.AssignVariant(variants, userId);
 
             // Assert
             Assert.Equal(firstAssignment.Id, secondAssignment.Id);
@@ -74,10 +76,11 @@ namespace AICO.UnitTests.Services
         public void AssignVariant_WithCustomSplit_ShouldRespectPercentages(int controlPercentage, int variantPercentage)
         {
             // Arrange
+            var abTestId = Guid.NewGuid();
             var variants = new List<Variant>
             {
-                new Variant("Control", Guid.NewGuid(), "Original", controlPercentage, true),
-                new Variant("Variant A", Guid.NewGuid(), "Modified", variantPercentage, false)
+                new Variant("Control", abTestId, "Original", controlPercentage, true),
+                new Variant("Variant A", abTestId, "Modified", variantPercentage, false)
             };
 
             var assignments = new Dictionary<Guid, int>();
@@ -87,7 +90,7 @@ namespace AICO.UnitTests.Services
             for (int i = 0; i < totalAssignments; i++)
             {
                 var userId = Guid.NewGuid().ToString();
-                var assignedVariant = _trafficSplitter.AssignVariant(userId, variants);
+                var assignedVariant = _trafficSplitter.AssignVariant(variants, userId);
 
                 if (!assignments.ContainsKey(assignedVariant.Id))
                     assignments[assignedVariant.Id] = 0;

@@ -67,11 +67,11 @@ namespace AICO.UnitTests.Domain.Services
 
             _mockAbTestService.Setup(x => x.GetTestResultsAsync(testId))
                 .ReturnsAsync(testResults);
-            _mockAbTestService.Setup(x => x.IsTestStatisticallySignificantAsync(testId, 0.95m))
+            _mockAbTestService.Setup(x => x.IsTestStatisticallySignificantAsync(testId, 0.95))
                 .ReturnsAsync(true);
 
             // Act
-            var result = await _mockAbTestService.Object.IsTestStatisticallySignificantAsync(testId, 0.95m);
+            var result = await _mockAbTestService.Object.IsTestStatisticallySignificantAsync(testId, 0.95);
 
             // Assert
             Assert.True(result);

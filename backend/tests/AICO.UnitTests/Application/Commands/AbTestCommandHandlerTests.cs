@@ -31,23 +31,19 @@ namespace AICO.UnitTests.Application.Commands
                 "Test Description",
                 "Button Color",
                 50,
-                "conversion_rate",
-                DateTime.UtcNow.AddDays(1).ToString("O"),
-                DateTime.UtcNow.AddDays(30),
                 "#cta-button",
                 "Buy Now",
-                "Get Started"
+                "conversion_rate",
+                50,
+                DateTime.UtcNow.AddDays(1),
+                DateTime.UtcNow.AddDays(30)
             );
 
             var expectedAbTest = AbTest.Create(
-                command.CampaignId,
                 command.Name,
                 command.Description,
-                command.TestType,
-                command.TrafficSplit,
-                command.SuccessMetric,
-                command.StartDate,
-                command.EndDate,
+                command.CampaignId,
+                AICO.Domain.ValueObjects.TestType.Create(command.TestType),
                 command.TargetSelector,
                 command.OriginalContent,
                 command.PrimaryMetric

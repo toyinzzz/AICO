@@ -1,10 +1,10 @@
-using System;
-using System.Threading.Tasks;
-using AICO.Application.Interfaces.ExternalServices;
 using AICO.Infrastructure.ExternalServices;
 using Moq;
 using Stripe;
 using Xunit;
+using AppSubscription = AICO.Application.Interfaces.ExternalServices.Subscription;
+using SubscriptionRequest = AICO.Application.Interfaces.ExternalServices.SubscriptionRequest;
+using PaymentRequest = AICO.Domain.Interfaces.Services.PaymentRequest;
 
 namespace AICO.UnitTests.Infrastructure.Services
 {
@@ -46,13 +46,10 @@ namespace AICO.UnitTests.Infrastructure.Services
                 .ReturnsAsync(paymentIntent);
 
             // Act
-            var result = await _paymentService.ProcessPaymentAsync(request);
+            var result = await _paymentService.ProcessPaymentAsync(request.UserId.ToString(), request.Amount, request.Currency);
 
             // Assert
-            Assert.True(result.Success);
-            Assert.Equal("pi_test_123", result.TransactionId);
-            Assert.Equal("succeeded", result.Status);
-            Assert.Null(result.ErrorMessage);
+            Assert.True(result);
         }
 
         [Fact]
@@ -71,11 +68,10 @@ namespace AICO.UnitTests.Infrastructure.Services
                 .ThrowsAsync(new StripeException("Your card was declined."));
 
             // Act
-            var result = await _paymentService.ProcessPaymentAsync(request);
+            var result = await _paymentService.ProcessPaymentAsync(request.UserId.ToString(), request.Amount, request.Currency);
 
             // Assert
-            Assert.False(result.Success);
-            Assert.Contains("declined", result.ErrorMessage);
+            Assert.False(result);
         }
 
         [Fact]
@@ -88,13 +84,15 @@ namespace AICO.UnitTests.Infrastructure.Services
                 PaymentMethodId: "pm_test_123"
             );
 
-            var subscription = new Subscription
-            {
-                Id = "sub_test_123",
-                Status = "active",
-                CurrentPeriodStart = DateTime.UtcNow,
-                CurrentPeriodEnd = DateTime.UtcNow.AddMonths(1)
-            };
+            var subscription = new AppSubscription(
+                Id: Guid.NewGuid(),
+                UserId: Guid.NewGuid(),
+                PlanId: "price_test_plan",
+                Status: "active",
+                StartDate: DateTime.UtcNow,
+                EndDate: DateTime.UtcNow.AddMonths(1),
+                Amount: 99.99m
+            );
 
             _mockPaymentIntentService.Setup(x => x.CreateAsync(It.IsAny<PaymentIntentCreateOptions>(), null, default))
                 .ReturnsAsync(new PaymentIntent { Status = "succeeded" });

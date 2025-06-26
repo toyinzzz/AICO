@@ -73,7 +73,7 @@ namespace AICO.UnitTests.Services
             _mockRevenueRepository
                 .Setup(r => r.AddAsync(It.IsAny<Revenue>()))
                 .Callback<Revenue>(r => capturedRevenue = r)
-                .Returns(Task.CompletedTask);
+                .ReturnsAsync((Revenue r) => r);
 
             // Act
             var revenue = await _profitTrackingService.ProcessStripeWebhookAsync(stripeEvent);

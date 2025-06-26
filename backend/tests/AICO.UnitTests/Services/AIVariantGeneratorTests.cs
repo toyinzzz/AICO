@@ -1,6 +1,5 @@
-using AICO.Application.Interfaces.ExternalServices;
-using AICO.Domain.DTOs;
 using AICO.Domain.Services;
+using DomainIAIService = AICO.Domain.Interfaces.ExternalServices.IAIService;
 using Moq;
 using Xunit;
 
@@ -8,12 +7,12 @@ namespace AICO.UnitTests.Services
 {
     public class AIVariantGeneratorTests
     {
-        private readonly Mock<IAIService> _mockAIService;
+        private readonly Mock<DomainIAIService> _mockAIService;
         private readonly AIVariantGenerator _variantGenerator;
 
         public AIVariantGeneratorTests()
         {
-            _mockAIService = new Mock<IAIService>();
+            _mockAIService = new Mock<DomainIAIService>();
             _variantGenerator = new AIVariantGenerator(_mockAIService.Object);
         }
 
@@ -25,32 +24,23 @@ namespace AICO.UnitTests.Services
             var variantCount = 3;
             var testGoal = "Increase click-through rate";
 
-            var expectedVariants = new List<AIGeneratedVariant>
+            // Expected content variations from AI service
+            var expectedContentVariations = new List<string>
             {
-                new AIGeneratedVariant
-                {
-                    Content = "<button class='btn btn-primary'>Purchase Now</button>",
-                    Description = "More action-oriented CTA",
-                    ConfidenceScore = 0.85m
-                },
-                new AIGeneratedVariant
-                {
-                    Content = "<button class='btn btn-success'>Get Started</button>",
-                    Description = "Softer approach",
-                    ConfidenceScore = 0.78m
-                }
+                "<button class='btn btn-primary'>Purchase Now</button>",
+                "<button class='btn btn-success'>Get Started</button>"
             };
 
-            _mockAIService.Setup(s => s.GenerateVariantsAsync(originalContent, variantCount, testGoal))
-                .ReturnsAsync(expectedVariants);
+            _mockAIService.Setup(s => s.GenerateContentVariationsAsync(originalContent, variantCount))
+                .ReturnsAsync(expectedContentVariations);
 
             // Act
-            var result = await _variantGenerator.GenerateVariantsAsync(originalContent, variantCount, testGoal);
+            var result = await _variantGenerator.GenerateVariants(originalContent, variantCount, Guid.NewGuid());
 
             // Assert
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);
-            Assert.All(result, v => Assert.True(v.ConfidenceScore > 0.7m));
+            Assert.All(result, v => Assert.False(string.IsNullOrEmpty(v.Content)));
         }
 
 

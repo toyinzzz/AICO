@@ -46,7 +46,7 @@ namespace AICO.UnitTests.Domain.Services
             // Assert
             Assert.NotNull(result);
             Assert.Equal(3, result.Count);
-            Assert.All(result, variant => Assert.NotNull(variant.HtmlContent));
+            Assert.All(result, variant => Assert.NotNull(variant.Content));
         }
 
         [Fact]
@@ -85,7 +85,7 @@ namespace AICO.UnitTests.Domain.Services
             {
                 IsValid = true,
                 BrandConsistencyScore = 0.95,
-                ValidationErrors = new List<string>()
+                Errors = new List<string>()
             };
 
             _mockVariantService.Setup(x => x.ValidateVariantAsync(variant))
@@ -97,7 +97,7 @@ namespace AICO.UnitTests.Domain.Services
             // Assert
             Assert.True(result.IsValid);
             Assert.True(result.BrandConsistencyScore > 0.9);
-            Assert.Empty(result.ValidationErrors);
+            Assert.Empty(result.Errors);
         }
 
         [Theory]
@@ -112,7 +112,7 @@ namespace AICO.UnitTests.Domain.Services
             {
                 IsValid = false,
                 BrandConsistencyScore = 0.2,
-                ValidationErrors = new List<string> { reason }
+                Errors = new List<string> { reason }
             };
 
             _mockVariantService.Setup(x => x.ValidateVariantAsync(variant))
@@ -123,7 +123,7 @@ namespace AICO.UnitTests.Domain.Services
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.True(result.ValidationErrors.Count > 0);
+            Assert.True(result.Errors.Count > 0);
         }
 
         [Fact]
