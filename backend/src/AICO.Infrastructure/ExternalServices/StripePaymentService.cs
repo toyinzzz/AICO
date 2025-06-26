@@ -18,5 +18,10 @@ namespace AICO.Infrastructure.ExternalServices
         {
             throw new System.NotImplementedException();
         }
+
+        public Task<Application.Interfaces.ExternalServices.Subscription> CreateSubscriptionAsync(SubscriptionRequest request)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

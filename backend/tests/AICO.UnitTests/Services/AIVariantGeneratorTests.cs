@@ -1,4 +1,5 @@
 using AICO.Application.Interfaces.ExternalServices;
+using AICO.Domain.DTOs;
 using AICO.Domain.Services;
 using Moq;
 using Xunit;

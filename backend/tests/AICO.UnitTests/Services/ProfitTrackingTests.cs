@@ -6,6 +6,7 @@ using AICO.Domain.Entities;
 using AICO.Domain.Interfaces.Repositories;
 using AICO.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Collections.Generic;
