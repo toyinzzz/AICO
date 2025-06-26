@@ -33,7 +33,7 @@ namespace AICO.Application.Commands
             // TODO: Get actual abTestId from the command or context
             var abTestId = Guid.NewGuid(); // This should come from the actual AB test
             var variant = new Variant(
-                "Variant 1",
+                "Variant 1", // name
                 abTestId,
                 generatedContent,
                 50.0m, // 50% traffic allocation

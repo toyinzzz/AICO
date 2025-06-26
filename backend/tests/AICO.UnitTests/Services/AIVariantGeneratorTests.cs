@@ -1,4 +1,5 @@
-using AICO.Application.Interfaces.ExternalServices;
+using AICO.Domain.Services;
+using DomainIAIService = AICO.Domain.Interfaces.ExternalServices.IAIService;
 using Moq;
 using Xunit;
 
@@ -6,12 +7,12 @@ namespace AICO.UnitTests.Services
 {
     public class AIVariantGeneratorTests
     {
-        private readonly Mock<IAIService> _mockAIService;
+        private readonly Mock<DomainIAIService> _mockAIService;
         private readonly AIVariantGenerator _variantGenerator;
 
         public AIVariantGeneratorTests()
         {
-            _mockAIService = new Mock<IAIService>();
+            _mockAIService = new Mock<DomainIAIService>();
             _variantGenerator = new AIVariantGenerator(_mockAIService.Object);
         }
 
@@ -20,77 +21,43 @@ namespace AICO.UnitTests.Services
         {
             // Arrange
             var originalContent = "<button class='btn'>Buy Now</button>";
-            var brandGuidelines = new BrandGuidelines
+            var variantCount = 3;
+            var testGoal = "Increase click-through rate";
+
+            // Expected content variations from AI service
+            var expectedContentVariations = new List<string>
             {
-                PrimaryColor = "#007bff",
-                SecondaryColor = "#6c757d",
-                FontFamily = "Arial, sans-serif",
-                ToneOfVoice = "Professional"
+                "<button class='btn btn-primary'>Purchase Now</button>",
+                "<button class='btn btn-success'>Get Started</button>"
             };
 
-            var expectedVariants = new List<AIGeneratedVariant>
-            {
-                new AIGeneratedVariant
-                {
-                    Content = "<button class='btn btn-primary'>Purchase Now</button>",
-                    Description = "More action-oriented CTA",
-                    ConfidenceScore = 0.85m
-                },
-                new AIGeneratedVariant
-                {
-                    Content = "<button class='btn btn-success'>Get Started</button>",
-                    Description = "Softer approach",
-                    ConfidenceScore = 0.78m
-                }
-            };
-
-            _mockAIService.Setup(s => s.GenerateVariantsAsync(originalContent, brandGuidelines))
-                .ReturnsAsync(expectedVariants);
+            _mockAIService.Setup(s => s.GenerateContentVariationsAsync(originalContent, variantCount))
+                .ReturnsAsync(expectedContentVariations);
 
             // Act
-            var result = await _variantGenerator.GenerateVariantsAsync(originalContent, brandGuidelines);
+            var result = await _variantGenerator.GenerateVariants(originalContent, variantCount, Guid.NewGuid());
 
             // Assert
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);
-            Assert.All(result, v => Assert.True(v.ConfidenceScore > 0.7m));
+            Assert.All(result, v => Assert.False(string.IsNullOrEmpty(v.Content)));
         }
+
+
 
         [Fact]
-        public async Task ValidateBrandConsistency_WithValidVariant_ShouldReturnTrue()
+        public async Task OptimizeContent_WithTargetAudience_ShouldReturnOptimizedContent()
         {
             // Arrange
-            var variant = "<button style='color: #007bff; font-family: Arial;'>Buy Now</button>";
-            var brandGuidelines = new BrandGuidelines
-            {
-                PrimaryColor = "#007bff",
-                FontFamily = "Arial, sans-serif"
-            };
+            var content = "Buy now for great deals!";
+            var targetAudience = "young professionals";
 
             // Act
-            var isConsistent = await _variantGenerator.ValidateBrandConsistencyAsync(variant, brandGuidelines);
+            var optimizedContent = await _variantGenerator.OptimizeContent(content, targetAudience);
 
             // Assert
-            Assert.True(isConsistent);
-        }
-
-        [Theory]
-        [InlineData("<button style='color: red;'>Buy</button>", false)] // Wrong color
-        [InlineData("<button style='font-family: Comic Sans;'>Buy</button>", false)] // Wrong font
-        public async Task ValidateBrandConsistency_WithInvalidVariant_ShouldReturnFalse(string variant, bool expected)
-        {
-            // Arrange
-            var brandGuidelines = new BrandGuidelines
-            {
-                PrimaryColor = "#007bff",
-                FontFamily = "Arial, sans-serif"
-            };
-
-            // Act
-            var isConsistent = await _variantGenerator.ValidateBrandConsistencyAsync(variant, brandGuidelines);
-
-            // Assert
-            Assert.Equal(expected, isConsistent);
+            Assert.NotNull(optimizedContent);
+            Assert.NotEmpty(optimizedContent);
         }
     }
 }

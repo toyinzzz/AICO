@@ -24,8 +24,8 @@ namespace AICO.IntegrationTests
 
             var variants = new List<AbTestVariant>
             {
-                new AbTestVariant { Name = "Control", Content = "Original", IsControl = true, TrafficSplitPercentage = 50 },
-                new AbTestVariant { Name = "Variant A", Content = "New Version", IsControl = false, TrafficSplitPercentage = 50 }
+                new AbTestVariant(campaignId, "Control", "Original", 50, null, true),
+                new AbTestVariant(campaignId, "Variant A", "New Version", 50, null, false)
             };
 
             // Act
@@ -46,8 +46,8 @@ namespace AICO.IntegrationTests
 
             var variants = new List<AbTestVariant>
             {
-                new AbTestVariant { Name = "Control", Content = "Original", IsControl = true, TrafficSplitPercentage = 50 },
-                new AbTestVariant { Name = "Variant A", Content = "New Version", IsControl = false, TrafficSplitPercentage = 50 }
+                new AbTestVariant(campaignId, "Control", "Original", 50, null, true),
+                new AbTestVariant(campaignId, "Variant A", "New Version", 50, null, false)
             };
 
             var test = await abTestService.CreateTestAsync(campaignId, variants);
@@ -70,8 +70,8 @@ namespace AICO.IntegrationTests
 
             var variants = new List<AbTestVariant>
             {
-                new AbTestVariant { Name = "Control", Content = "Original", IsControl = true, TrafficSplitPercentage = 50 },
-                new AbTestVariant { Name = "Variant A", Content = "New Version", IsControl = false, TrafficSplitPercentage = 50 }
+                new AbTestVariant(campaignId, "Control", "Original", 50, null, true),
+                new AbTestVariant(campaignId, "Variant A", "New Version", 50, null, false)
             };
 
             var test = await abTestService.CreateTestAsync(campaignId, variants);

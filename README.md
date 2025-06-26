@@ -41,6 +41,28 @@ AICO is built as a cloud-native microservices application with the following com
 
 For detailed architecture information, see our [Architecture Documentation](./docs/ARCHITECTURE.md).
 
+## Documentation
+
+Our comprehensive documentation covers all aspects of the project:
+
+### Core Documentation
+- **[Architecture](./docs/ARCHITECTURE.md)**: System design and technical architecture
+- **[Business Plan](./docs/COMPREHENSIVE_BUSINESS_PLAN.md)**: Strategic direction and market positioning
+- **[MVP Specification](./docs/PROFITLIFT_MVP.md)**: Detailed MVP requirements and timeline
+- **[Implementation Notes](./docs/IMPLEMENTATION_NOTES.md)**: Technical implementation details
+
+### Decision Documentation
+- **[Decision Log](./docs/DECISION_LOG.md)**: Record of all architectural, technical, and business decisions
+- **[Decision Documentation Guide](./docs/DECISION_DOCUMENTATION_GUIDE.md)**: Guidelines for documenting decisions
+- **[Change Log](./docs/CHANGE_LOG.md)**: Historical record of project changes
+
+### Development Documentation
+- **[Next Steps](./docs/NEXT-STEP.md)**: Current development priorities and roadmap
+- **[CI/CD Strategy](./docs/CI_CD_STRATEGY.md)**: Deployment and automation strategy
+- **[Entity Design](./docs/ENTITY_DESIGN.md)**: Database and domain model design
+
+> **For Contributors**: When making significant architectural, technical, or business decisions, please document them using the templates in [DECISION_LOG.md](./docs/DECISION_LOG.md) following the guidelines in [DECISION_DOCUMENTATION_GUIDE.md](./docs/DECISION_DOCUMENTATION_GUIDE.md).
+
 ## Development Setup & Status
 
 This section outlines the current development setup progress and status for each service.

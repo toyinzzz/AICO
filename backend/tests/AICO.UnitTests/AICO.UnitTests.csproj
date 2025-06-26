@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\AICO.Application\AICO.Application.csproj" />
     <ProjectReference Include="..\..\src\AICO.Infrastructure\AICO.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\AICO.Domain\AICO.Domain.csproj" />
   </ItemGroup>
 
 </Project>

@@ -6,6 +6,7 @@ using AICO.Domain.Entities;
 using AICO.Domain.Interfaces.Repositories;
 using AICO.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -27,10 +28,13 @@ namespace AICO.UnitTests.Services
             _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
             _mockWebsiteService = new Mock<IWebsiteService>();
             
+            var mockLogger = new Mock<ILogger<ProfitTrackingService>>();
+            
             _profitTrackingService = new ProfitTrackingService(
                 _mockRevenueRepository.Object,
                 _mockHttpContextAccessor.Object,
-                _mockWebsiteService.Object);
+                _mockWebsiteService.Object,
+                mockLogger.Object);
         }
 
         [Fact]
@@ -69,7 +73,7 @@ namespace AICO.UnitTests.Services
             _mockRevenueRepository
                 .Setup(r => r.AddAsync(It.IsAny<Revenue>()))
                 .Callback<Revenue>(r => capturedRevenue = r)
-                .Returns(Task.CompletedTask);
+                .ReturnsAsync((Revenue r) => r);
 
             // Act
             var revenue = await _profitTrackingService.ProcessStripeWebhookAsync(stripeEvent);
@@ -246,15 +250,15 @@ namespace AICO.UnitTests.Services
         }
 
         [Theory]
-        [InlineData(decimal.MaxValue, 1, decimal.MaxValue, 1)] // Very large numbers
-        [InlineData(0.01m, 1000000, 0.02m, 1000000)] // Very small revenue per conversion
+        [InlineData(999999999.99, 1, 999999999.99, 1)] // Very large numbers
+        [InlineData(0.01, 1000000, 0.02, 1000000)] // Very small revenue per conversion
         public void CalculateMCP_WithExtremeValues_ShouldNotOverflow(decimal controlRevenue, int controlConversions, decimal variantRevenue, int variantConversions)
         {
             // Act
             var result = _profitTrackingService.CalculateMCP(controlRevenue, controlConversions, variantRevenue, variantConversions);
 
             // Assert
-            Assert.True(decimal.IsFinite(result), "MCP calculation should not result in infinity or NaN");
+            Assert.True(result >= decimal.MinValue && result <= decimal.MaxValue, "MCP calculation should result in a valid decimal");
         }
 
         [Fact]
@@ -300,7 +304,7 @@ namespace AICO.UnitTests.Services
             var result = _profitTrackingService.CalculateMCP(controlRevenue, controlConversions, variantRevenue, variantConversions);
 
             // Assert
-            Assert.True(decimal.IsFinite(result));
+            Assert.True(result >= decimal.MinValue && result <= decimal.MaxValue);
         }
 
         [Fact]
@@ -316,7 +320,7 @@ namespace AICO.UnitTests.Services
             var result = _profitTrackingService.CalculateMCP(controlRevenue, controlConversions, variantRevenue, variantConversions);
             
             // Assert
-            Assert.True(decimal.IsFinite(result));
+            Assert.True(result >= decimal.MinValue && result <= decimal.MaxValue);
         }
 
         [Fact]

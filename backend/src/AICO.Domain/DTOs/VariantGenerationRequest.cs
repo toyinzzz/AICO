@@ -21,6 +21,11 @@ namespace AICO.Domain.DTOs
         public string ConversionGoal { get; set; } = string.Empty;
 
         /// <summary>
+        /// Optimization goal for the variants
+        /// </summary>
+        public string OptimizationGoal { get; set; } = string.Empty;
+
+        /// <summary>
         /// Specific elements to focus on (headlines, cta, copy, etc.)
         /// </summary>
         public List<string> FocusElements { get; set; } = new();

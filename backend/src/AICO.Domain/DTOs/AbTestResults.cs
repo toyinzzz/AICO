@@ -41,6 +41,11 @@ namespace AICO.Domain.DTOs
         public List<VariantResults> TestVariants { get; set; } = new();
 
         /// <summary>
+        /// Primary test variant (for simple A/B tests)
+        /// </summary>
+        public VariantResults? TestVariant { get; set; }
+
+        /// <summary>
         /// Overall test confidence level
         /// </summary>
         public decimal ConfidenceLevel { get; set; }
@@ -120,6 +125,11 @@ namespace AICO.Domain.DTOs
         /// Number of visitors
         /// </summary>
         public int Visitors { get; set; }
+
+        /// <summary>
+        /// Number of views
+        /// </summary>
+        public int Views { get; set; }
 
         /// <summary>
         /// Number of conversions
