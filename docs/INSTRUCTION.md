@@ -1,3 +1,64 @@
+1. AICO.Domain
+Prüfpunkte:
+•	Entities, ValueObjects, Interfaces, Domain-Services
+•	Kapselung, Validierung, Factory-Pattern
+•	Keine Business-Logik in Entities, sondern in Services
+Typische Hinweise:
+•	Properties sollten möglichst private set oder init haben.
+•	Factory-Methoden für Entity-Erstellung nutzen.
+•	Validierung in Factory/Service, nicht im Controller.
+•	Keine Magic Strings/Numbers.
+•	Interfaces sollten Nullability korrekt abbilden (Task<T?> für GetByIdAsync).
+---
+2. AICO.Application
+Prüfpunkte:
+•	Command/Query-Handler, DTOs, Application-Services
+•	Trennung von Logik und Datenzugriff
+•	Nutzung von MediatR, AutoMapper, FluentValidation
+Typische Hinweise:
+•	Handler sollten nur orchestrieren, keine Business-Logik enthalten.
+•	DTOs und Entities klar trennen.
+•	Validierung mit FluentValidation.
+•	Keine direkten Datenbankzugriffe im Application-Layer.
+---
+3. AICO.Infrastructure
+Prüfpunkte:
+•	Repositories, Datenbankzugriff, externe Services, DI
+•	Nutzung von EF Core, saubere Repository-Pattern-Implementierung
+•	Keine Business-Logik in Repositories
+Typische Hinweise:
+•	Alle Services/Repos im DI-Container registrieren.
+•	Asynchrone Methoden für alle Datenbankzugriffe.
+•	Keine Reflection für Property-Setzung (besser: interne/protected Setter).
+•	NotImplementedException nur für nicht-MVP-relevante Methoden.
+---
+4. AICO.API
+Prüfpunkte:
+•	Controller, Routing, Swagger, Auth
+•	REST-Konformität, Fehlerbehandlung, Statuscodes
+Typische Hinweise:
+•	Controller sollten nur orchestrieren, keine Logik enthalten.
+•	Fehler sauber behandeln (z.B. mit ProblemDetails).
+•	Swagger/OpenAPI aktiviert.
+•	Authentifizierung und Autorisierung korrekt konfiguriert.
+---
+5. AICO.Shared
+Prüfpunkte:
+•	Geteilte Typen, Hilfsklassen, ggf. Extensions
+Typische Hinweise:
+•	Keine Business-Logik, nur Hilfsfunktionen/Typen.
+•	Saubere Trennung von Shared-Code und Domain/Application.
+---
+6. AICO.IntegrationTests
+Prüfpunkte:
+•	Testabdeckung für alle MVP-Workflows
+•	Arrange/Act/Assert-Struktur, Nutzung von Test-Fixtures
+•	Tests für Erfolgs- und Fehlerfälle
+Typische Hinweise:
+•	Tests sollten unabhängig und wiederholbar sein.
+•	Testdaten gezielt wählen, nicht nur zufällige GUIDs.
+•	Negativtests ergänzen.
+
 ## Code Review Report: for Entities, AbTest Entity as example
 
 **Developer:** [AgentA]  

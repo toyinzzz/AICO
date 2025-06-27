@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using AICO.Application.Interfaces.Commands;
 using AICO.Application.Interfaces.Queries;
 using AICO.Domain.Entities;
@@ -9,7 +7,7 @@ using Xunit;
 
 namespace AICO.IntegrationTests
 {
-    public class AbTestIntegrationTests : IClassFixture<TestWebApplicationFactory>
+    public class AbTestIntegrationTests : IClassFixture<TestWebApplicationFactory>, IDisposable
     {
         private readonly TestWebApplicationFactory _factory;
         private readonly IServiceScope _scope;
@@ -27,58 +25,127 @@ namespace AICO.IntegrationTests
         [Fact]
         public async Task CreateAndRetrieveAbTest_ShouldWorkEndToEnd()
         {
-            // Arrange
+            // Arrange  
             var campaignId = Guid.NewGuid();
             var command = new CreateAbTestCommand(
                 campaignId,
                 "Integration Test A/B Test",
                 "Test Description",
-                TestType.Create("Button Color"),
+                "Button Color",
                 50,
+                "#cta-button",
+                "Buy Now",
                 "conversion_rate",
+                50,
                 DateTime.UtcNow.AddDays(1),
                 DateTime.UtcNow.AddDays(30)
             );
 
-            // Act
+            // Act  
             var createdAbTest = await _commandHandler.CreateAbTestAsync(command);
             var retrievedAbTest = await _queryHandler.GetAbTestByIdAsync(createdAbTest.Id);
 
-            // Assert
+            // Assert  
             Assert.NotNull(createdAbTest);
             Assert.NotNull(retrievedAbTest);
             Assert.Equal(createdAbTest.Id, retrievedAbTest.Id);
             Assert.Equal(command.Name, retrievedAbTest.Name);
             Assert.Equal(AbTestStatus.Draft, retrievedAbTest.Status);
+            Assert.Equal(command.Description, retrievedAbTest.Description);
+            Assert.Equal(command.TrafficSplit, retrievedAbTest.TrafficPercentage);
         }
 
         [Fact]
-        public async Task AbTestWorkflow_CreateStartStop_ShouldWorkCorrectly()
+        public async Task AbTestWorkflow_CreateStartStopComplete_ShouldWorkCorrectly()
         {
-            // Arrange
+            // Arrange  
             var campaignId = Guid.NewGuid();
             var command = new CreateAbTestCommand(
                 campaignId,
                 "Workflow Test",
                 "Test Description",
-                TestType.Create("Text Content"),
+                "Text Content",
                 60,
+                "#cta-button",
+                "Buy Now",
                 "click_rate",
+                60,
+                DateTime.UtcNow.AddDays(1),
+                DateTime.UtcNow.AddDays(30)
+            );
+
+            // Act  
+            var abTest = await _commandHandler.CreateAbTestAsync(command);
+            Assert.Equal(AbTestStatus.Draft, abTest.Status);
+
+            // Start Test  
+            await _commandHandler.StartAbTestAsync(abTest.Id);
+            var runningAbTest = await _queryHandler.GetAbTestByIdAsync(abTest.Id);
+            Assert.Equal(AbTestStatus.Running, runningAbTest.Status);
+
+            // Stop Test  
+            await _commandHandler.StopAbTestAsync(abTest.Id);
+            var stoppedAbTest = await _queryHandler.GetAbTestByIdAsync(abTest.Id);
+            Assert.Equal(AbTestStatus.Stopped, stoppedAbTest.Status);
+
+            // Complete Test  
+            await _commandHandler.CompleteAbTestAsync(abTest.Id);
+            var completedAbTest = await _queryHandler.GetAbTestByIdAsync(abTest.Id);
+            Assert.Equal(AbTestStatus.Completed, completedAbTest.Status);
+        }
+
+        [Fact]
+        public async Task CreateAbTest_WithInvalidTrafficSplit_ShouldFail()
+        {
+            // Arrange
+            var campaignId = Guid.NewGuid();
+            var command = new CreateAbTestCommand(
+                campaignId,
+                "Invalid Traffic Test",
+                "Test Description",
+                "Button Color",
+                150, // Invalid traffic split
+                "#cta-button",
+                "Buy Now",
+                "conversion_rate",
+                150,
                 DateTime.UtcNow.AddDays(1),
                 DateTime.UtcNow.AddDays(30)
             );
 
             // Act & Assert
-            var abTest = await _commandHandler.CreateAbTestAsync(command);
-            Assert.Equal(AbTestStatus.Draft, abTest.Status);
+            await Assert.ThrowsAsync<ArgumentException>(async () =>
+            {
+                await _commandHandler.CreateAbTestAsync(command);
+            });
+        }
 
-            await _commandHandler.StartAbTestAsync(abTest.Id);
-            var runningAbTest = await _queryHandler.GetAbTestByIdAsync(abTest.Id);
-            Assert.Equal(AbTestStatus.Running, runningAbTest.Status);
+        [Fact]
+        public async Task StartAbTest_WithoutRequiredFields_ShouldFail()
+        {
+            // Arrange
+            var campaignId = Guid.NewGuid();
+            var command = new CreateAbTestCommand(
+                campaignId,
+                "Missing Fields Test",
+                null,
+                "Button Color",
+                50,
+                "#cta-button",
+                "Buy Now",
+                null, // Missing primary metric
+                50,
+                DateTime.UtcNow.AddDays(1),
+                DateTime.UtcNow.AddDays(30)
+            );
 
-            await _commandHandler.StopAbTestAsync(abTest.Id);
-            var stoppedAbTest = await _queryHandler.GetAbTestByIdAsync(abTest.Id);
-            Assert.Equal(AbTestStatus.Stopped, stoppedAbTest.Status);
+            AbTest abTest = await _commandHandler.CreateAbTestAsync(command);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            {
+                await _commandHandler.StartAbTestAsync(abTest.Id);
+            });
         }
 
         public void Dispose()

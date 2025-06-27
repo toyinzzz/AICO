@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace AICO.Domain.Entities
@@ -20,7 +19,7 @@ namespace AICO.Domain.Entities
         /// </summary>
         [Required]
         public Guid AbTestId { get; private set; }
-        public AbTest AbTest { get; private set; }
+        public AbTest? AbTest { get; private set; }
 
         /// <summary>
         /// Variant content (HTML/text)
@@ -32,7 +31,7 @@ namespace AICO.Domain.Entities
         /// Traffic allocation percentage for this variant
         /// </summary>
         [Range(0, 100)]
-        public int TrafficAllocation { get; private set; }
+        public decimal TrafficAllocation { get; private set; }
 
         /// <summary>
         /// Whether this is the control variant
@@ -49,7 +48,7 @@ namespace AICO.Domain.Entities
         /// AI generation prompt used
         /// </summary>
         [MaxLength(2000)]
-        public string AiPrompt { get; private set; }
+        public string? AiPrompt { get; private set; }
 
         /// <summary>
         /// Number of views for this variant
@@ -64,13 +63,18 @@ namespace AICO.Domain.Entities
         /// <summary>
         /// Private constructor for EF Core
         /// </summary>
-        private Variant() { }
+        private Variant() 
+        {
+            Name = string.Empty;
+            Content = string.Empty;
+            AbTest = null!; // EF Core will populate this
+        }
 
         /// <summary>
         /// Creates a new variant
         /// </summary>
-        public Variant(string name, Guid abTestId, string content, int trafficAllocation, 
-                      bool isControl = false, string aiPrompt = null, int? aiConfidenceScore = null)
+        public Variant(string name, Guid abTestId, string content, decimal trafficAllocation,
+                      bool isControl = false, string? aiPrompt = null, int? aiConfidenceScore = null)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
             AbTestId = abTestId;

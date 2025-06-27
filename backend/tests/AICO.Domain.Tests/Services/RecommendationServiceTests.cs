@@ -1,7 +1,6 @@
-using System;
-using System.Threading.Tasks;
 using AICO.Domain.Entities;
 using AICO.Domain.Interfaces;
+using AICO.Domain.Interfaces.Services; // Added this line
 using AICO.Domain.Services;
 using Moq;
 using Xunit;
@@ -27,10 +26,10 @@ namespace AICO.Domain.Tests.Services
             var title = "Improve meta tags";
             var description = "Add better meta descriptions";
             var priority = 2;
-            var category = "SEO";
+            var recommendationType = "SEO";
 
             // Act
-            var result = _recommendationService.CreateRecommendationEntity(analysisResultId, title, description, priority, category);
+            var result = _recommendationService.CreateRecommendationEntity(analysisResultId, title, description, priority, recommendationType);
 
             // Assert
             Assert.NotNull(result);
@@ -38,8 +37,8 @@ namespace AICO.Domain.Tests.Services
             Assert.Equal(title, result.Title);
             Assert.Equal(description, result.Description);
             Assert.Equal(priority, result.Priority);
-            Assert.Equal(category, result.Category);
-            Assert.False(result.IsImplemented);
+            Assert.Equal(recommendationType, result.RecommendationType);
+            Assert.Equal(RecommendationStatus.Pending, result.Status);
             Assert.Null(result.ImplementedAt);
         }
 
@@ -51,10 +50,10 @@ namespace AICO.Domain.Tests.Services
             var title = "Add alt tags";
             var description = "Add alt tags to images";
             var priority = 1;
-            var category = "Accessibility";
+            var recommendationType = "Accessibility";
 
             // Act
-            var result = await _recommendationService.CreateRecommendationAsync(analysisResultId, title, description, priority, category);
+            var result = await _recommendationService.CreateRecommendationAsync(analysisResultId, title, description, priority, recommendationType);
 
             // Assert
             Assert.NotNull(result);
@@ -62,13 +61,13 @@ namespace AICO.Domain.Tests.Services
             Assert.Equal(title, result.Title);
             Assert.Equal(description, result.Description);
             Assert.Equal(priority, result.Priority);
-            Assert.Equal(category, result.Category);
-            Assert.False(result.IsImplemented);
+            Assert.Equal(recommendationType, result.RecommendationType);
+            Assert.Equal(RecommendationStatus.Pending, result.Status);
             Assert.Null(result.ImplementedAt);
-            _mockAuditService.Verify(s => s.SetCreationAudit(It.IsAny<IAuditableEntity>()), Times.Once);
+            _mockAuditService.Verify(s => s.SetCreationAudit(It.IsAny<Recommendation>(), It.IsAny<string>()), Times.Once);
         }
 
-        [Fact]
+         [Fact]
         public async Task UpdateRecommendationAsync_ShouldUpdateAndAuditEntity()
         {
             // Arrange
@@ -80,20 +79,20 @@ namespace AICO.Domain.Tests.Services
                 3,
                 "Initial category"
             );
-            
+
             var newTitle = "Updated title";
             var newDescription = "Updated description";
             var newPriority = 2;
-            var newCategory = "Updated category";
+            var newRecommendationType = "Updated category";
 
             // Act
-            await _recommendationService.UpdateRecommendationAsync(recommendation, newTitle, newDescription, newPriority, newCategory);
+            await _recommendationService.UpdateRecommendationAsync(recommendation, newTitle, newDescription, newPriority, newRecommendationType);
 
             // Assert
             Assert.Equal(newTitle, recommendation.Title);
             Assert.Equal(newDescription, recommendation.Description);
             Assert.Equal(newPriority, recommendation.Priority);
-            Assert.Equal(newCategory, recommendation.Category);
+            Assert.Equal(newRecommendationType, recommendation.RecommendationType);
             _mockAuditService.Verify(s => s.UpdateModificationDate(It.IsAny<IAuditableEntity>()), Times.Once);
         }
 
@@ -114,7 +113,7 @@ namespace AICO.Domain.Tests.Services
             await _recommendationService.MarkAsImplementedAsync(recommendation);
 
             // Assert
-            Assert.True(recommendation.IsImplemented);
+            Assert.Equal(RecommendationStatus.Implemented, recommendation.Status);
             Assert.NotNull(recommendation.ImplementedAt);
             _mockAuditService.Verify(s => s.UpdateModificationDate(It.IsAny<IAuditableEntity>()), Times.Once);
         }
@@ -138,7 +137,7 @@ namespace AICO.Domain.Tests.Services
             await _recommendationService.MarkAsNotImplementedAsync(recommendation);
 
             // Assert
-            Assert.False(recommendation.IsImplemented);
+            Assert.Equal(RecommendationStatus.Pending, recommendation.Status);
             Assert.Null(recommendation.ImplementedAt);
             _mockAuditService.Verify(s => s.UpdateModificationDate(It.IsAny<IAuditableEntity>()), Times.Once);
         }
@@ -188,4 +187,4 @@ namespace AICO.Domain.Tests.Services
             Assert.True(result);
         }
     }
-} 
+}

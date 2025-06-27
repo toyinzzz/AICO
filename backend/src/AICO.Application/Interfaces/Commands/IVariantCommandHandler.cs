@@ -4,14 +4,7 @@ using System.Threading.Tasks;
 
 namespace AICO.Application.Interfaces.Commands
 {
-    public interface IVariantCommandHandler
-    {
-        Task<Variant> CreateVariantAsync(CreateVariantCommand command);
-        Task<Variant> UpdateVariantAsync(UpdateVariantCommand command);
-        Task DeleteVariantAsync(Guid variantId);
-        Task<Variant> GenerateAIVariantAsync(GenerateAIVariantCommand command);
-    }
-
+    // Command Records
     public record CreateVariantCommand(
         Guid AbTestId,
         Guid CampaignId,
@@ -19,7 +12,7 @@ namespace AICO.Application.Interfaces.Commands
         string Content,
         bool IsControl,
         int TrafficPercentage
-    );
+    ) : ICommand<Variant>;
 
     public record UpdateVariantCommand(
         Guid Id,
@@ -27,7 +20,9 @@ namespace AICO.Application.Interfaces.Commands
         string Content,
         bool IsControl,
         int TrafficPercentage
-    );
+    ) : ICommand<Variant>;
+
+    public record DeleteVariantCommand(Guid VariantId) : ICommand;
 
     public record GenerateAIVariantCommand(
         Guid AbTestId,
@@ -35,5 +30,14 @@ namespace AICO.Application.Interfaces.Commands
         string OriginalContent,
         string OptimizationGoal,
         string TargetAudience
-    );
+    ) : ICommand<Variant>;
+
+    // Command Handler Interface
+    public interface IVariantCommandHandler :
+        ICommandHandler<CreateVariantCommand, Variant>,
+        ICommandHandler<UpdateVariantCommand, Variant>,
+        ICommandHandler<DeleteVariantCommand>,
+        ICommandHandler<GenerateAIVariantCommand, Variant>
+    {
+    }
 }

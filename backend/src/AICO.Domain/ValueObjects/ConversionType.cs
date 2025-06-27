@@ -1,5 +1,3 @@
-using System;
-
 namespace AICO.Domain.ValueObjects
 {
     /// <summary>
@@ -19,17 +17,17 @@ namespace AICO.Domain.ValueObjects
             public static readonly ConversionType Subscription = new("subscription");
             public static readonly ConversionType Custom = new("custom");
         }
-        
+
         /// <summary>
         /// The conversion type value
         /// </summary>
         public string Value { get; }
-        
+
         private ConversionType(string value)
         {
             Value = value;
         }
-        
+
         /// <summary>
         /// Creates a new ConversionType value object
         /// </summary>
@@ -40,10 +38,10 @@ namespace AICO.Domain.ValueObjects
         {
             if (string.IsNullOrWhiteSpace(value))
                 throw new ArgumentException("Conversion type cannot be empty", nameof(value));
-                
+
             return new ConversionType(value.Trim().ToLowerInvariant());
         }
-        
+
         public override string ToString() => Value;
     }
 }

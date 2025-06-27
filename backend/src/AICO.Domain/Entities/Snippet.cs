@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace AICO.Domain.Entities
@@ -13,7 +12,7 @@ namespace AICO.Domain.Entities
         /// </summary>
         [Required]
         public Guid WebsiteId { get; private set; }
-        public Website Website { get; private set; }
+        public Website? Website { get; private set; }
 
         /// <summary>
         /// Snippet name/identifier
@@ -50,7 +49,7 @@ namespace AICO.Domain.Entities
         /// <summary>
         /// Configuration settings as JSON
         /// </summary>
-        public string Configuration { get; private set; }
+        public string? Configuration { get; private set; }
 
         /// <summary>
         /// Last time the snippet was loaded
@@ -65,13 +64,20 @@ namespace AICO.Domain.Entities
         /// <summary>
         /// Private constructor for EF Core
         /// </summary>
-        private Snippet() { }
+        private Snippet() 
+        {
+            Name = string.Empty;
+            Code = string.Empty;
+            Version = string.Empty;
+            Type = string.Empty;
+            Website = null!;
+        }
 
         /// <summary>
         /// Creates a new snippet
         /// </summary>
-        public Snippet(Guid websiteId, string name, string code, string type, 
-                      string version = "1.0.0", string configuration = null)
+        public Snippet(Guid websiteId, string name, string code, string type,
+                      string version = "1.0.0", string? configuration = null)
         {
             WebsiteId = websiteId;
             Name = name ?? throw new ArgumentNullException(nameof(name));
@@ -84,7 +90,7 @@ namespace AICO.Domain.Entities
         /// <summary>
         /// Updates the snippet code
         /// </summary>
-        public void UpdateCode(string newCode, string newVersion = null)
+        public void UpdateCode(string newCode, string? newVersion = null)
         {
             Code = newCode ?? throw new ArgumentNullException(nameof(newCode));
             if (!string.IsNullOrEmpty(newVersion))

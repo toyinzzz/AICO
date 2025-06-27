@@ -41,6 +41,60 @@ AICO is built as a cloud-native microservices application with the following com
 
 For detailed architecture information, see our [Architecture Documentation](./docs/ARCHITECTURE.md).
 
+## Documentation
+
+Our comprehensive documentation covers all aspects of the project:
+
+### Core Documentation
+- **[Architecture](./docs/ARCHITECTURE.md)**: System design and technical architecture
+- **[Business Plan](./docs/COMPREHENSIVE_BUSINESS_PLAN.md)**: Strategic direction and market positioning
+- **[MVP Specification](./docs/PROFITLIFT_MVP.md)**: Detailed MVP requirements and timeline
+- **[Implementation Notes](./docs/IMPLEMENTATION_NOTES.md)**: Technical implementation details
+
+### Decision Documentation
+- **[Decision Log](./docs/DECISION_LOG.md)**: Record of all architectural, technical, and business decisions
+- **[Decision Documentation Guide](./docs/DECISION_DOCUMENTATION_GUIDE.md)**: Guidelines for documenting decisions
+- **[Change Log](./docs/CHANGE_LOG.md)**: Historical record of project changes
+
+### Development Documentation
+- **[Next Steps](./docs/NEXT-STEP.md)**: Current development priorities and roadmap
+- **[CI/CD Strategy](./docs/CI_CD_STRATEGY.md)**: Deployment and automation strategy
+- **[Entity Design](./docs/ENTITY_DESIGN.md)**: Database and domain model design
+
+> **For Contributors**: When making significant architectural, technical, or business decisions, please document them using the templates in [DECISION_LOG.md](./docs/DECISION_LOG.md) following the guidelines in [DECISION_DOCUMENTATION_GUIDE.md](./docs/DECISION_DOCUMENTATION_GUIDE.md).
+
+## Development Setup & Status
+
+This section outlines the current development setup progress and status for each service.
+
+### Frontend Service (React + Vite)
+
+- **Local Development:** The frontend can be run locally.
+  - Navigate to the `frontend` directory.
+  - Run `npm install` to install dependencies.
+  - Run `npm run dev` to start the development server (typically on `http://localhost:8080/`).
+- **Initial Setup Notes:**
+  - The `frontend/run-dev.bat` script for Docker-based development was initially pointing to an incorrect path for `docker-compose.dev.yml`. This has been corrected.
+  - During initial attempts, the Docker build process for the frontend (`docker-compose up --build`) was getting stuck at the "load build context" stage. As a workaround, local development via `npm run dev` was pursued and is functional.
+  - Data display in the frontend is a mix: many components use mocked data, while an `mcpService.ts` exists for potential backend integration (currently configured with `mockData: true` in some usages).
+
+### Backend API Service (.NET)
+
+- **Database:** Configured to use PostgreSQL for development and production
+- **Local Development:** The backend can be run locally or via Docker
+  - Ensure PostgreSQL is running (via Docker or local installation)
+  - Navigate to the `backend/src/AICO.API` directory
+  - Run `dotnet restore` to restore dependencies
+  - Run `dotnet ef database update` to apply migrations
+  - Run `dotnet run` to start the API server (typically on `http://localhost:5000`)
+- **Docker Development:** Use the provided scripts for easy setup
+  - Run `scripts/docker-dev-setup.bat` to start the full stack with PostgreSQL
+  - Run `scripts/setup-database.bat` to create and apply database migrations
+
+### AI Analysis Service (Python + FastAPI)
+
+- Setup and testing are pending.
+
 ## Project Structure
 
 ```
@@ -128,6 +182,7 @@ Each component has its own detailed README with specific information about its s
 - .NET 8 SDK
 - Node.js 18+ and npm/bun
 - Python 3.11+
+- PostgreSQL 15+ (if running locally without Docker)
 
 ### Development Setup
 
@@ -151,14 +206,18 @@ For detailed frontend documentation, see the [Frontend README](./frontend/README
 #### Backend Development
 
 ```bash
-# Build and run the backend service
-cd backend
+# Option 1: Local development with PostgreSQL
+cd backend/src/AICO.API
 dotnet restore
-dotnet build
-dotnet run --project src/AICO.API
+dotnet ef database update
+dotnet run
 
-# Or using Docker
-docker-compose -f environments/dev/docker-compose.dev.yml up backend
+# Option 2: Full Docker stack (recommended)
+./scripts/docker-dev-setup.bat  # Windows
+./scripts/docker-dev-setup.sh   # Linux/macOS
+
+# Option 3: Individual service via Docker
+docker-compose -f environments/dev/docker-compose.dev.yml up --build
 ```
 
 For detailed backend documentation, see the [Backend README](./backend/README.md).

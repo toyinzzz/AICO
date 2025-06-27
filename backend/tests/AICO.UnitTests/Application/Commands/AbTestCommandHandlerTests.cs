@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using AICO.Application.Interfaces.Commands;
 using AICO.Domain.Entities;
 using AICO.Domain.Interfaces.Repositories;
@@ -31,22 +29,24 @@ namespace AICO.UnitTests.Application.Commands
                 Guid.NewGuid(),
                 "Test A/B Test",
                 "Test Description",
-                TestType.Create("Button Color"),
+                "Button Color",
                 50,
+                "#cta-button",
+                "Buy Now",
                 "conversion_rate",
+                50,
                 DateTime.UtcNow.AddDays(1),
                 DateTime.UtcNow.AddDays(30)
             );
 
             var expectedAbTest = AbTest.Create(
-                command.CampaignId,
                 command.Name,
                 command.Description,
-                command.TestType,
-                command.TrafficSplit,
-                command.SuccessMetric,
-                command.StartDate,
-                command.EndDate
+                command.CampaignId,
+                AICO.Domain.ValueObjects.TestType.Create(command.TestType),
+                command.TargetSelector,
+                command.OriginalContent,
+                command.PrimaryMetric
             );
 
             _mockAbTestRepository.Setup(r => r.AddAsync(It.IsAny<AbTest>()))
@@ -69,15 +69,16 @@ namespace AICO.UnitTests.Application.Commands
         {
             // Arrange
             var abTestId = Guid.NewGuid();
+            var campaignId = Guid.NewGuid();
+            var testType = TestType.Create("Button Color");
             var abTest = AbTest.Create(
-                Guid.NewGuid(),
                 "Test",
                 "Description",
-                TestType.Create("Button Color"),
-                50,
-                "conversion_rate",
-                DateTime.UtcNow.AddDays(1),
-                DateTime.UtcNow.AddDays(30)
+                campaignId,
+                testType,
+                "#cta-button",
+                "Buy Now",
+                "conversion_rate"
             );
 
             _mockAbTestRepository.Setup(r => r.GetByIdAsync(abTestId))

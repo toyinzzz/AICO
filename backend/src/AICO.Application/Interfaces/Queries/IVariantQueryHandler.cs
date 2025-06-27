@@ -5,12 +5,20 @@ using System.Threading.Tasks;
 
 namespace AICO.Application.Interfaces.Queries
 {
-    public interface IVariantQueryHandler
+    // Query Records
+    public record GetVariantByIdQuery(Guid Id) : IQuery<Variant?>;
+    public record GetVariantsByAbTestIdQuery(Guid AbTestId) : IQuery<IEnumerable<Variant>>;
+    public record GetVariantsByCampaignIdQuery(Guid CampaignId) : IQuery<IEnumerable<Variant>>;
+    public record GetControlVariantQuery(Guid AbTestId) : IQuery<Variant?>;
+    public record GetTestVariantsQuery(Guid AbTestId) : IQuery<IEnumerable<Variant>>;
+
+    // Query Handler Interface
+    public interface IVariantQueryHandler :
+        IQueryHandler<GetVariantByIdQuery, Variant?>,
+        IQueryHandler<GetVariantsByAbTestIdQuery, IEnumerable<Variant>>,
+        IQueryHandler<GetVariantsByCampaignIdQuery, IEnumerable<Variant>>,
+        IQueryHandler<GetControlVariantQuery, Variant?>,
+        IQueryHandler<GetTestVariantsQuery, IEnumerable<Variant>>
     {
-        Task<Variant?> GetVariantByIdAsync(Guid id);
-        Task<IEnumerable<Variant>> GetVariantsByAbTestIdAsync(Guid abTestId);
-        Task<IEnumerable<Variant>> GetVariantsByCampaignIdAsync(Guid campaignId);
-        Task<Variant?> GetControlVariantAsync(Guid abTestId);
-        Task<IEnumerable<Variant>> GetTestVariantsAsync(Guid abTestId);
     }
 }

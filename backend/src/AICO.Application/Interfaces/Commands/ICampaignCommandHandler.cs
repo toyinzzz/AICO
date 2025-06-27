@@ -4,16 +4,7 @@ using System.Threading.Tasks;
 
 namespace AICO.Application.Interfaces.Commands
 {
-    public interface ICampaignCommandHandler
-    {
-        Task<Campaign> CreateCampaignAsync(CreateCampaignCommand command);
-        Task<Campaign> UpdateCampaignAsync(UpdateCampaignCommand command);
-        Task DeleteCampaignAsync(Guid campaignId);
-        Task<Campaign> StartCampaignAsync(Guid campaignId);
-        Task<Campaign> StopCampaignAsync(Guid campaignId);
-        Task<Campaign> CompleteCampaignAsync(Guid campaignId);
-    }
-
+    // Command Records
     public record CreateCampaignCommand(
         Guid WebsiteId,
         string Name,
@@ -22,7 +13,7 @@ namespace AICO.Application.Interfaces.Commands
         DateTime? EndDate,
         decimal Budget,
         string TargetUrl
-    );
+    ) : ICommand<Campaign>;
 
     public record UpdateCampaignCommand(
         Guid Id,
@@ -32,5 +23,24 @@ namespace AICO.Application.Interfaces.Commands
         DateTime? EndDate,
         decimal Budget,
         string TargetUrl
-    );
+    ) : ICommand<Campaign>;
+
+    public record DeleteCampaignCommand(Guid CampaignId) : ICommand;
+
+    public record StartCampaignCommand(Guid CampaignId) : ICommand<Campaign>;
+
+    public record StopCampaignCommand(Guid CampaignId) : ICommand<Campaign>;
+
+    public record CompleteCampaignCommand(Guid CampaignId) : ICommand<Campaign>;
+
+    // Command Handler Interface
+    public interface ICampaignCommandHandler :
+        ICommandHandler<CreateCampaignCommand, Campaign>,
+        ICommandHandler<UpdateCampaignCommand, Campaign>,
+        ICommandHandler<DeleteCampaignCommand>,
+        ICommandHandler<StartCampaignCommand, Campaign>,
+        ICommandHandler<StopCampaignCommand, Campaign>,
+        ICommandHandler<CompleteCampaignCommand, Campaign>
+    {
+    }
 }

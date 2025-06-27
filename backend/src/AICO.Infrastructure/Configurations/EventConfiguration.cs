@@ -1,63 +1,43 @@
 using AICO.Domain.Entities;
-using AICO.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace AICO.Infrastructure.Configurations
+namespace AICO.Infrastructure.Data.Configurations
 {
-    /// <summary>
-    /// Entity Framework configuration for Event entity
-    /// </summary>
     public class EventConfiguration : IEntityTypeConfiguration<Event>
     {
         public void Configure(EntityTypeBuilder<Event> builder)
         {
-            builder.ToTable("Events");
-            
             builder.HasKey(e => e.Id);
-            
-            builder.Property(e => e.Id)
-                .ValueGeneratedNever();
-                
-            builder.Property(e => e.WebsiteId)
-                .IsRequired();
-                
+
             builder.Property(e => e.EventType)
-                .HasConversion(
-                    v => v.Value,
-                    v => EventType.Create(v))
-                .HasMaxLength(50)
-                .IsRequired();
-                
+                .IsRequired()
+                .HasConversion<string>()
+                .HasMaxLength(50); // Max length for the string representation of the enum
+
             builder.Property(e => e.EventData)
-                .IsRequired();
-                
-            builder.Property(e => e.UserAgent)
-                .HasMaxLength(500);
-                
-            builder.Property(e => e.IpAddress)
-                .HasMaxLength(45);
-                
-            builder.Property(e => e.Timestamp)
-                .IsRequired();
-                
-            builder.Property(e => e.CreatedAt)
-                .IsRequired();
-                
-            builder.Property(e => e.RowVersion)
-                .IsRowVersion();
-                
+                .HasColumnType("jsonb"); // Assuming PostgreSQL, adjust if different DB
+
+            builder.Property(e => e.UserAgent).HasMaxLength(500);
+            builder.Property(e => e.IpAddress).HasMaxLength(45); // Max length for IPv6
+
+            builder.Property(e => e.Timestamp).IsRequired();
+
+            // Relationships
             builder.HasOne(e => e.Website)
-                .WithMany()
+                .WithMany() // Assuming Website doesn't have a direct collection of Events, or configured elsewhere
                 .HasForeignKey(e => e.WebsiteId)
-                .OnDelete(DeleteBehavior.Cascade);
-                
+                .IsRequired();
+
             builder.HasOne(e => e.Session)
-                .WithMany(s => s.Events)
+                .WithMany(s => s.Events) // Assuming Session has a collection of Events
                 .HasForeignKey(e => e.SessionId)
-                .OnDelete(DeleteBehavior.SetNull);
-                
-            builder.HasQueryFilter(e => !e.IsDeleted);
+                .IsRequired(false); // SessionId is nullable
+
+            // BaseEntity properties
+            builder.Property(e => e.CreatedAt).IsRequired();
+            builder.Property(e => e.ModifiedAt).IsRequired();
+            builder.Property(e => e.RowVersion).IsRowVersion();
         }
     }
 }

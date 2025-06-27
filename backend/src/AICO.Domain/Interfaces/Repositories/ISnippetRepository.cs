@@ -1,7 +1,4 @@
 using AICO.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace AICO.Domain.Interfaces.Repositories
 {

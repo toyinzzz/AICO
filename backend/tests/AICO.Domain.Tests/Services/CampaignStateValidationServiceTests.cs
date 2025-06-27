@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using AICO.Domain.Entities;
 using AICO.Domain.Services;
 using Xunit;
@@ -37,9 +35,9 @@ namespace AICO.Domain.Tests.Services
         public void ValidateTransition_WithValidTransition_ShouldNotThrow()
         {
             // Act & Assert
-            var exception = Record.Exception(() => 
+            var exception = Record.Exception(() =>
                 _validationService.ValidateTransition(CampaignStatus.Draft, CampaignStatus.Active));
-            
+
             Assert.Null(exception);
         }
 
@@ -47,9 +45,9 @@ namespace AICO.Domain.Tests.Services
         public void ValidateTransition_WithInvalidTransition_ShouldThrowInvalidOperationException()
         {
             // Act & Assert
-            var exception = Assert.Throws<InvalidOperationException>(() => 
+            var exception = Assert.Throws<InvalidOperationException>(() =>
                 _validationService.ValidateTransition(CampaignStatus.Draft, CampaignStatus.Completed));
-            
+
             Assert.Contains("Invalid campaign state transition", exception.Message);
             Assert.Contains("Draft", exception.Message);
             Assert.Contains("Completed", exception.Message);

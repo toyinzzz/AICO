@@ -1,0 +1,45 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\toyin\\AICO\\backend\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{0E4CDF10-D8CA-4FFD-AF54-7CF64499B256}|src\\AICO.Domain\\AICO.Domain.csproj|c:\\users\\toyin\\aico\\backend\\src\\aico.domain\\services\\conversionservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0E4CDF10-D8CA-4FFD-AF54-7CF64499B256}|src\\AICO.Domain\\AICO.Domain.csproj|solutionrelative:src\\aico.domain\\services\\conversionservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{5da8d69b-058a-4294-a87a-f4f7ae2983b3}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "ConversionService.cs",
+              "DocumentMoniker": "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.Domain\\Services\\ConversionService.cs",
+              "RelativeDocumentMoniker": "src\\AICO.Domain\\Services\\ConversionService.cs",
+              "ToolTip": "C:\\Users\\toyin\\AICO\\backend\\src\\AICO.Domain\\Services\\ConversionService.cs",
+              "RelativeToolTip": "src\\AICO.Domain\\Services\\ConversionService.cs",
+              "ViewState": "AgIAACYAAAAAAAAAAAAIwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-22T12:16:58.476Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

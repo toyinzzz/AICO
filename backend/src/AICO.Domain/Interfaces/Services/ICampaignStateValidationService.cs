@@ -11,12 +11,12 @@ namespace AICO.Domain.Interfaces.Services
         /// Checks if a state transition is valid
         /// </summary>
         bool CanTransitionTo(CampaignStatus from, CampaignStatus to);
-        
+
         /// <summary>
         /// Validates a state transition and throws if invalid
         /// </summary>
         void ValidateTransition(CampaignStatus from, CampaignStatus to);
-        
+
         /// <summary>
         /// Gets all valid transitions from a given state
         /// </summary>

@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MoneyLostChart } from "@/components/Dashboard/MoneyLostChart";
+import { MCPComparisonChart } from "@/components/Dashboard/MCPComparisonChart";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, AreaChart, Area, BarChart, Bar } from "recharts";
 import { useNavigate } from "react-router-dom";
@@ -191,9 +192,9 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Revenue Loss Analytics */}
+          {/* MCP Analysis */}
           <div className="grid grid-cols-1 gap-8">
-            <MoneyLostChart />
+            <MCPComparisonChart />
           </div>
 
           {/* Modern Key Metrics */}

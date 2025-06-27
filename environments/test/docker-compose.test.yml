@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  aico-backend-tests:
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile.test
+    volumes:
+      - ../../backend/TestResults:/app/TestResults
+      - ../../backend:/app
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Testing
+      - ConnectionStrings__DefaultConnection=Data Source=:memory:
+    networks:
+      - aico-test-network
+    command: >
+      sh -c "dotnet test --configuration Release 
+             --logger trx --results-directory /app/TestResults 
+             --collect 'XPlat Code Coverage' 
+             --verbosity normal"
+
+networks:
+  aico-test-network:
+    driver: bridge

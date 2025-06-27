@@ -21,34 +21,41 @@ services:
     networks:
       - aico-dev-network
 
-  # Future: Add backend service here
-  # aico-api:
-  #   build:
-  #     context: ./backend
-  #   ports:
-  #     - "5000:5000"
-  #   environment:
-  #     - NODE_ENV=development
-  #   networks:
-  #     - aico-dev-network
+  aico-api:
+    build:
+      context: ../../backend
+      dockerfile: ../environments/dev/Dockerfile.backend.dev
+    ports:
+      - "5000:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=aico-db;Database=aico_dev;Username=aico_user;Password=aico_password
+      - ASPNETCORE_URLS=http://+:5000
+    depends_on:
+      - aico-db
+    networks:
+      - aico-dev-network
+    restart: unless-stopped
 
-
-  # Future: Add database service here
-  # aico-db:
-  #   image: postgres:15
-  #   ports:
-  #     - "5432:5432"
-  #   environment:
-  #     - POSTGRES_USER=aico
-  #   networks:
-  #     - aico-dev-network  
-  #   volumes:
-  #     - ./data:/var/lib/postgresql/data
-  #   restart: unless-stopped 
-  #   stdin_open: true
-  #   tty: true
+  aico-db:
+    image: postgres:15
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=aico_user
+      - POSTGRES_PASSWORD=aico_password
+      - POSTGRES_DB=aico_dev
+    networks:
+      - aico-dev-network  
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    restart: unless-stopped
   
 
 networks:
   aico-dev-network:
     driver: bridge
+
+volumes:
+  postgres_dev_data:

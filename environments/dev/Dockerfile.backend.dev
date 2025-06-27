@@ -1,0 +1,39 @@
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+WORKDIR /app
+EXPOSE 5000
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# Copy solution file
+COPY ["AICO.sln", "./"]
+
+# Copy project files
+COPY ["src/AICO.API/AICO.API.csproj", "src/AICO.API/"]
+COPY ["src/AICO.Application/AICO.Application.csproj", "src/AICO.Application/"]
+COPY ["src/AICO.Domain/AICO.Domain.csproj", "src/AICO.Domain/"]
+COPY ["src/AICO.Infrastructure/AICO.Infrastructure.csproj", "src/AICO.Infrastructure/"]
+COPY ["src/AICO.Shared/AICO.Shared.csproj", "src/AICO.Shared/"]
+
+# Restore dependencies
+RUN dotnet restore "src/AICO.API/AICO.API.csproj"
+
+# Copy source code
+COPY . .
+
+# Build the application
+WORKDIR "/src/src/AICO.API"
+RUN dotnet build "AICO.API.csproj" -c Debug -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "AICO.API.csproj" -c Debug -o /app/publish
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+
+# Install Entity Framework tools for migrations
+RUN dotnet tool install --global dotnet-ef
+ENV PATH="$PATH:/root/.dotnet/tools"
+
+ENTRYPOINT ["dotnet", "AICO.API.dll"]

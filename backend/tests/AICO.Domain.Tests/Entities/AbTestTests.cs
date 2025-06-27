@@ -1,13 +1,26 @@
-using System;
 using AICO.Domain.Entities;
+using AICO.Domain.Events;
 using AICO.Domain.ValueObjects;
-using Moq;
 using Xunit;
 
 namespace AICO.Domain.Tests.Entities
 {
     public class AbTestTests
     {
+        private AbTest CreateValidAbTest()
+        {
+            var abTest = AbTest.Create(
+                "Test A/B Test",
+                "Test Description",
+                Guid.NewGuid(),
+                TestType.Create("Button Color"),
+                ".cta-button",
+                "Buy Now",
+                "conversion_rate"
+            );
+            return abTest;
+        }
+
         [Fact]
         public void Create_WithValidData_ShouldReturnAbTest()
         {
@@ -16,13 +29,12 @@ namespace AICO.Domain.Tests.Entities
             var name = "Test A/B Test";
             var description = "Test Description";
             var testType = TestType.Create("Button Color");
-            var trafficSplit = 50;
             var successMetric = "conversion_rate";
-            var startDate = DateTime.UtcNow.AddDays(1);
-            var endDate = DateTime.UtcNow.AddDays(30);
+            var targetSelector = ".cta-button";
+            var originalContent = "Buy Now";
 
             // Act
-            var abTest = AbTest.Create(campaignId, name, description, testType, trafficSplit, successMetric, startDate, endDate);
+            var abTest = AbTest.Create(name, description, campaignId, testType, targetSelector, originalContent, successMetric);
 
             // Assert
             Assert.NotNull(abTest);
@@ -30,81 +42,103 @@ namespace AICO.Domain.Tests.Entities
             Assert.Equal(name, abTest.Name);
             Assert.Equal(description, abTest.Description);
             Assert.Equal(testType, abTest.TestType);
-            Assert.Equal(trafficSplit, abTest.TrafficSplit);
-            Assert.Equal(successMetric, abTest.SuccessMetric);
-            Assert.Equal(startDate, abTest.StartDate);
-            Assert.Equal(endDate, abTest.EndDate);
+            Assert.Equal(successMetric, abTest.PrimaryMetric);
             Assert.Equal(AbTestStatus.Draft, abTest.Status);
+            Assert.Empty(abTest.Variants);
+            Assert.Empty(abTest.Conversions);
+            Assert.Empty(abTest.DomainEvents);
+        }
+
+        [Fact]
+        public void AddVariant_ShouldAddVariantToList()
+        {
+            // Arrange
+            var abTest = CreateValidAbTest();
+            var variant = new AbTestVariant(abTest.Id, "Variant A", "Test content", 50m, null, true);
+
+            // Act
+            abTest.AddVariant(variant);
+
+            // Assert
+            Assert.Single(abTest.Variants);
+            Assert.Contains(variant, abTest.Variants);
+        }
+
+        [Fact]
+        public void RemoveVariant_ShouldRemoveVariantFromList()
+        {
+            // Arrange
+            var abTest = CreateValidAbTest();
+            var variant = new AbTestVariant(abTest.Id, "Variant A", "Test content", 50m, null, true);
+            abTest.AddVariant(variant);
+
+            // Act
+            abTest.RemoveVariant(variant.Id);
+
+            // Assert
+            Assert.Empty(abTest.Variants);
+        }
+
+        [Fact]
+        public void ClearVariants_ShouldClearVariantList()
+        {
+            // Arrange
+            var abTest = CreateValidAbTest();
+            var variant1 = new AbTestVariant(abTest.Id, "Variant A", "Test content", 50m, null, true);
+            var variant2 = new AbTestVariant(abTest.Id, "Variant B", "Test content", 50m, null, false);
+            abTest.AddVariant(variant1);
+            abTest.AddVariant(variant2);
+
+            // Act
+            abTest.ClearVariants();
+
+            // Assert
+            Assert.Empty(abTest.Variants);
+        }
+
+        [Fact]
+        public void AddConversion_ShouldAddConversionToList()
+        {
+            // Arrange
+            var abTest = CreateValidAbTest();
+            var conversion = Conversion.Create(abTest.Id, ConversionType.Create("click"), DateTime.UtcNow.ToString(), 100.0m);
+
+            // Act
+            abTest.AddConversion(conversion);
+
+            // Assert
+            Assert.Single(abTest.Conversions);
+            Assert.Contains(conversion, abTest.Conversions);
         }
 
         [Theory]
-        [InlineData(-1)]
-        [InlineData(0)]
-        [InlineData(101)]
-        public void Create_WithInvalidTrafficSplit_ShouldThrowArgumentException(int invalidTrafficSplit)
-        {
-            // Arrange
-            var campaignId = Guid.NewGuid();
-            var testType = TestType.Create("Button Color");
-            var startDate = DateTime.UtcNow.AddDays(1);
-            var endDate = DateTime.UtcNow.AddDays(30);
-
-            // Act & Assert
-            Assert.Throws<ArgumentException>(() => 
-                AbTest.Create(campaignId, "Test", "Description", testType, invalidTrafficSplit, "conversion_rate", startDate, endDate));
-        }
-
-        [Fact]
-        public void StartTest_WithValidState_ShouldUpdateStatusAndStartDate()
+        [InlineData(nameof(AbTest.Start), AbTestStatus.Draft, AbTestStatus.Running)]
+        [InlineData(nameof(AbTest.Pause), AbTestStatus.Running, AbTestStatus.Paused)]
+        [InlineData(nameof(AbTest.Stop), AbTestStatus.Running, AbTestStatus.Stopped)]
+        [InlineData(nameof(AbTest.Complete), AbTestStatus.Running, AbTestStatus.Completed)]
+        [InlineData(nameof(AbTest.Archive), AbTestStatus.Completed, AbTestStatus.Archived)]
+        [InlineData(nameof(AbTest.Resume), AbTestStatus.Paused, AbTestStatus.Running)]
+        [InlineData(nameof(AbTest.MarkReadyToStart), AbTestStatus.Draft, AbTestStatus.ReadyToStart)]
+        public void StatusChangeMethods_ShouldRaiseAbTestStatusChangedEvent(string methodName, AbTestStatus initialStatus, AbTestStatus newStatus)
         {
             // Arrange
             var abTest = CreateValidAbTest();
-            var mockValidator = new Mock<IAbTestStateValidationService>();
-            mockValidator.Setup(x => x.CanTransitionTo(AbTestStatus.Draft, AbTestStatus.Running))
-                        .Returns(true);
+            abTest.GetType().GetProperty("Status").SetValue(abTest, initialStatus);
+            abTest.ClearDomainEvents();
 
             // Act
-            abTest.StartTest(mockValidator.Object);
+            abTest.GetType().GetMethod(methodName).Invoke(abTest, null);
 
             // Assert
-            Assert.Equal(AbTestStatus.Running, abTest.Status);
-            Assert.True(abTest.ActualStartDate.HasValue);
-            Assert.True(abTest.ActualStartDate.Value <= DateTime.UtcNow);
-        }
+            var domainEvent = abTest.DomainEvents.FirstOrDefault();
+            Assert.NotNull(domainEvent);
+            Assert.IsType<AbTestStatusChangedEvent>(domainEvent);
 
-        [Fact]
-        public void CompleteTest_WithValidState_ShouldUpdateStatusAndEndDate()
-        {
-            // Arrange
-            var abTest = CreateValidAbTest();
-            var mockValidator = new Mock<IAbTestStateValidationService>();
-            mockValidator.Setup(x => x.CanTransitionTo(AbTestStatus.Running, AbTestStatus.Completed))
-                        .Returns(true);
-            
-            // Start the test first
-            abTest.GetType().GetProperty("Status")?.SetValue(abTest, AbTestStatus.Running);
-
-            // Act
-            abTest.CompleteTest(mockValidator.Object);
-
-            // Assert
-            Assert.Equal(AbTestStatus.Completed, abTest.Status);
-            Assert.True(abTest.ActualEndDate.HasValue);
-            Assert.True(abTest.ActualEndDate.Value <= DateTime.UtcNow);
-        }
-
-        private AbTest CreateValidAbTest()
-        {
-            return AbTest.Create(
-                Guid.NewGuid(),
-                "Test A/B Test",
-                "Test Description",
-                TestType.Create("Button Color"),
-                50,
-                "conversion_rate",
-                DateTime.UtcNow.AddDays(1),
-                DateTime.UtcNow.AddDays(30)
-            );
+            var statusChangedEvent = (AbTestStatusChangedEvent)domainEvent;
+            Assert.Equal(abTest.Id, statusChangedEvent.AbTestId);
+            Assert.Equal(initialStatus, statusChangedEvent.OldStatus);
+            Assert.Equal(newStatus, statusChangedEvent.NewStatus);
+            Assert.Equal(newStatus, abTest.Status);
         }
     }
 }

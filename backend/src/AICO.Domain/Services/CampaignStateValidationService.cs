@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using AICO.Domain.Entities;
 using AICO.Domain.Interfaces.Services;
 
@@ -45,8 +42,8 @@ namespace AICO.Domain.Services
         /// </summary>
         public IEnumerable<CampaignStatus> GetValidTransitions(CampaignStatus from)
         {
-            return ValidTransitions.ContainsKey(from) 
-                ? ValidTransitions[from].AsEnumerable() 
+            return ValidTransitions.ContainsKey(from)
+                ? ValidTransitions[from].AsEnumerable()
                 : Enumerable.Empty<CampaignStatus>();
         }
     }

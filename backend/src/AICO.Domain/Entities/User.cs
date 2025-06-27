@@ -1,3 +1,4 @@
+using AICO.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -7,7 +8,7 @@ namespace AICO.Domain.Entities
     /// <summary>
     /// Represents a user in the system
     /// </summary>
-    public class User : BaseEntity
+    public class User : BaseEntity, IAuditableEntity
     {
         /// <summary>
         /// User's email address (unique)
@@ -49,6 +50,16 @@ namespace AICO.Domain.Entities
         public string PasswordSalt { get; private set; }
 
         /// <summary>
+        /// Foreign key for the Website this user is primarily associated with (optional)
+        /// </summary>
+        public Guid? WebsiteId { get; private set; }
+
+        /// <summary>
+        /// Navigation property for the Website
+        /// </summary>
+        public Website? Website { get; private set; }
+
+        /// <summary>
         /// User's role (e.g., Admin, User)
         /// </summary>
         [Required]
@@ -70,6 +81,11 @@ namespace AICO.Domain.Entities
         /// </summary>
         public virtual ICollection<Website> Websites { get; private set; }
 
+        /// <summary>
+        /// Token for email verification (optional, can be null)
+        /// </summary>
+        public string? VerificationToken { get; internal set; }
+
         // Private constructor for EF Core
         private User()
         {
@@ -88,13 +104,13 @@ namespace AICO.Domain.Entities
         {
             if (string.IsNullOrWhiteSpace(email))
                 throw new ArgumentException("Email is required", nameof(email));
-            
+
             if (string.IsNullOrWhiteSpace(username))
                 throw new ArgumentException("Username is required", nameof(username));
-            
+
             if (string.IsNullOrWhiteSpace(passwordHash))
                 throw new ArgumentException("Password hash is required", nameof(passwordHash));
-            
+
             if (string.IsNullOrWhiteSpace(passwordSalt))
                 throw new ArgumentException("Password salt is required", nameof(passwordSalt));
 
@@ -112,7 +128,7 @@ namespace AICO.Domain.Entities
         }
 
         // Method for updating user profile information
-        internal void UpdateProfile(string firstName, string lastName, string username)
+        public void UpdateProfile(string firstName, string lastName, string username)
         {
             if (string.IsNullOrWhiteSpace(username))
                 throw new ArgumentException("Username is required", nameof(username));
@@ -120,40 +136,45 @@ namespace AICO.Domain.Entities
             Username = username.Trim();
             FirstName = firstName?.Trim();
             LastName = lastName?.Trim();
+            MarkAsUpdated();
         }
 
         // Method for updating user's password
-        internal void UpdatePassword(string passwordHash, string passwordSalt)
+        public void UpdatePassword(string passwordHash, string passwordSalt)
         {
             if (string.IsNullOrWhiteSpace(passwordHash))
                 throw new ArgumentException("Password hash is required", nameof(passwordHash));
-            
+
             if (string.IsNullOrWhiteSpace(passwordSalt))
                 throw new ArgumentException("Password salt is required", nameof(passwordSalt));
 
             PasswordHash = passwordHash;
             PasswordSalt = passwordSalt;
+            MarkAsUpdated();
         }
 
         // Method for marking email as verified
-        internal void VerifyEmail()
+        public void VerifyEmail()
         {
             IsEmailVerified = true;
+            MarkAsUpdated();
         }
 
         // Method for updating the last login date
-        internal void UpdateLastLoginDate()
+        public void UpdateLastLoginDate()
         {
             LastLoginDate = DateTime.UtcNow;
+            MarkAsUpdated();
         }
 
         // Method for updating user's role (admin only operation)
-        internal void UpdateRole(string role)
+        public void UpdateRole(string role)
         {
             if (string.IsNullOrWhiteSpace(role))
                 throw new ArgumentException("Role is required", nameof(role));
 
             Role = role;
+            MarkAsUpdated();
         }
     }
-} 
+}
