@@ -80,7 +80,16 @@ This section outlines the current development setup progress and status for each
 
 ### Backend API Service (.NET)
 
-- Setup and testing are pending.
+- **Database:** Configured to use PostgreSQL for development and production
+- **Local Development:** The backend can be run locally or via Docker
+  - Ensure PostgreSQL is running (via Docker or local installation)
+  - Navigate to the `backend/src/AICO.API` directory
+  - Run `dotnet restore` to restore dependencies
+  - Run `dotnet ef database update` to apply migrations
+  - Run `dotnet run` to start the API server (typically on `http://localhost:5000`)
+- **Docker Development:** Use the provided scripts for easy setup
+  - Run `scripts/docker-dev-setup.bat` to start the full stack with PostgreSQL
+  - Run `scripts/setup-database.bat` to create and apply database migrations
 
 ### AI Analysis Service (Python + FastAPI)
 
@@ -173,6 +182,7 @@ Each component has its own detailed README with specific information about its s
 - .NET 8 SDK
 - Node.js 18+ and npm/bun
 - Python 3.11+
+- PostgreSQL 15+ (if running locally without Docker)
 
 ### Development Setup
 
@@ -196,14 +206,18 @@ For detailed frontend documentation, see the [Frontend README](./frontend/README
 #### Backend Development
 
 ```bash
-# Build and run the backend service
-cd backend
+# Option 1: Local development with PostgreSQL
+cd backend/src/AICO.API
 dotnet restore
-dotnet build
-dotnet run --project src/AICO.API
+dotnet ef database update
+dotnet run
 
-# Or using Docker
-docker-compose -f environments/dev/docker-compose.dev.yml up backend
+# Option 2: Full Docker stack (recommended)
+./scripts/docker-dev-setup.bat  # Windows
+./scripts/docker-dev-setup.sh   # Linux/macOS
+
+# Option 3: Individual service via Docker
+docker-compose -f environments/dev/docker-compose.dev.yml up --build
 ```
 
 For detailed backend documentation, see the [Backend README](./backend/README.md).

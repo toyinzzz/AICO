@@ -1,14 +1,20 @@
-using AICO.Infrastructure.Data;
 using AICO.Infrastructure.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.InMemory; // For UseInMemoryDatabase
+using Npgsql.EntityFrameworkCore.PostgreSQL; // Add this line for UseNpgsql
+using AICO.Infrastructure.Data;
 using AICO.Application.Interfaces.Services;
 using AICO.Application.Commands;
 using AICO.Application.Interfaces.Commands;
 using AICO.Application.Interfaces.Queries;
 using AICO.Application.Queries;
+using AICO.Infrastructure.DependencyInjection;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure logging
+builder.Logging.AddConsole();
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -32,7 +38,7 @@ builder.Services.AddDbContext<AicoDbContext>(options =>
     }
     else
     {
-        options.UseSqlServer(connectionString);
+        options.UseNpgsql(connectionString);
     }
 });
 
@@ -43,20 +49,9 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Progr
 builder.Services.AddDomainServices();
 builder.Services.AddRepositories();
 builder.Services.AddApplicationServices();
-
-// Register Command Handlers
-builder.Services.AddScoped<IAbTestCommandHandler, AbTestCommandHandler>();
-builder.Services.AddScoped<ICampaignCommandHandler, CampaignCommandHandler>();
-builder.Services.AddScoped<IVariantCommandHandler, VariantCommandHandler>();
-builder.Services.AddScoped<IConversionEventCommandHandler, ConversionEventCommandHandler>();
-
-// Register Query Handlers
-builder.Services.AddScoped<IAbTestQueryHandler, AbTestQueryHandler>();
-builder.Services.AddScoped<ICampaignQueryHandler, CampaignQueryHandler>();
-builder.Services.AddScoped<IVariantQueryHandler, VariantQueryHandler>();
-builder.Services.AddScoped<IConversionEventQueryHandler, ConversionEventQueryHandler>();
-
 builder.Services.AddExternalServices();
+
+// Command and Query handlers are registered in AddApplicationServices()
 
 
 // Add HTTP Client for external services

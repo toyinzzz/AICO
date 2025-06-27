@@ -6,10 +6,10 @@ namespace AICO.Application.Commands
 {
     public class GenerateVariantCommand : ICommand<List<Variant>>
     {
-        public string OriginalPageUrl { get; set; }
-        public string OptimizationGoal { get; set; } // e.g., 'Increase-CTR', 'Improve-Conversion'
-        public string TargetAudience { get; set; } // e.g., 'New-Visitors', 'Returning-Customers'
-        public string ContentType { get; set; } // e.g., 'Headline', 'CTA-Button'
-        public string[] Keywords { get; set; } // e.g., ['AI', 'Optimization']
+        public required string OriginalPageUrl { get; set; }
+        public required string OptimizationGoal { get; set; } // e.g., 'Increase-CTR', 'Improve-Conversion'
+        public required string TargetAudience { get; set; } // e.g., 'New-Visitors', 'Returning-Customers'
+        public required string ContentType { get; set; } // e.g., 'Headline', 'CTA-Button'
+        public required string[] Keywords { get; set; } // e.g., ['AI', 'Optimization']
     }
 }

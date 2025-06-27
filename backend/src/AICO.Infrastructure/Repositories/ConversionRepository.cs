@@ -69,11 +69,8 @@ public class ConversionRepository : BaseRepository<Conversion>, IConversionRepos
 
         // Group by day or week
         var groupedQuery = timeframe.ToLower() == "week"
-            ? query.GroupBy(c => EF.Functions.DateFromParts(
-                c.CreatedAt.Year,
-                c.CreatedAt.Month,
-                c.CreatedAt.Day - ((int)c.CreatedAt.DayOfWeek)))
-            : query.GroupBy(c => EF.Functions.DateFromParts(c.CreatedAt.Year, c.CreatedAt.Month, c.CreatedAt.Day));
+            ? query.GroupBy(c => c.CreatedAt.Date.AddDays(-((int)c.CreatedAt.DayOfWeek)))
+            : query.GroupBy(c => c.CreatedAt.Date);
 
         // Aggregate the data
         var trends = await groupedQuery
