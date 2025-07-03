@@ -29,12 +29,12 @@ namespace AICO.Domain.Tests.Entities
             var name = "Test A/B Test";
             var description = "Test Description";
             var testType = TestType.Create("Button Color");
-            var successMetric = "conversion_rate";
+            var primaryMetric = "conversion_rate";
             var targetSelector = ".cta-button";
             var originalContent = "Buy Now";
 
             // Act
-            var abTest = AbTest.Create(name, description, campaignId, testType, targetSelector, originalContent, successMetric);
+            var abTest = AbTest.Create(name, description, campaignId, testType, targetSelector, originalContent, primaryMetric);
 
             // Assert
             Assert.NotNull(abTest);
@@ -42,7 +42,7 @@ namespace AICO.Domain.Tests.Entities
             Assert.Equal(name, abTest.Name);
             Assert.Equal(description, abTest.Description);
             Assert.Equal(testType, abTest.TestType);
-            Assert.Equal(successMetric, abTest.PrimaryMetric);
+            Assert.Equal(primaryMetric, abTest.PrimaryMetric);
             Assert.Equal(AbTestStatus.Draft, abTest.Status);
             Assert.Empty(abTest.Variants);
             Assert.Empty(abTest.Conversions);

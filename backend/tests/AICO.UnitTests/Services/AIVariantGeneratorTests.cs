@@ -1,5 +1,5 @@
 using AICO.Domain.Services;
-using DomainIAIService = AICO.Domain.Interfaces.ExternalServices.IAIService;
+using IAIService = AICO.Domain.Interfaces.ExternalServices.IAIService;
 using Moq;
 using Xunit;
 
@@ -7,12 +7,12 @@ namespace AICO.UnitTests.Services
 {
     public class AIVariantGeneratorTests
     {
-        private readonly Mock<DomainIAIService> _mockAIService;
+        private readonly Mock<IAIService> _mockAIService;
         private readonly AIVariantGenerator _variantGenerator;
 
         public AIVariantGeneratorTests()
         {
-            _mockAIService = new Mock<DomainIAIService>();
+            _mockAIService = new Mock<IAIService>();
             _variantGenerator = new AIVariantGenerator(_mockAIService.Object);
         }
 
@@ -42,9 +42,6 @@ namespace AICO.UnitTests.Services
             Assert.Equal(2, result.Count);
             Assert.All(result, v => Assert.False(string.IsNullOrEmpty(v.Content)));
         }
-
-
-
         [Fact]
         public async Task OptimizeContent_WithTargetAudience_ShouldReturnOptimizedContent()
         {

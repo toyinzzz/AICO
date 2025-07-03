@@ -1,42 +1,41 @@
-using AICO.Application.Interfaces.Commands;
+using Xunit;
+using Moq;
+using AICO.Application.Commands;
 using AICO.Domain.Entities;
 using AICO.Domain.Interfaces.Repositories;
-using AICO.Domain.Interfaces.Services;
+using AICO.Application.Interfaces.Commands;
 using AICO.Domain.ValueObjects;
-using Moq;
-using Xunit;
 
 namespace AICO.UnitTests.Application.Commands
 {
     public class AbTestCommandHandlerTests
     {
         private readonly Mock<IAbTestRepository> _mockAbTestRepository;
-        private readonly Mock<IAbTestStateValidationService> _mockValidationService;
-        private readonly Mock<IAbTestCommandHandler> _mockCommandHandler;
+        private readonly AbTestCommandHandler _handler;
 
         public AbTestCommandHandlerTests()
         {
             _mockAbTestRepository = new Mock<IAbTestRepository>();
-            _mockValidationService = new Mock<IAbTestStateValidationService>();
-            _mockCommandHandler = new Mock<IAbTestCommandHandler>();
+            _handler = new AbTestCommandHandler(_mockAbTestRepository.Object);
         }
 
         [Fact]
         public async Task CreateAbTestAsync_WithValidCommand_ShouldReturnAbTest()
         {
             // Arrange
+            var campaignId = Guid.NewGuid();
             var command = new CreateAbTestCommand(
-                Guid.NewGuid(),
-                "Test A/B Test",
-                "Test Description",
-                "Button Color",
-                50,
-                "#cta-button",
-                "Buy Now",
-                "conversion_rate",
-                50,
-                DateTime.UtcNow.AddDays(1),
-                DateTime.UtcNow.AddDays(30)
+                campaignId,           // CampaignId (Guid)
+                "Test A/B Test",      // Name (string)
+                "Test Description",   // Description (string)
+                "Button Color",       // TestType (string)
+                1,                     // V (int)
+                "#cta-button",        // TargetSelector (string)
+                "Buy Now",            // OriginalContent (string)
+                "conversion_rate",    // PrimaryMetric (string)
+                50,                    // TrafficSplit (int)
+                DateTime.UtcNow.AddDays(1),   // StartDate (DateTime)
+                DateTime.UtcNow.AddDays(30)   // EndDate (DateTime?)
             );
 
             var expectedAbTest = AbTest.Create(
@@ -52,11 +51,8 @@ namespace AICO.UnitTests.Application.Commands
             _mockAbTestRepository.Setup(r => r.AddAsync(It.IsAny<AbTest>()))
                 .ReturnsAsync(expectedAbTest);
 
-            _mockCommandHandler.Setup(h => h.CreateAbTestAsync(command))
-                .ReturnsAsync(expectedAbTest);
-
             // Act
-            var result = await _mockCommandHandler.Object.CreateAbTestAsync(command);
+            var result = await _handler.CreateAbTestAsync(command);
 
             // Assert
             Assert.NotNull(result);
@@ -83,18 +79,45 @@ namespace AICO.UnitTests.Application.Commands
 
             _mockAbTestRepository.Setup(r => r.GetByIdAsync(abTestId))
                 .ReturnsAsync(abTest);
-
-            _mockValidationService.Setup(v => v.CanTransitionTo(AbTestStatus.Draft, AbTestStatus.Running))
-                .Returns(true);
-
-            _mockCommandHandler.Setup(h => h.StartAbTestAsync(abTestId))
-                .Returns(Task.CompletedTask);
+            _mockAbTestRepository.Setup(r => r.UpdateAsync(It.IsAny<AbTest>()))
+                .ReturnsAsync(abTest);
 
             // Act
-            await _mockCommandHandler.Object.StartAbTestAsync(abTestId);
+            var result = await _handler.StartAbTestAsync(abTestId);
 
             // Assert
-            _mockCommandHandler.Verify(h => h.StartAbTestAsync(abTestId), Times.Once);
+            Assert.NotNull(result);
+            _mockAbTestRepository.Verify(r => r.UpdateAsync(It.IsAny<AbTest>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task StopAbTestAsync_WithValidId_ShouldUpdateStatus()
+        {
+            // Arrange
+            var abTestId = Guid.NewGuid();
+            var campaignId = Guid.NewGuid();
+            var testType = TestType.Create("Button Color");
+            var abTest = AbTest.Create(
+                "Test",
+                "Description",
+                campaignId,
+                testType,
+                "#cta-button",
+                "Buy Now",
+                "conversion_rate"
+            );
+
+            _mockAbTestRepository.Setup(r => r.GetByIdAsync(abTestId))
+                .ReturnsAsync(abTest);
+            _mockAbTestRepository.Setup(r => r.UpdateAsync(It.IsAny<AbTest>()))
+                .ReturnsAsync(abTest);
+
+            // Act
+            var result = await _handler.StopAbTestAsync(abTestId);
+
+            // Assert
+            Assert.NotNull(result);
+            _mockAbTestRepository.Verify(r => r.UpdateAsync(It.IsAny<AbTest>()), Times.Once);
         }
     }
 }

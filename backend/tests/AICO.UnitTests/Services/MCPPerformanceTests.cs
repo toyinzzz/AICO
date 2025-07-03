@@ -1,11 +1,13 @@
-using System.Diagnostics;
 using System;
 using System.Collections.Generic;
+using Moq;
+using Microsoft.Extensions.Logging;
+using AICO.Domain.Interfaces.Repositories;
+using Microsoft.AspNetCore.Http;
+using AICO.Application.Interfaces.Services;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using AICO.Application.Interfaces.Services;
 using AICO.Application.Services;
-using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using AICO.Domain.Interfaces.Repositories;

@@ -130,4 +130,19 @@ public class ConversionRepository : BaseRepository<Conversion>, IConversionRepos
     {
         throw new NotImplementedException();
     }
+
+    public async Task<IEnumerable<Conversion>> GetByAbTestIdAndDateRangeAsync(Guid abTestId, DateTime startDate, DateTime endDate)
+    {
+        // Get all variant IDs for this AB test
+        var variantIds = await _context.Variants
+            .Where(v => v.AbTestId == abTestId)
+            .Select(v => v.Id)
+            .ToListAsync();
+
+        return await _context.Conversions
+            .Where(c => c.VariantId.HasValue && variantIds.Contains(c.VariantId.Value) && 
+                       c.CreatedAt >= startDate && c.CreatedAt <= endDate)
+            .OrderByDescending(c => c.CreatedAt)
+            .ToListAsync();
+    }
 }

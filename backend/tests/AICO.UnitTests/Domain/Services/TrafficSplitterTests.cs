@@ -30,6 +30,7 @@ namespace AICO.UnitTests.Domain.Services
             {
                 var userId = $"user_{i}";
                 var assignedVariant = _trafficSplitter.AssignVariant(variants, userId);
+                Assert.NotNull(assignedVariant);
 
                 if (!assignments.ContainsKey(assignedVariant.Id))
                     assignments[assignedVariant.Id] = 0;
@@ -58,8 +59,12 @@ namespace AICO.UnitTests.Domain.Services
 
             // Act - Assign same user multiple times
             var firstAssignment = _trafficSplitter.AssignVariant(variants, userId);
-                var secondAssignment = _trafficSplitter.AssignVariant(variants, userId);
-                var thirdAssignment = _trafficSplitter.AssignVariant(variants, userId);
+            var secondAssignment = _trafficSplitter.AssignVariant(variants, userId);
+            var thirdAssignment = _trafficSplitter.AssignVariant(variants, userId);
+            
+            Assert.NotNull(firstAssignment);
+            Assert.NotNull(secondAssignment);
+            Assert.NotNull(thirdAssignment);
 
             // Assert - Should always get the same variant
             Assert.Equal(firstAssignment.Id, secondAssignment.Id);
@@ -86,6 +91,7 @@ namespace AICO.UnitTests.Domain.Services
             {
                 var userId = $"user_{i}";
                 var assignedVariant = _trafficSplitter.AssignVariant(variants, userId);
+                Assert.NotNull(assignedVariant);
 
                 if (!assignments.ContainsKey(assignedVariant.Id))
                     assignments[assignedVariant.Id] = 0;
@@ -120,6 +126,7 @@ namespace AICO.UnitTests.Domain.Services
             {
                 var userId = $"user_{i}";
                 var assignedVariant = _trafficSplitter.AssignVariant(variants, userId);
+                Assert.NotNull(assignedVariant);
 
                 if (!assignments.ContainsKey(assignedVariant.Id))
                     assignments[assignedVariant.Id] = 0;

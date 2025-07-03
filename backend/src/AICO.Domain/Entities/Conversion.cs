@@ -19,6 +19,11 @@ namespace AICO.Domain.Entities
         public Guid? SessionId { get; private set; }
 
         /// <summary>
+        /// The ID of the A/B test variant associated with this conversion
+        /// </summary>
+        public Guid? VariantId { get; private set; }
+
+        /// <summary>
         /// The type of conversion
         /// </summary>
         public ConversionType ConversionType { get; private set; }
@@ -75,7 +80,8 @@ namespace AICO.Domain.Entities
             decimal? value = null,
             string? currency = null,
             string? conversionData = null,
-            Guid? sessionId = null)
+            Guid? sessionId = null,
+            Guid? variantId = null)
         {
             if (conversionType == null)
                 throw new ArgumentNullException(nameof(conversionType));
@@ -93,6 +99,7 @@ namespace AICO.Domain.Entities
             {
                 WebsiteId = websiteId,
                 SessionId = sessionId,
+                VariantId = variantId,
                 ConversionType = conversionType,
                 GoalName = goalName,
                 Value = value,
@@ -122,7 +129,8 @@ namespace AICO.Domain.Entities
             decimal? value = null,
             string? currency = null,
             string? conversionData = null,
-            Guid? sessionId = null)
+            Guid? sessionId = null,
+            Guid? variantId = null)
         {
             if (string.IsNullOrWhiteSpace(conversionType))
                 throw new ArgumentException("Conversion type cannot be null or empty", nameof(conversionType));
@@ -134,7 +142,8 @@ namespace AICO.Domain.Entities
                 value,
                 currency,
                 conversionData,
-                sessionId);
+                sessionId,
+                variantId);
         }
     }
 }

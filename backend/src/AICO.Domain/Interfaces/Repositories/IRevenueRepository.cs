@@ -11,5 +11,6 @@ namespace AICO.Domain.Interfaces.Repositories
         Task<decimal> GetTotalRevenueAsync(Guid campaignId);
         Task<decimal> GetTotalRevenueByVariantAsync(Guid variantId);
         Task<IEnumerable<Revenue>> GetByWebsiteIdAsync(Guid websiteId);
+        Task<IEnumerable<Revenue>> GetByAbTestIdAndDateRangeAsync(Guid abTestId, DateTime startDate, DateTime endDate);
     }
 }

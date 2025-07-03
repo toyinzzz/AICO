@@ -180,6 +180,64 @@ Phase 2 Complete When:
 - Real recommendations replace mock data
 - Performance metrics are calculated accurately
 ## Development Guidelines
+
+### Async/Await Best Practices
+
+#### Context-Dependent Approach
+When deciding between synchronous and asynchronous methods, consider these factors rather than applying absolute rules:
+
+**Use Async When:**
+- Performing I/O operations (database, file system, network calls)
+- Maintaining architectural consistency across the call chain
+- Working with external APIs or services
+- Long-running operations that could benefit from non-blocking execution
+
+**Consider Sync When:**
+- Pure CPU-bound operations with no I/O
+- Simple validation logic or calculations
+- Performance is critical and async overhead isn't justified
+- The operation completes quickly (< 50ms typically)
+
+**Architectural Consistency Considerations:**
+- If your service layer is predominantly async, maintain consistency
+- Consider the entire call chain - mixing sync/async can create complexity
+- Team conventions and existing patterns should influence decisions
+- Document deviations from established patterns with clear reasoning
+
+**Performance Trade-offs:**
+- Async has overhead - measure actual performance impact
+- Consider thread pool implications and scalability requirements
+- Evaluate memory usage patterns for high-throughput scenarios
+- Profile real-world usage rather than making assumptions
+
+**Example Decision Framework:**
+```csharp
+// Good: Async for I/O operations
+public async Task<ValidationResult> ValidateWithDatabaseAsync(string input)
+{
+    var exists = await _repository.ExistsAsync(input);
+    return new ValidationResult { IsValid = exists };
+}
+
+// Good: Sync for pure computation
+public ValidationResult ValidateFormat(string input)
+{
+    return new ValidationResult 
+    { 
+        IsValid = !string.IsNullOrEmpty(input) && input.Length > 3 
+    };
+}
+
+// Consider context: If part of async call chain, prefer async for consistency
+public async Task<ValidationResult> ValidateComprehensiveAsync(string input)
+{
+    var formatResult = ValidateFormat(input); // Sync is fine here
+    var dbResult = await ValidateWithDatabaseAsync(input); // Async required
+    
+    return CombineResults(formatResult, dbResult);
+}
+```
+
 ### Code Review Checklist:
 - SOLID principles followed
 - Proper dependency injection used
@@ -187,12 +245,16 @@ Phase 2 Complete When:
 - Comprehensive error handling
 - Unit tests written
 - Documentation updated
+- Async/await usage follows context-dependent guidelines
+- Performance implications of sync/async choices considered
+
 ### Architecture Validation:
 - Clean separation of concerns
 - Proper abstraction layers
 - IoC container properly configured
 - Database queries optimized
 - API responses properly structured
+- Consistent async patterns across service layers
 ## Resources & References
 - Clean Architecture : Robert C. Martin
 - SOLID Principles : Uncle Bob's principles

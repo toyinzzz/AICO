@@ -59,6 +59,21 @@ public class RevenueRepository : BaseRepository<Revenue>, IRevenueRepository
         throw new NotImplementedException();
     }
 
+    public async Task<IEnumerable<Revenue>> GetByAbTestIdAndDateRangeAsync(Guid abTestId, DateTime startDate, DateTime endDate)
+    {
+        // Get all variant IDs for this AB test
+        var variantIds = await _context.Variants
+            .Where(v => v.AbTestId == abTestId)
+            .Select(v => v.Id)
+            .ToListAsync();
+
+        return await _context.Revenues
+            .Where(r => r.VariantId.HasValue && variantIds.Contains(r.VariantId.Value) && 
+                       r.CreatedAt >= startDate && r.CreatedAt <= endDate)
+            .OrderByDescending(r => r.CreatedAt)
+            .ToListAsync();
+    }
+
     Task IRepository<Revenue>.UpdateAsync(Revenue entity)
     {
         throw new NotImplementedException();

@@ -57,5 +57,10 @@ namespace AICO.Domain.Interfaces.Repositories
         /// Bulk inserts multiple conversions
         /// </summary>
         Task BulkInsertAsync(IEnumerable<Conversion> conversions);
+
+        /// <summary>
+        /// Gets conversions for an AB test within a date range
+        /// </summary>
+        Task<IEnumerable<Conversion>> GetByAbTestIdAndDateRangeAsync(Guid abTestId, DateTime startDate, DateTime endDate);
     }
 }

@@ -15,22 +15,7 @@ namespace AICO.Application.Interfaces.Commands
         int TrafficSplit,
         DateTime StartDate,
         DateTime? EndDate
-    ) : ICommand<AbTest>
-    {
-        private Guid id;
-        private string v1;
-        private string v2;
-        private string v3;
-        private int v4;
-        private string v5;
-        private string v6;
-        private string v7;
-        private string v8;
-        private string v9;
-        private string v10;
-
-        
-    }
+    ) : ICommand<AbTest>;
 
     public record UpdateAbTestCommand(
         Guid Id,

@@ -62,7 +62,7 @@ namespace AICO.UnitTests.Application.Mappers
                 CampaignId = Guid.NewGuid(),
                 StartDate = DateTime.UtcNow.AddDays(-7),
                 EndDate = DateTime.UtcNow,
-                Metrics = null,
+                Metrics = null!,
                 OverallMcp = 0.5m,
                 WinningVariant = Guid.NewGuid().ToString()
             };
@@ -84,7 +84,7 @@ namespace AICO.UnitTests.Application.Mappers
         public void MapWithNullSource_ShouldReturnNull()
         {
             // Arrange, Act
-            var result = _mapper.Map((RevenueReportSource)null);
+            var result = _mapper.Map((RevenueReportSource)null!);
 
             // Assert
             Assert.Null(result);

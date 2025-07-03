@@ -89,6 +89,12 @@ public static class ServiceCollectionExtensions
         // Application Services
         services.AddScoped<IProfitTrackingService, ProfitTrackingService>();
         services.AddScoped<IJwtService, JwtService>();
+        
+        // MCP Services
+        services.AddScoped<IMCPAnalyticsService, MCPAnalyticsService>();
+        services.AddScoped<IMCPValidationService, MCPValidationService>();
+        services.AddScoped<IMCPReportingService, MCPReportingService>();
+        services.AddScoped<ICurrencyConversionService, CurrencyConversionService>();
 
         // Register Mappers
         services.AddScoped<IMapper<Variant, VariantDto>, VariantMapper>();

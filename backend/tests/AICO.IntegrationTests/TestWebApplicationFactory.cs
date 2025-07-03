@@ -105,25 +105,25 @@ namespace AICO.IntegrationTests
             context.AbTests.Add(abTest);
 
             // Create Variants
-            var controlVariant = new Variant(
-                "Control",
+            var controlVariant = new AbTestVariant(
                 abTest.Id,
+                "Control",
                 "<button class='cta-button'>Click Me</button>",
                 50.0m,
-                true
+                isControl: true
             );
-            controlVariant.Id = Guid.Parse("66666666-6666-6666-6666-666666666666");
+            controlVariant.Id = Guid.Parse("66666666-6666-6666-6666-111111111111");
 
-            var testVariant = new Variant(
-                "Test Variant",
+            var testVariant = new AbTestVariant(
                 abTest.Id,
+                "Test Variant",
                 "<button class='cta-button red'>Click Me</button>",
                 50.0m,
-                false
+                isControl: false
             );
-            testVariant.Id = Guid.Parse("77777777-7777-7777-7777-777777777777");
+            testVariant.Id = Guid.Parse("77777777-7777-7777-7777-222222222222");
 
-            context.Variants.AddRange(controlVariant, testVariant);
+            context.AbTestVariants.AddRange(controlVariant, testVariant);
 
             // Save all changes
             context.SaveChanges();

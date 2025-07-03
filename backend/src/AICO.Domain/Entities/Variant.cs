@@ -61,6 +61,16 @@ namespace AICO.Domain.Entities
         public int Conversions { get; private set; }
 
         /// <summary>
+        /// Number of visitors for this variant
+        /// </summary>
+        public int Visitors { get; private set; }
+
+        /// <summary>
+        /// Cost associated with this variant
+        /// </summary>
+        public decimal Cost { get; private set; }
+
+        /// <summary>
         /// Private constructor for EF Core
         /// </summary>
         private Variant() 
