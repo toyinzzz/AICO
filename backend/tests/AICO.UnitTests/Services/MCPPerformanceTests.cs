@@ -1,18 +1,15 @@
 using System;
 using System.Collections.Generic;
-using Moq;
-using Microsoft.Extensions.Logging;
-using AICO.Domain.Interfaces.Repositories;
-using Microsoft.AspNetCore.Http;
-using AICO.Application.Interfaces.Services;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using AICO.Application.Interfaces.Services;
 using AICO.Application.Services;
-using Moq;
-using Xunit;
 using AICO.Domain.Interfaces.Repositories;
 using AICO.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+using Moq;
+using Xunit;
 
 namespace AICO.UnitTests.Services
 {

@@ -28,7 +28,7 @@ public class MCPExecutiveSummary
     public MCPOverallMetrics OverallMetrics { get; set; } = new();
     public List<MCPVariantPerformance> VariantPerformance { get; set; } = new();
     public MCPStatisticalAnalysis StatisticalAnalysis { get; set; } = new();
-    public MCPRevenueBreakdown RevenueBreakdown { get; set; } = new(0m, 0m, 0m, 0m, new Dictionary<string, decimal>(), new Dictionary<string, decimal>());
+    public MCPRevenueBreakdown RevenueBreakdown { get; set; } = MCPRevenueBreakdown.CreateDefault();
     public List<MCPPerformanceInsight> PerformanceInsights { get; set; } = new();
 }
 

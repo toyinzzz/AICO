@@ -10,7 +10,18 @@ public record MCPConversionFunnel(
     decimal OverallConversionRate,
     List<MCPDropOffPoint> DropOffPoints,
     Dictionary<string, decimal> ConversionRatesByStep
-);
+)
+{
+    /// <summary>
+    /// Creates a default conversion funnel instance with safe default values
+    /// </summary>
+    public static MCPConversionFunnel CreateDefault() => new(
+        Steps: new List<MCPFunnelStep>(),
+        OverallConversionRate: 0.0m,
+        DropOffPoints: new List<MCPDropOffPoint>(),
+        ConversionRatesByStep: new Dictionary<string, decimal>()
+    );
+}
 
 /// <summary>
 /// Individual step in the conversion funnel

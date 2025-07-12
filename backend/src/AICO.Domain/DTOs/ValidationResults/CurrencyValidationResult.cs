@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace AICO.Domain.DTOs.ValidationResults;
 
 /// <summary>
@@ -18,4 +20,9 @@ public class CurrencyValidationResult
     public string NormalizedCurrency { get; set; } = string.Empty;
     public decimal NormalizedAmount { get; set; }
     public decimal ConversionRate { get; set; }
+    
+    // Properties for multi-currency validation
+    public string TargetCurrency { get; set; } = string.Empty;
+    public Dictionary<string, decimal> ConversionRates { get; set; } = new();
+    public List<(decimal Amount, string Currency)> NormalizedAmounts { get; set; } = new();
 }

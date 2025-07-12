@@ -23,7 +23,19 @@ public record MCPStatisticalComparison(
     bool IsSignificant,
     string TestType,
     int SampleSize
-);
+)
+{
+    /// <summary>
+    /// Creates a default statistical comparison instance with safe default values
+    /// </summary>
+    public static MCPStatisticalComparison CreateDefault() => new(
+        PValue: 0.0m,
+        ConfidenceInterval: 0.0m,
+        IsSignificant: false,
+        TestType: string.Empty,
+        SampleSize: 0
+    );
+}
 
 /// <summary>
 /// Performance gaps identified between variants
@@ -32,7 +44,17 @@ public record MCPPerformanceGaps(
     List<string> IdentifiedGaps,
     Dictionary<string, decimal> GapSizes,
     List<string> ImprovementOpportunities
-);
+)
+{
+    /// <summary>
+    /// Creates a default performance gaps instance with safe default values
+    /// </summary>
+    public static MCPPerformanceGaps CreateDefault() => new(
+        IdentifiedGaps: new List<string>(),
+        GapSizes: new Dictionary<string, decimal>(),
+        ImprovementOpportunities: new List<string>()
+    );
+}
 
 /// <summary>
 /// Comparison of specific metrics between variants
@@ -52,4 +74,15 @@ public record MCPRecommendations(
     List<string> LongTermStrategies,
     List<string> TestingRecommendations,
     string PriorityLevel
-);
+)
+{
+    /// <summary>
+    /// Creates a default recommendations instance with safe default values
+    /// </summary>
+    public static MCPRecommendations CreateDefault() => new(
+        ImmediateActions: new List<string>(),
+        LongTermStrategies: new List<string>(),
+        TestingRecommendations: new List<string>(),
+        PriorityLevel: string.Empty
+    );
+}

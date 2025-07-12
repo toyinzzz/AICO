@@ -1,15 +1,6 @@
 using AICO.Infrastructure.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.InMemory; // For UseInMemoryDatabase
-using Npgsql.EntityFrameworkCore.PostgreSQL; // Add this line for UseNpgsql
 using AICO.Infrastructure.Data;
-using AICO.Application.Interfaces.Services;
-using AICO.Application.Commands;
-using AICO.Application.Interfaces.Commands;
-using AICO.Application.Interfaces.Queries;
-using AICO.Application.Queries;
-using AICO.Infrastructure.DependencyInjection;
-
 
 var builder = WebApplication.CreateBuilder(args);
 

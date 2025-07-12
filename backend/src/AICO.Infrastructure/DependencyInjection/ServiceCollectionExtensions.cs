@@ -95,6 +95,16 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IMCPValidationService, MCPValidationService>();
         services.AddScoped<IMCPReportingService, MCPReportingService>();
         services.AddScoped<ICurrencyConversionService, CurrencyConversionService>();
+        
+        // Specialized Validation Services
+        services.AddScoped<IBasicInputValidationService, BasicInputValidationService>();
+        services.AddScoped<IStatisticalValidationService, StatisticalValidationService>();
+        services.AddScoped<ICurrencyValidationService, CurrencyValidationService>();
+        services.AddScoped<IBusinessRuleValidationService, BusinessRuleValidationService>();
+        
+        // Statistical and Reporting Services
+        services.AddScoped<IMCPStatisticalService, MCPStatisticalService>();
+        services.AddScoped<IMCPReportingAnalysisService, MCPReportingAnalysisService>();
 
         // Register Mappers
         services.AddScoped<IMapper<Variant, VariantDto>, VariantMapper>();

@@ -89,7 +89,7 @@ public class MCPPortfolioMetrics
     public string PerformanceTrend { get; set; } = string.Empty;
     
     // Keep existing properties for backward compatibility
-    public MCPPortfolioPerformance Performance { get; set; } = new(0m, 0m, 0m, 0m, string.Empty, new Dictionary<string, decimal>());
+    public MCPPortfolioPerformance Performance { get; set; } = MCPPortfolioPerformance.CreateDefault();
     public List<MCPTestSummary> TopPerformingTests { get; set; } = new();
     public List<MCPTestSummary> UnderperformingTests { get; set; } = new();
 }
@@ -104,7 +104,20 @@ public record MCPPortfolioPerformance(
     decimal AverageConfidence,
     string PerformanceTrend,
     Dictionary<string, decimal> MetricsByCategory
-);
+)
+{
+    /// <summary>
+    /// Creates a default portfolio performance instance with safe default values
+    /// </summary>
+    public static MCPPortfolioPerformance CreateDefault() => new(
+        OverallROI: 0.0m,
+        TotalLift: 0.0m,
+        WinRate: 0.0m,
+        AverageConfidence: 0.0m,
+        PerformanceTrend: "stable",
+        MetricsByCategory: new Dictionary<string, decimal>()
+    );
+}
 
 /// <summary>
 /// Summary information for individual tests
@@ -417,4 +430,17 @@ public record MCPRevenueBreakdown(
     decimal RevenuePerConversion,
     Dictionary<string, decimal> RevenueBySegment,
     Dictionary<string, decimal> RevenueByTimeframe
-);
+)
+{
+    /// <summary>
+    /// Creates a default revenue breakdown instance with safe default values
+    /// </summary>
+    public static MCPRevenueBreakdown CreateDefault() => new(
+        TotalRevenue: 0.0m,
+        RevenueGrowth: 0.0m,
+        AverageOrderValue: 0.0m,
+        RevenuePerConversion: 0.0m,
+        RevenueBySegment: new Dictionary<string, decimal>(),
+        RevenueByTimeframe: new Dictionary<string, decimal>()
+    );
+}

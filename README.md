@@ -2,10 +2,10 @@
 
 <div align="center">
   <img src="frontend/public/placeholder.svg" alt="AICO Logo" width="200"/>
-  <p><strong>Enterprise-grade platform for optimizing website conversions with AI-powered insights</strong></p>
+  <p><strong>Enterprise-grade platform for Maximum Customer Profit (MCP) optimization through A/B testing and AI-powered statistical analysis</strong></p>
   
   <p>
-    <a href="https://reactjs.org/"><img src="https://img.shields.io/badge/React-18-blue.svg" alt="React 18"></a>
+    <a href="https://vuejs.org/"><img src="https://img.shields.io/badge/Vue.js-3-4FC08D.svg" alt="Vue.js 3"></a>
     <a href="https://dotnet.microsoft.com/"><img src="https://img.shields.io/badge/.NET-8.0-512BD4.svg" alt=".NET 8"></a>
     <a href="https://fastapi.tiangolo.com/"><img src="https://img.shields.io/badge/FastAPI-0.103.1-009688.svg" alt="FastAPI"></a>
     <a href="https://www.postgresql.org/"><img src="https://img.shields.io/badge/PostgreSQL-15-336791.svg" alt="PostgreSQL 15"></a>
@@ -13,23 +13,163 @@
   </p>
 </div>
 
+## 🤖 AI Assistant Quick Start
+
+**For AI Coding Assistants**: This project uses Clean Architecture with .NET 8, Vue.js 3, and follows Domain-Driven Design. The documentation is optimized for AI-powered development.
+
+### 📚 Essential Documentation for AI Assistants
+
+| Document | Purpose | When to Use |
+|----------|---------|-------------|
+| [`.claude.md`](./.claude.md) | Project overview & context | Start here for project understanding |
+| [`docs/AI_ASSISTANT_GUIDE.md`](./docs/AI_ASSISTANT_GUIDE.md) | Development patterns & guidelines | Code generation & architecture decisions |
+| [`docs/CODE_TEMPLATES.md`](./docs/CODE_TEMPLATES.md) | Standardized code patterns | Creating new components, services, APIs |
+| [`docs/API_DOCUMENTATION.md`](./docs/API_DOCUMENTATION.md) | Complete API reference | API development & integration |
+| [`docs/DATABASE_SCHEMA.md`](./docs/DATABASE_SCHEMA.md) | Database design & queries | Data modeling & repository implementation |
+
+### 🎯 Current Development Context
+
+**Status**: MVP Development Phase (65% Production Ready)  
+**Priority**: Authentication system, API controllers, OpenAI integration  
+**Architecture**: Clean Architecture with Repository pattern, CQRS, and comprehensive testing  
+**Build Issues**: Compilation errors in `MCPReportingAnalysisService.cs` (documented for separate branch fix)
+
+### 🚀 Quick Development Commands
+
+```bash
+# Build and run development environment
+make dev-build && make dev-up
+
+# Run tests
+make test
+
+# View logs
+make dev-logs
+
+# Clean environment
+make dev-clean
+```
+
 ## Overview
 
-AICO (AI Conversion Optimizer) is an enterprise-grade platform that leverages artificial intelligence to analyze websites and provide data-driven recommendations for optimizing conversion rates, enhancing user experience, and improving overall performance. 
+AICO (AI Conversion Optimizer) is an enterprise-grade platform focused on **Maximum Customer Profit (MCP)** optimization through sophisticated A/B testing and statistical analysis. The platform leverages artificial intelligence to provide data-driven recommendations for optimizing conversion rates and maximizing customer profitability.
 
-Built with a modern microservices architecture, AICO follows Domain-Driven Design principles and Clean Architecture patterns to ensure scalability, maintainability, and extensibility. The platform integrates advanced analytics with machine learning algorithms to deliver actionable insights that measurably improve website conversion metrics.
+Built with Clean Architecture principles and Domain-Driven Design, AICO ensures scalability, maintainability, and extensibility. The platform integrates advanced statistical analysis with machine learning algorithms to deliver actionable insights for profit optimization.
 
-AICO is designed for marketing teams, e-commerce businesses, and digital agencies seeking to maximize their online conversion rates through AI-powered optimization strategies.
+### Core Business Logic: MCP (Maximum Customer Profit)
+
+```csharp
+// Core MCP Calculation
+public async Task<decimal> CalculateMCPAsync(decimal revenue, decimal cost, int conversions, int visitors)
+{
+    if (visitors == 0) return 0;
+    
+    var conversionRate = (decimal)conversions / visitors;
+    var revenuePerVisitor = revenue / visitors;
+    var costPerVisitor = cost / visitors;
+    
+    return (revenuePerVisitor - costPerVisitor) * conversionRate;
+}
+```
 
 ### Key Features
 
-- **Real-time Analytics**: Track user behavior, sessions, and conversion events
-- **AI-Powered Insights**: Generate intelligent recommendations for conversion optimization
-- **A/B Testing**: Manage and analyze conversion experiments
-- **Competitor Analysis**: Monitor and compare against competitor performance
-- **Multi-channel Integration**: Support for various website platforms and tools
+- **MCP Analytics**: Calculate and optimize Maximum Customer Profit across variants
+- **Statistical Analysis**: Advanced statistical significance testing and power analysis
+- **A/B Testing**: Comprehensive A/B test management with variant comparison
+- **Trend Analysis**: Time-series analysis of MCP performance
+- **Reporting**: Executive, performance, and analytical reporting dashboards
+- **Validation**: Multi-layer validation (input, business rules, statistical)
 
 ## Architecture
+
+AICO follows **Clean Architecture** with Domain-Driven Design principles:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Presentation Layer                       │
+│  ┌─────────────────┐    ┌─────────────────────────────────┐ │
+│  │   Frontend      │    │        Backend API              │ │
+│  │   (Vue.js 3)    │    │       (.NET 8 Web API)         │ │
+│  │   - Pinia Store │    │   - Controllers (MCP, A/B)     │ │
+│  │   - Vue Router  │    │   - Authentication/JWT         │ │
+│  └─────────────────┘    └─────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                   Application Layer                         │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │              Business Logic Services                   │ │
+│  │   - MCPCalculationService                              │ │
+│  │   - StatisticalAnalysisService                         │ │
+│  │   - ABTestService, ReportingService                    │ │
+│  │   - CQRS (MediatR), AutoMapper, FluentValidation      │ │
+│  └─────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                     Domain Layer                            │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │           Core Business Entities & Rules               │ │
+│  │   - ABTest, Variant, Conversion, MCPData              │ │
+│  │   - Domain Events, Value Objects, Aggregates          │ │
+│  └─────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                 Infrastructure Layer                        │
+│  ┌─────────────────┐    ┌─────────────────────────────────┐ │
+│  │   Database      │    │       AI Service                │ │
+│  │  (PostgreSQL)   │    │    (Python FastAPI)            │ │
+│  │  - EF Core      │    │   - Statistical Analysis       │ │
+│  │  - Repositories │    │   - OpenAI Integration         │ │
+│  └─────────────────┘    └─────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 🏗️ Development Patterns for AI Assistants
+
+#### Service Layer Pattern
+```csharp
+// Standard service interface
+public interface IMCPCalculationService
+{
+    Task<MCPResult> CalculateMCPAsync(MCPRequest request);
+    Task<MCPComparison> CompareVariantsAsync(ComparisonRequest request);
+}
+
+// Implementation with dependency injection
+public class MCPCalculationService : IMCPCalculationService
+{
+    private readonly IConversionRepository _conversionRepository;
+    private readonly ILogger<MCPCalculationService> _logger;
+    
+    public MCPCalculationService(
+        IConversionRepository conversionRepository,
+        ILogger<MCPCalculationService> logger)
+    {
+        _conversionRepository = conversionRepository;
+        _logger = logger;
+    }
+}
+```
+
+#### Repository Pattern
+```csharp
+// Generic repository interface
+public interface IRepository<T> where T : class
+{
+    Task<T> GetByIdAsync(int id);
+    Task<IEnumerable<T>> GetAllAsync();
+    Task<T> AddAsync(T entity);
+    Task UpdateAsync(T entity);
+    Task DeleteAsync(int id);
+}
+
+// Specific repository
+public interface IConversionRepository : IRepository<Conversion>
+{
+    Task<IEnumerable<Conversion>> GetByABTestIdAsync(int abTestId);
+    Task<decimal> CalculateTotalRevenueAsync(int variantId, DateTime startDate, DateTime endDate);
+}
+```
 
 AICO is built as a cloud-native microservices application with the following components:
 

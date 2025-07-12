@@ -20,8 +20,8 @@ public class MCPComparisonReport
     public string TestId { get; set; } = string.Empty;
     public DateTime ReportDate { get; set; }
     public List<MCPVariantComparison> VariantComparisons { get; set; } = new();
-    public MCPStatisticalComparison StatisticalComparison { get; set; } = new(0m, 0m, false, string.Empty, 0);
-    public MCPPerformanceGaps PerformanceGaps { get; set; } = new(new List<string>(), new Dictionary<string, decimal>(), new List<string>());
+    public MCPStatisticalComparison StatisticalComparison { get; set; } = MCPStatisticalComparison.CreateDefault();
+    public MCPPerformanceGaps PerformanceGaps { get; set; } = MCPPerformanceGaps.CreateDefault();
     public List<MCPMetricComparison> MetricComparisons { get; set; } = new();
-    public MCPRecommendations Recommendations { get; set; } = new(new List<string>(), new List<string>(), new List<string>(), string.Empty);
+    public MCPRecommendations Recommendations { get; set; } = MCPRecommendations.CreateDefault();
 }

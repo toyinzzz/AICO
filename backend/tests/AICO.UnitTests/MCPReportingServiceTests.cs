@@ -757,15 +757,14 @@ public class MCPReportingServiceTests
             var date = DateTime.UtcNow.AddDays(i + 1);
             var predictedValue = baseValue + i * 0.2m; // Gradual increase
             
-            forecastData.Add(new MCPForecastPoint
-            {
-                Date = date,
-                PredictedMCP = predictedValue,
-                LowerBound = predictedValue * 0.9m,
-                UpperBound = predictedValue * 1.1m,
-                Confidence = 0.85 - (i * 0.01), // Decreasing confidence over time
-                ForecastMethod = "Linear Regression"
-            });
+            forecastData.Add(new MCPForecastPoint(
+                Date: date,
+                ForecastValue: predictedValue,
+                LowerBound: predictedValue * 0.9m,
+                UpperBound: predictedValue * 1.1m,
+                MetricType: "MCP",
+                Confidence: 0.85m - (i * 0.01m) // Decreasing confidence over time
+            ));
         }
 
         return forecastData;

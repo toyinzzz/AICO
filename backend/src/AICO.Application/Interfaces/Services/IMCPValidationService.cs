@@ -59,6 +59,14 @@ public interface IMCPValidationService
     CurrencyValidationResult ValidateCurrency(string currency);
 
     /// <summary>
+    /// Validate currency inputs and normalization requirements asynchronously
+    /// </summary>
+    /// <param name="amounts">List of amounts with currencies to validate</param>
+    /// <param name="targetCurrency">Target currency for normalization</param>
+    /// <returns>Currency validation result</returns>
+    Task<CurrencyValidationResult> ValidateCurrencyAsync(List<(decimal amount, string currency)> amounts, string targetCurrency);
+
+    /// <summary>
     /// Validate multiple variants data structure
     /// </summary>
     /// <param name="variants">List of variant data to validate</param>
@@ -79,6 +87,14 @@ public interface IMCPValidationService
     /// <param name="endDate">Analysis end date</param>
     /// <returns>Date range validation result</returns>
     DateRangeValidationResult ValidateDateRange(DateTime startDate, DateTime endDate);
+
+    /// <summary>
+    /// Validate date range for MCP analysis asynchronously
+    /// </summary>
+    /// <param name="startDate">Analysis start date</param>
+    /// <param name="endDate">Analysis end date</param>
+    /// <returns>Date range validation result</returns>
+    Task<DateRangeValidationResult> ValidateDateRangeAsync(DateTime startDate, DateTime endDate);
 
     /// <summary>
     /// Validate confidence level for statistical calculations
